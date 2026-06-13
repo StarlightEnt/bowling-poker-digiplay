@@ -1,6 +1,5 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import PlayerNameSelect from '../components/PlayerNameSelect.js';
 
 const BG = '#1a1a2e';
 const SURFACE = '#2a2a45';
@@ -8,10 +7,9 @@ const BORDER = '#7777cc';
 const ACCENT = '#e8ff47';
 const ERROR = '#e8192c';
 
-export default function PhonePinEntry() {
+export default function KioskPinEntry({ onSuccess }) {
   const [digits, setDigits] = useState(['', '', '', '']);
-  const [status, setStatus] = useState('idle'); // idle | checking | error | success
-  const [sessionData, setSessionData] = useState(null);
+  const [status, setStatus] = useState('idle');
   const [shake, setShake] = useState(false);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
 
@@ -24,9 +22,7 @@ export default function PhonePinEntry() {
     const newDigits = [...digits];
     newDigits[index] = digit;
     setDigits(newDigits);
-    if (digit && index < 3) {
-      inputRefs[index + 1].current?.focus();
-    }
+    if (digit && index < 3) inputRefs[index + 1].current?.focus();
   }
 
   function handleKeyDown(index, e) {
@@ -57,7 +53,7 @@ export default function PhonePinEntry() {
     const data = await res.json();
     if (data.valid) {
       setStatus('success');
-      setSessionData(data.session);
+      onSuccess(data.session);
     } else {
       setStatus('error');
       setShake(true);
@@ -66,15 +62,9 @@ export default function PhonePinEntry() {
         setStatus('idle');
         setShake(false);
         inputRefs[0].current?.focus();
-      }, 600);
+      }, 700);
     }
   }
-
-  if (status === 'success' && sessionData) {
-    return <PlayerNameSelect session={sessionData} />;
-  }
-
-  const borderColor = status === 'error' ? ERROR : BORDER;
 
   return (
     <div style={{
@@ -85,40 +75,31 @@ export default function PhonePinEntry() {
       alignItems: 'center',
       justifyContent: 'center',
       fontFamily: 'system-ui, sans-serif',
-      padding: '24px',
     }}>
-      {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <div style={{ color: '#8888aa', fontSize: '14px', letterSpacing: '2px',
+      <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+        <div style={{ color: '#8888aa', fontSize: '18px', letterSpacing: '2px',
           textTransform: 'uppercase', marginBottom: '4px' }}>Welcome to</div>
-        <div style={{ color: '#ffffff', fontSize: '32px', fontWeight: 900,
-          letterSpacing: '2px', lineHeight: 1 }}>Bowling Poker</div>
-        <div style={{ color: ACCENT, fontSize: '28px', fontWeight: 900,
-          letterSpacing: '6px' }}>DIGIPLAY</div>
+        <div style={{ color: '#ffffff', fontSize: '52px', fontWeight: 900, letterSpacing: '2px' }}>
+          Bowling Poker
+        </div>
+        <div style={{ color: ACCENT, fontSize: '46px', fontWeight: 900, letterSpacing: '8px' }}>
+          DIGIPLAY
+        </div>
       </div>
 
-      {/* PIN input area with bowling pin behind */}
-      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', marginBottom: '24px' }}>
-        <img
-          src="/bowling-pin.png"
-          alt=""
-          style={{
-            position: 'absolute',
-            width: '80px',
-            opacity: 0.15,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            pointerEvents: 'none',
-            zIndex: 0,
-          }}
-        />
+      <div style={{
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        marginBottom: '32px',
+      }}>
+        <img src="/bowling-pin.png" alt=""
+          style={{ position: 'absolute', width: '100px', opacity: 0.15,
+            top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', zIndex: 0 }} />
         <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-          position: 'relative',
-          zIndex: 1,
+          display: 'flex', flexDirection: 'column', gap: '10px',
+          position: 'relative', zIndex: 1,
           animation: shake ? 'shake 0.5s ease' : 'none',
         }}>
           {digits.map((digit, i) => (
@@ -132,33 +113,29 @@ export default function PhonePinEntry() {
               onChange={e => handleDigit(i, e.target.value)}
               onKeyDown={e => handleKeyDown(i, e)}
               style={{
-                width: '36px',
-                height: '44px',
+                width: '48px',
+                height: '56px',
                 background: SURFACE,
-                border: `2px solid ${digit ? borderColor : BORDER}`,
-                borderRadius: '6px',
+                border: `2px solid ${status === 'error' ? ERROR : BORDER}`,
+                borderRadius: '8px',
                 color: '#ffffff',
-                fontSize: '20px',
+                fontSize: '24px',
                 fontWeight: 700,
                 textAlign: 'center',
                 outline: 'none',
-                transition: 'border-color 0.15s',
               }}
             />
           ))}
         </div>
       </div>
 
-      {/* Instructions */}
-      <p style={{ color: '#8888aa', fontSize: '14px', textAlign: 'center', marginBottom: '8px' }}>
+      <p style={{ color: '#8888aa', fontSize: '16px', marginBottom: '8px' }}>
         Enter the PIN to get started.
       </p>
-      <p style={{ color: '#555577', fontSize: '12px', fontStyle: 'italic',
-        textAlign: 'center', marginBottom: '32px' }}>
+      <p style={{ color: '#555577', fontSize: '13px', fontStyle: 'italic', marginBottom: '40px' }}>
         One PIN only, please. Get it? <span style={{ fontStyle: 'normal' }}>😉</span>
       </p>
 
-      {/* Enter button */}
       <button
         onClick={handleSubmit}
         disabled={!pinComplete || status === 'checking'}
@@ -166,35 +143,29 @@ export default function PhonePinEntry() {
           background: pinComplete ? ACCENT : SURFACE,
           color: pinComplete ? '#1a1a2e' : '#555577',
           border: `2px solid ${pinComplete ? ACCENT : BORDER}`,
-          borderRadius: '8px',
-          padding: '14px 40px',
-          fontSize: '16px',
+          borderRadius: '10px',
+          padding: '18px 56px',
+          fontSize: '20px',
           fontWeight: 700,
           letterSpacing: '1px',
-          transition: 'all 0.15s',
-          marginBottom: '24px',
         }}
       >
         {status === 'checking' ? 'Checking...' : 'Enter the Lane 🎳'}
       </button>
 
       {status === 'error' && (
-        <p style={{ color: ERROR, fontSize: '13px', textAlign: 'center' }}>
+        <p style={{ color: ERROR, fontSize: '15px', marginTop: '16px' }}>
           Wrong PIN — try again.
         </p>
       )}
 
-      <p style={{ color: '#333355', fontSize: '11px', position: 'absolute', bottom: '16px' }}>
-        Summer 2026
-      </p>
-
       <style>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
-          20% { transform: translateX(-8px); }
-          40% { transform: translateX(8px); }
-          60% { transform: translateX(-8px); }
-          80% { transform: translateX(4px); }
+          20% { transform: translateX(-10px); }
+          40% { transform: translateX(10px); }
+          60% { transform: translateX(-10px); }
+          80% { transform: translateX(5px); }
         }
       `}</style>
     </div>
