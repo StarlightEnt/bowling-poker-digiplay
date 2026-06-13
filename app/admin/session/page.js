@@ -1,6 +1,387 @@
-export default function SessionSetup() {
-  return <div style={{ padding: '32px' }}>
-    <h1 style={{ color: '#e8ff47', fontSize: '28px' }}>Session Setup</h1>
-    <p style={{ color: '#8888aa', marginTop: '8px' }}>Coming in next build.</p>
-  </div>;
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import { calculatePayouts, generatePin } from '../../../lib/finance.js';
+
+const card = {
+  background: '#16213e',
+  border: '1px solid #2a2a5a',
+  borderRadius: '8px',
+  padding: '24px',
+  marginBottom: '16px',
+};
+
+const label = {
+  display: 'block',
+  color: '#8888aa',
+  fontSize: '11px',
+  textTransform: 'uppercase',
+  letterSpacing: '1px',
+  marginBottom: '6px',
+};
+
+const input = {
+  background: '#0f3460',
+  border: '1px solid #2a2a5a',
+  borderRadius: '6px',
+  color: '#ffffff',
+  padding: '9px 12px',
+  fontSize: '14px',
+  outline: 'none',
+  width: '100%',
+};
+
+const btnPrimary = {
+  background: '#e8ff47',
+  color: '#1a1a2e',
+  border: 'none',
+  borderRadius: '6px',
+  padding: '10px 20px',
+  fontSize: '14px',
+  fontWeight: 700,
+  cursor: 'pointer',
+};
+
+const btnSecondary = {
+  background: 'transparent',
+  color: '#8888aa',
+  border: '1px solid #2a2a5a',
+  borderRadius: '6px',
+  padding: '9px 16px',
+  fontSize: '13px',
+  cursor: 'pointer',
+};
+
+export default function SessionSetupPage() {
+  const [currentSession, setCurrentSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [importStatus, setImportStatus] = useState('');
+  const [players, setPlayers] = useState([]);
+  const [checkedInCount, setCheckedInCount] = useState(0);
+  const fileRef = useRef(null);
+
+  const [pin, setPin] = useState('');
+  const [seasonName, setSeasonName] = useState('Summer 2026');
+  const [weekNumber, setWeekNumber] = useState('');
+  const [sessionDate, setSessionDate] = useState(new Date().toISOString().split('T')[0]);
+  const [buyinAmount, setBuyinAmount] = useState('5.00');
+  const [progressiveNightly, setProgressiveNightly] = useState('3.00');
+
+  useEffect(() => {
+    fetchSession();
+  }, []);
+
+  async function fetchSession() {
+    setLoading(true);
+    const res = await fetch('/api/admin/session');
+    const data = await res.json();
+    if (data.session) {
+      setCurrentSession(data.session);
+      setPin(data.session.pin?.trim() || '');
+      setSeasonName(data.session.season_name || 'Summer 2026');
+      setWeekNumber(String(data.session.week_number || ''));
+      setSessionDate(data.session.session_date?.split('T')[0] || new Date().toISOString().split('T')[0]);
+      setBuyinAmount(String(data.session.buyin_amount || '5.00'));
+      setProgressiveNightly(String(data.session.progressive_nightly || '3.00'));
+      setCheckedInCount(data.checkedInCount || 0);
+      if (data.session.id) fetchPlayers(data.session.id);
+    }
+    setLoading(false);
+  }
+
+  async function fetchPlayers(sessionId) {
+    const res = await fetch(`/api/admin/players?sessionId=${sessionId}`);
+    const data = await res.json();
+    setPlayers(data.players || []);
+  }
+
+  async function createSession() {
+    setSaving(true);
+    const res = await fetch('/api/admin/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        seasonName,
+        weekNumber: parseInt(weekNumber),
+        sessionDate,
+        pin,
+        buyinAmount: parseFloat(buyinAmount),
+        progressiveNightly: parseFloat(progressiveNightly),
+      }),
+    });
+    const data = await res.json();
+    if (data.session) await fetchSession();
+    setSaving(false);
+  }
+
+  async function updatePin() {
+    if (!currentSession) return;
+    setSaving(true);
+    await fetch('/api/admin/session', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId: currentSession.id, action: 'update', pin }),
+    });
+    setSaving(false);
+  }
+
+  async function lockSession() {
+    if (!currentSession) return;
+    setSaving(true);
+    await fetch('/api/admin/session', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId: currentSession.id, action: 'lock' }),
+    });
+    await fetchSession();
+    setSaving(false);
+  }
+
+  async function unlockSession() {
+    if (!currentSession) return;
+    if (!confirm('Unlock session? This reverses the lock and allows changes.')) return;
+    setSaving(true);
+    await fetch('/api/admin/session', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId: currentSession.id, action: 'unlock' }),
+    });
+    await fetchSession();
+    setSaving(false);
+  }
+
+  function handleCsvUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const text = ev.target.result;
+      const lines = text.trim().split('\n');
+      const rows = lines.slice(1).map(line => {
+        const parts = line.split(',');
+        return { name: parts[0]?.trim(), lane: parts[1]?.trim() };
+      }).filter(r => r.name && r.lane);
+
+      setImportStatus(`Importing ${rows.length} players...`);
+      const res = await fetch('/api/admin/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: currentSession.id, players: rows }),
+      });
+      const data = await res.json();
+      setImportStatus(`✅ ${data.count} players imported.`);
+      await fetchPlayers(currentSession.id);
+    };
+    reader.readAsText(file);
+  }
+
+  function downloadTemplate() {
+    const csv = 'name,lane\nAlice Smith,1\nBob Jones,2\n';
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'digiplay-player-template.csv';
+    a.click();
+  }
+
+  const payouts = calculatePayouts(
+    players.length || checkedInCount || 0,
+    parseFloat(buyinAmount) || 5,
+    parseFloat(progressiveNightly) || 3
+  );
+
+  const isLocked = currentSession?.locked;
+
+  if (loading) return <div style={{ padding: '32px', color: '#8888aa' }}>Loading...</div>;
+
+  return (
+    <div style={{ padding: '32px', maxWidth: '800px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <div>
+          <h1 style={{ color: '#e8ff47', fontSize: '28px' }}>Session Setup</h1>
+          {isLocked && (
+            <span style={{ background: '#e8ff47', color: '#1a1a2e', fontSize: '11px',
+              fontWeight: 700, padding: '2px 8px', borderRadius: '4px', marginTop: '4px', display: 'inline-block' }}>
+              🔒 LOCKED
+            </span>
+          )}
+        </div>
+        {currentSession && !isLocked && (
+          <button onClick={lockSession} disabled={saving || players.length === 0}
+            style={{ ...btnPrimary, opacity: players.length === 0 ? 0.5 : 1 }}>
+            Lock Session →
+          </button>
+        )}
+        {isLocked && (
+          <button onClick={unlockSession} disabled={saving} style={btnSecondary}>
+            Unlock (Destructive)
+          </button>
+        )}
+      </div>
+
+      <div style={card}>
+        <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '16px' }}>Session Details</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div>
+            <label style={label}>Season</label>
+            <input style={input} value={seasonName} disabled={isLocked}
+              onChange={e => setSeasonName(e.target.value)} />
+          </div>
+          <div>
+            <label style={label}>Week Number</label>
+            <input style={input} type="number" value={weekNumber} disabled={isLocked}
+              onChange={e => setWeekNumber(e.target.value)} />
+          </div>
+          <div>
+            <label style={label}>Game Date</label>
+            <input style={input} type="date" value={sessionDate} disabled={isLocked}
+              onChange={e => setSessionDate(e.target.value)} />
+          </div>
+          <div>
+            <label style={label}>Weekly PIN</label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input style={{ ...input, fontFamily: 'monospace', fontSize: '18px', letterSpacing: '6px' }}
+                value={pin} maxLength={4} disabled={isLocked}
+                onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))} />
+              {!isLocked && (
+                <button onClick={() => setPin(generatePin())} style={btnSecondary}>🎲</button>
+              )}
+            </div>
+            <p style={{ color: '#555577', fontSize: '11px', fontStyle: 'italic', marginTop: '4px' }}>
+              One PIN only, please. Get it? 😉
+            </p>
+          </div>
+        </div>
+        {!currentSession ? (
+          <button onClick={createSession} disabled={saving || !pin || !weekNumber} style={btnPrimary}>
+            {saving ? 'Creating...' : 'Create Session'}
+          </button>
+        ) : !isLocked && (
+          <button onClick={updatePin} disabled={saving} style={btnSecondary}>
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        )}
+      </div>
+
+      <div style={card}>
+        <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '16px' }}>Financial</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div>
+            <label style={label}>Buy-in Amount ($)</label>
+            <input style={input} type="number" step="0.50" value={buyinAmount} disabled={isLocked}
+              onChange={e => setBuyinAmount(e.target.value)} />
+          </div>
+          <div>
+            <label style={label}>Progressive Nightly ($)</label>
+            <input style={input} type="number" step="0.50" value={progressiveNightly} disabled={isLocked}
+              onChange={e => setProgressiveNightly(e.target.value)} />
+          </div>
+        </div>
+        <div style={{ background: '#0f3460', borderRadius: '6px', padding: '16px',
+          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+          {[
+            { label: 'Total Pool', value: `$${payouts.pool.toFixed(2)}` },
+            { label: 'Per Game Payout', value: `$${payouts.perGame.toFixed(2)}`, highlight: true },
+            { label: 'Charity', value: `$${payouts.charity.toFixed(2)}` },
+            { label: 'Progressive Add', value: `$${payouts.progressiveAdd.toFixed(2)}` },
+          ].map(({ label: l, value, highlight }) => (
+            <div key={l}>
+              <div style={{ color: '#8888aa', fontSize: '10px', textTransform: 'uppercase',
+                letterSpacing: '1px', marginBottom: '4px' }}>{l}</div>
+              <div style={{ color: highlight ? '#e8ff47' : '#ffffff',
+                fontSize: highlight ? '20px' : '16px', fontWeight: 700 }}>{value}</div>
+            </div>
+          ))}
+        </div>
+        <p style={{ color: '#555577', fontSize: '11px', marginTop: '8px' }}>
+          Based on {players.length} players imported
+        </p>
+      </div>
+
+      {currentSession && (
+        <div style={card}>
+          <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '4px' }}>Player Import</h2>
+          <p style={{ color: '#8888aa', fontSize: '12px', marginBottom: '16px' }}>
+            Upload a CSV with player name and lane assignment.
+          </p>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+            <button onClick={() => fileRef.current?.click()} disabled={isLocked} style={btnPrimary}>
+              📂 Upload CSV
+            </button>
+            <button onClick={downloadTemplate} style={btnSecondary}>
+              ⬇ Download Template
+            </button>
+            <input ref={fileRef} type="file" accept=".csv" style={{ display: 'none' }}
+              onChange={handleCsvUpload} />
+          </div>
+          {importStatus && (
+            <p style={{ color: '#3dffa0', fontSize: '13px', marginBottom: '12px' }}>{importStatus}</p>
+          )}
+          {players.length > 0 && (
+            <div style={{ maxHeight: '240px', overflowY: 'auto',
+              border: '1px solid #2a2a5a', borderRadius: '6px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                <thead>
+                  <tr style={{ background: '#0f3460' }}>
+                    <th style={{ padding: '8px 12px', textAlign: 'left', color: '#8888aa',
+                      fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Player</th>
+                    <th style={{ padding: '8px 12px', textAlign: 'left', color: '#8888aa',
+                      fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Lane</th>
+                    <th style={{ padding: '8px 12px', textAlign: 'left', color: '#8888aa',
+                      fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Pair</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {players.map((p, i) => (
+                    <tr key={p.id} style={{ borderTop: '1px solid #2a2a5a',
+                      background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)' }}>
+                      <td style={{ padding: '8px 12px', color: '#ffffff' }}>{p.normalized_name}</td>
+                      <td style={{ padding: '8px 12px', color: '#8888aa' }}>{p.lane}</td>
+                      <td style={{ padding: '8px 12px', color: '#8888aa' }}>{p.lane_pair}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {players.length === 0 && (
+            <p style={{ color: '#555577', fontSize: '12px', fontStyle: 'italic' }}>
+              No players imported yet.
+            </p>
+          )}
+        </div>
+      )}
+
+      {currentSession && !isLocked && (
+        <div style={{ ...card, border: '1px solid #7777cc' }}>
+          <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '8px' }}>Ready to Lock?</h2>
+          <p style={{ color: '#8888aa', fontSize: '13px', marginBottom: '16px' }}>
+            Locking the session activates the PIN, initializes card shoes, and opens the player list on the kiosk.
+            No changes can be made after locking.
+          </p>
+          <p style={{ color: players.length === 0 ? '#ffaa44' : '#3dffa0', fontSize: '13px' }}>
+            {players.length === 0
+              ? '⚠️ Import players before locking.'
+              : `✅ ${players.length} players ready to lock.`}
+          </p>
+          <button
+            onClick={lockSession}
+            disabled={saving || players.length === 0}
+            style={{ ...btnPrimary, marginTop: '16px', opacity: players.length === 0 ? 0.5 : 1 }}>
+            🔒 Lock Session
+          </button>
+        </div>
+      )}
+
+      {isLocked && (
+        <div style={{ ...card, border: '1px solid #3dffa0' }}>
+          <h2 style={{ color: '#3dffa0', fontSize: '16px', marginBottom: '8px' }}>✅ Session Locked</h2>
+          <p style={{ color: '#8888aa', fontSize: '13px' }}>
+            PIN is active. Card shoes initialized. Players can now enter on their phones or the kiosk.
+          </p>
+        </div>
+      )}
+    </div>
+  );
 }
