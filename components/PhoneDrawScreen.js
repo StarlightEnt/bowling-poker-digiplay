@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import HandDisplay from './HandDisplay.js';
 import BowlingMarks from './BowlingMarks.js';
+import { CardRow } from './CardDisplay.js';
 
 const ACCENT = '#e8ff47';
 const SURFACE = '#2a2a45';
@@ -20,12 +21,31 @@ export default function PhoneDrawScreen({ player, session }) {
   const [showForfeitOverlay, setShowForfeitOverlay] = useState(false);
   const [forfeitConfirmed, setForfeitConfirmed] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [announcement, setAnnouncement] = useState(null);
+  const [announcementDismissed, setAnnouncementDismissed] = useState(false);
   const queueRef = useRef(0);
   const queueTimerRef = useRef(null);
 
   useEffect(() => {
     fetchGames();
   }, []);
+
+  const activeGame = games[activeGameIndex];
+
+  useEffect(() => {
+    if (!activeGame?.id || announcementDismissed) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/play/announcement?sessionId=${session.id}&gameId=${activeGame.id}`);
+        const data = await res.json();
+        if (data.announced) {
+          setAnnouncement(data);
+          clearInterval(interval);
+        }
+      } catch {}
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [activeGame?.id, announcementDismissed]);
 
   async function fetchGames() {
     const res = await fetch(`/api/play/games?sessionId=${session.id}&playerId=${player.id}`);
@@ -79,7 +99,6 @@ export default function PhoneDrawScreen({ player, session }) {
   const isInvalid = !!validationError;
   const isSubmitted = playerState?.status === 'submitted';
   const isForfeited = playerState?.status === 'forfeited';
-  const activeGame = games[activeGameIndex];
 
   function handleDrawTap() {
     if (drawing || isInvalid || cardsAvailable === 0 || isSubmitted || isForfeited) return;
@@ -386,6 +405,50 @@ export default function PhoneDrawScreen({ player, session }) {
           >
             Forfeit this game
           </button>
+        </div>
+      )}
+
+      {/* Winner announcement overlay */}
+      {announcement && !announcementDismissed && (
+        <div
+          onClick={() => setAnnouncementDismissed(true)}
+          style={{
+            position: 'fixed', inset: 0,
+            background: announcement.isRoyalFlush ? '#1a1000' : '#0d0d1a',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            zIndex: 1000, padding: 24, textAlign: 'center',
+          }}>
+          <div style={{ color: '#8888aa', fontSize: 11, textTransform: 'uppercase',
+            letterSpacing: 2, marginBottom: 12 }}>
+            Game {announcement.gameNumber} Winner
+          </div>
+          <div style={{
+            color: announcement.isRoyalFlush ? '#ffd700' : '#ffffff',
+            fontSize: 42, fontWeight: 900, marginBottom: 8, lineHeight: 1.1,
+          }}>
+            {announcement.winners.join(' & ')}
+          </div>
+          <div style={{ color: '#e8ff47', fontSize: 22, marginBottom: 20 }}>
+            {announcement.handName}
+          </div>
+          {announcement.handCards?.length > 0 && (
+            <div style={{ marginBottom: 20 }}>
+              <CardRow cards={announcement.handCards} status="best5" size="lg" />
+            </div>
+          )}
+          <div style={{ color: '#3dffa0', fontSize: 28, fontWeight: 700, marginBottom: 6 }}>
+            ${announcement.payoutAmount?.toFixed(2)}
+          </div>
+          {announcement.isRoyalFlush && announcement.progressiveWon && (
+            <div style={{ color: '#ffd700', fontSize: 20, fontWeight: 700, marginBottom: 6 }}>
+              + ${announcement.progressiveWon.toFixed(2)} Progressive Pot! 🏆
+            </div>
+          )}
+          {announcement.isTie && (
+            <div style={{ color: '#ffaa44', fontSize: 13, marginBottom: 4 }}>Split payout</div>
+          )}
+          <div style={{ color: '#444466', fontSize: 12, marginTop: 28 }}>Tap anywhere to dismiss</div>
         </div>
       )}
 
