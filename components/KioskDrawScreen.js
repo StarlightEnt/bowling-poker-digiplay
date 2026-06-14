@@ -2,11 +2,20 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import HandDisplay from './HandDisplay.js';
 import BowlingMarks from './BowlingMarks.js';
+import { CardRow } from './CardDisplay.js';
 
 const ACCENT = '#e8ff47';
 const SURFACE = '#2a2a45';
 const BORDER = '#7777cc';
 const INACTIVITY_SECONDS = 30;
+
+const RANK_DISPLAY = {'2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','T':'10','J':'J','Q':'Q','K':'K','A':'A'};
+const SUIT_SYMBOL = {'s':'♠','h':'♥','c':'♣','d':'♦'};
+function cardParts(code) {
+  const rank = code.slice(0, -1);
+  const suit = code.slice(-1);
+  return { rank: RANK_DISPLAY[rank] || rank, suit: SUIT_SYMBOL[suit] || suit };
+}
 
 export default function KioskDrawScreen({ player, session, onBack }) {
   const [games, setGames] = useState([]);
@@ -22,12 +31,28 @@ export default function KioskDrawScreen({ player, session, onBack }) {
   const [forfeitConfirmed, setForfeitConfirmed] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [inactivityCountdown, setInactivityCountdown] = useState(null);
+  const [announcement, setAnnouncement] = useState(null);
+  const [announcementDismissed, setAnnouncementDismissed] = useState(false);
   const queueRef = useRef(0);
   const queueTimerRef = useRef(null);
   const inactivityRef = useRef(null);
   const countdownRef = useRef(null);
 
   useEffect(() => { fetchGames(); }, []);
+
+  const activeGame = games[activeGameIndex];
+
+  useEffect(() => {
+    if (!activeGame?.id || announcementDismissed) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/play/announcement?sessionId=${session.id}&gameId=${activeGame.id}`);
+        const data = await res.json();
+        if (data.announced) { setAnnouncement(data); clearInterval(interval); }
+      } catch {}
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [activeGame?.id, announcementDismissed]);
 
   const resetInactivity = useCallback(() => {
     setInactivityCountdown(null);
@@ -102,7 +127,6 @@ export default function KioskDrawScreen({ player, session, onBack }) {
   const isInvalid = !!validationError;
   const isSubmitted = playerState?.status === 'submitted';
   const isForfeited = playerState?.status === 'forfeited';
-  const activeGame = games[activeGameIndex];
   const showSubmitButton = marks.frame === 10 && cardsAvailable === 0 && !isSubmitted && !isForfeited;
 
   function handleDrawTap() {
@@ -407,6 +431,103 @@ export default function KioskDrawScreen({ player, session, onBack }) {
             >
               Back to Player List
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Winner announcement overlay — landscape, centered */}
+      {announcement && !announcementDismissed && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 200,
+          background: announcement.isRoyalFlush ? '#1a1000' : '#1a1a2e',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          padding: '40px 80px',
+        }} onClick={() => setAnnouncementDismissed(true)}>
+          {/* Game badge */}
+          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 3,
+            textTransform: 'uppercase', color: announcement.isRoyalFlush ? '#c9860a' : '#888899',
+            marginBottom: 16 }}>
+            Game {announcement.gameNumber} Winner
+          </div>
+          {/* Congratulations */}
+          <div style={{ fontSize: 14, color: announcement.isRoyalFlush ? '#c9860a' : '#888899',
+            letterSpacing: 2, marginBottom: 8 }}>Congratulations</div>
+          {/* Winner name — 56px */}
+          <div style={{ fontSize: 56, fontWeight: 700,
+            color: announcement.isRoyalFlush ? '#ffd700' : '#ffffff',
+            marginBottom: 4, lineHeight: 1.1 }}>
+            {announcement.winners.join(' & ')}
+          </div>
+          {/* Hand name */}
+          <div style={{ fontSize: 24, fontWeight: 600,
+            color: announcement.isRoyalFlush ? '#ffd700' : '#e8ff47',
+            marginBottom: announcement.isRoyalFlush ? 8 : 32, letterSpacing: 1 }}>
+            {announcement.handName}
+          </div>
+          {/* RF subtitle: suit · ranks */}
+          {announcement.isRoyalFlush && (
+            <div style={{ fontSize: 13, color: '#c9860a', marginBottom: 24, letterSpacing: 1 }}>
+              {cardParts(announcement.handCards?.[0] || '').suit} · {(announcement.handCards || []).map(c => cardParts(c).rank).join(' ')}
+            </div>
+          )}
+          {/* Cards — 64×90px */}
+          {announcement.handCards?.length > 0 && (
+            <div style={{ display: 'flex', gap: 14, marginBottom: 36 }}>
+              {announcement.handCards.map((code, i) => {
+                const card = cardParts(code);
+                return (
+                  <div key={i} style={{
+                    width: 64, height: 90,
+                    background: announcement.isRoyalFlush ? '#fff9e6' : '#ffffff',
+                    borderRadius: 8,
+                    border: `2px solid ${announcement.isRoyalFlush ? '#ffd700' : '#e8ff47'}`,
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <div style={{ fontSize: 22, fontWeight: 800,
+                      color: ['♥','♦'].includes(card.suit) ? '#cc2222' :
+                        announcement.isRoyalFlush ? '#7a4f00' : '#1a1a2e' }}>
+                      {card.rank}
+                    </div>
+                    <div style={{ fontSize: 16,
+                      color: ['♥','♦'].includes(card.suit) ? '#cc2222' :
+                        announcement.isRoyalFlush ? '#7a4f00' : '#1a1a2e' }}>
+                      {card.suit}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          {/* Payout — 44px */}
+          {!announcement.isRoyalFlush && (
+            <>
+              <div style={{ fontSize: 12, color: '#666688', letterSpacing: 2,
+                textTransform: 'uppercase', marginBottom: 6 }}>Game payout</div>
+              <div style={{ fontSize: 44, fontWeight: 700, color: '#e8ff47' }}>
+                ${announcement.payoutAmount?.toFixed(2)}
+              </div>
+            </>
+          )}
+          {/* RF: game payout + progressive pot (52px) */}
+          {announcement.isRoyalFlush && (
+            <>
+              <div style={{ fontSize: 12, color: '#c9860a', letterSpacing: 1,
+                textTransform: 'uppercase', marginBottom: 4 }}>Game payout</div>
+              <div style={{ fontSize: 20, color: '#c9860a', marginBottom: 8 }}>
+                ${announcement.payoutAmount?.toFixed(2)}
+              </div>
+              <div style={{ borderTop: '1px solid #3a2800', width: 300, margin: '8px 0' }} />
+              <div style={{ fontSize: 12, color: '#c9860a', letterSpacing: 2,
+                textTransform: 'uppercase', marginBottom: 6 }}>Progressive pot won</div>
+              <div style={{ fontSize: 52, fontWeight: 700, color: '#ffd700' }}>
+                ${announcement.progressiveWon?.toFixed(2)}
+              </div>
+            </>
+          )}
+          <div style={{ fontSize: 11, color: '#444466', marginTop: 24, letterSpacing: 1 }}>
+            Tap anywhere to dismiss
           </div>
         </div>
       )}

@@ -8,6 +8,14 @@ const ACCENT = '#e8ff47';
 const SURFACE = '#2a2a45';
 const BORDER = '#7777cc';
 
+const RANK_DISPLAY = {'2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','T':'10','J':'J','Q':'Q','K':'K','A':'A'};
+const SUIT_SYMBOL = {'s':'♠','h':'♥','c':'♣','d':'♦'};
+function cardParts(code) {
+  const rank = code.slice(0, -1);
+  const suit = code.slice(-1);
+  return { rank: RANK_DISPLAY[rank] || rank, suit: SUIT_SYMBOL[suit] || suit };
+}
+
 export default function PhoneDrawScreen({ player, session }) {
   const [games, setGames] = useState([]);
   const [activeGameIndex, setActiveGameIndex] = useState(0);
@@ -419,36 +427,96 @@ export default function PhoneDrawScreen({ player, session }) {
             alignItems: 'center', justifyContent: 'center',
             zIndex: 1000, padding: 24, textAlign: 'center',
           }}>
-          <div style={{ color: '#8888aa', fontSize: 11, textTransform: 'uppercase',
-            letterSpacing: 2, marginBottom: 12 }}>
+          {/* Game badge */}
+          <div style={{ color: announcement.isRoyalFlush ? '#c9860a' : '#8888aa',
+            fontSize: 11, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 8 }}>
             Game {announcement.gameNumber} Winner
           </div>
+          {/* Congratulations */}
+          <div style={{ color: announcement.isRoyalFlush ? '#c9860a' : '#8888aa',
+            fontSize: 13, letterSpacing: 2, marginBottom: 8 }}>
+            Congratulations
+          </div>
+          {/* Winner name */}
           <div style={{
             color: announcement.isRoyalFlush ? '#ffd700' : '#ffffff',
-            fontSize: 42, fontWeight: 900, marginBottom: 8, lineHeight: 1.1,
+            fontSize: 42, fontWeight: 900, marginBottom: 6, lineHeight: 1.1,
           }}>
             {announcement.winners.join(' & ')}
           </div>
-          <div style={{ color: '#e8ff47', fontSize: 22, marginBottom: 20 }}>
+          {/* Hand name */}
+          <div style={{ color: announcement.isRoyalFlush ? '#ffd700' : '#e8ff47',
+            fontSize: 22, fontWeight: 600,
+            marginBottom: announcement.isRoyalFlush ? 6 : 16 }}>
             {announcement.handName}
           </div>
+          {/* RF subtitle: suit · ranks */}
+          {announcement.isRoyalFlush && (
+            <div style={{ fontSize: 12, color: '#c9860a', marginBottom: 16, letterSpacing: 1 }}>
+              {cardParts(announcement.handCards?.[0] || '').suit} · {(announcement.handCards || []).map(c => cardParts(c).rank).join(' ')}
+            </div>
+          )}
+          {/* Cards */}
           {announcement.handCards?.length > 0 && (
-            <div style={{ marginBottom: 20 }}>
-              <CardRow cards={announcement.handCards} status="best5" size="lg" />
-            </div>
+            announcement.isRoyalFlush ? (
+              <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+                {announcement.handCards.map((code, i) => {
+                  const card = cardParts(code);
+                  return (
+                    <div key={i} style={{
+                      width: 44, height: 62, background: '#fff9e6',
+                      borderRadius: 6, border: '2px solid #ffd700',
+                      display: 'flex', flexDirection: 'column',
+                      alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <div style={{ fontSize: 15, fontWeight: 800,
+                        color: ['♥','♦'].includes(card.suit) ? '#cc2222' : '#7a4f00' }}>
+                        {card.rank}
+                      </div>
+                      <div style={{ fontSize: 11,
+                        color: ['♥','♦'].includes(card.suit) ? '#cc2222' : '#7a4f00' }}>
+                        {card.suit}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={{ marginBottom: 16 }}>
+                <CardRow cards={announcement.handCards} status="best5" size="lg" />
+              </div>
+            )
           )}
-          <div style={{ color: '#3dffa0', fontSize: 28, fontWeight: 700, marginBottom: 6 }}>
-            ${announcement.payoutAmount?.toFixed(2)}
-          </div>
-          {announcement.isRoyalFlush && announcement.progressiveWon && (
-            <div style={{ color: '#ffd700', fontSize: 20, fontWeight: 700, marginBottom: 6 }}>
-              + ${announcement.progressiveWon.toFixed(2)} Progressive Pot! 🏆
-            </div>
+          {/* Non-RF: Game Payout label + yellow amount */}
+          {!announcement.isRoyalFlush && (
+            <>
+              <div style={{ fontSize: 11, color: '#666688', letterSpacing: 2,
+                textTransform: 'uppercase', marginBottom: 4 }}>Game Payout</div>
+              <div style={{ color: '#e8ff47', fontSize: 28, fontWeight: 700, marginBottom: 6 }}>
+                ${announcement.payoutAmount?.toFixed(2)}
+              </div>
+              {announcement.isTie && (
+                <div style={{ color: '#ffaa44', fontSize: 13, marginBottom: 4 }}>Split payout</div>
+              )}
+            </>
           )}
-          {announcement.isTie && (
-            <div style={{ color: '#ffaa44', fontSize: 13, marginBottom: 4 }}>Split payout</div>
+          {/* RF: game payout + progressive (36px) */}
+          {announcement.isRoyalFlush && (
+            <>
+              <div style={{ fontSize: 11, color: '#c9860a', letterSpacing: 1,
+                textTransform: 'uppercase', marginBottom: 4 }}>Game Payout</div>
+              <div style={{ fontSize: 18, color: '#c9860a', marginBottom: 8 }}>
+                ${announcement.payoutAmount?.toFixed(2)}
+              </div>
+              <div style={{ borderTop: '1px solid #3a2800', width: 240, margin: '6px 0' }} />
+              <div style={{ fontSize: 11, color: '#c9860a', letterSpacing: 2,
+                textTransform: 'uppercase', marginBottom: 4 }}>Progressive Pot Won</div>
+              <div style={{ fontSize: 36, fontWeight: 700, color: '#ffd700' }}>
+                ${announcement.progressiveWon?.toFixed(2)}
+              </div>
+            </>
           )}
-          <div style={{ color: '#444466', fontSize: 12, marginTop: 28 }}>Tap anywhere to dismiss</div>
+          <div style={{ color: '#444466', fontSize: 12, marginTop: 20 }}>Tap anywhere to dismiss</div>
         </div>
       )}
 

@@ -15,6 +15,9 @@ export default function GameAdvancement() {
   const [confirmed, setConfirmed] = useState(false);
   const [confirmResult, setConfirmResult] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [changingWinner, setChangingWinner] = useState(false);
+  const [changeSearch, setChangeSearch] = useState('');
+  const [manualWinner, setManualWinner] = useState(null);
 
   const fetchDash = useCallback(async () => {
     const res = await fetch('/api/admin/dashboard');
@@ -39,14 +42,14 @@ export default function GameAdvancement() {
       .then(setLeaderboard);
   }, [selectedGameId]);
 
-  async function handleConfirmWinner(overridePlayerIds) {
+  async function handleConfirmWinner() {
     if (!leaderboard) return;
     setConfirming(true);
 
-    const winnerIds = overridePlayerIds ||
-      leaderboard.tiedPlayers.map(p => p.id);
-
-    const topPlayer = leaderboard.tiedPlayers[0];
+    const sourcePlayer = manualWinner || leaderboard.tiedPlayers[0];
+    const winnerIds = manualWinner
+      ? [manualWinner.id]
+      : leaderboard.tiedPlayers.map(p => p.id);
 
     const res = await fetch('/api/admin/confirm-winner', {
       method: 'POST',
@@ -54,9 +57,9 @@ export default function GameAdvancement() {
       body: JSON.stringify({
         gameId: selectedGameId,
         winnerPlayerIds: winnerIds,
-        handName: topPlayer.hand?.name,
-        handCards: topPlayer.hand?.best5 || [],
-        handScore: topPlayer.score,
+        handName: sourcePlayer.hand?.name,
+        handCards: sourcePlayer.hand?.best5 || [],
+        handScore: sourcePlayer.score,
       }),
     });
     const data = await res.json();
@@ -136,15 +139,15 @@ export default function GameAdvancement() {
           {!confirmed && leaderboard.tiedPlayers.length > 0 && (
             <div style={{
               background: SURFACE,
-              border: `1px solid ${leaderboard.isTie ? '#ffaa44' : '#3dffa0'}`,
+              border: `1px solid ${manualWinner ? ACCENT : leaderboard.isTie ? '#ffaa44' : '#3dffa0'}`,
               borderRadius: 8, padding: 20, marginBottom: 20,
             }}>
               <div style={{ color: '#8888aa', fontSize: 11, textTransform: 'uppercase',
                 letterSpacing: 1, marginBottom: 8 }}>
-                {leaderboard.isTie ? '⚠️ Tie Detected — Split Payout' : '🏆 Suggested Winner'}
+                {manualWinner ? '✏️ Manual Override' : leaderboard.isTie ? '⚠️ Tie Detected — Split Payout' : '🏆 Suggested Winner'}
               </div>
 
-              {leaderboard.tiedPlayers.map(p => (
+              {(manualWinner ? [manualWinner] : leaderboard.tiedPlayers).map(p => (
                 <div key={p.id} style={{ marginBottom: 8 }}>
                   <div style={{ color: '#ffffff', fontSize: 18, fontWeight: 700 }}>
                     {p.normalized_name}
@@ -158,10 +161,10 @@ export default function GameAdvancement() {
                 </div>
               ))}
 
-              <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                 <div>
                   <div style={{ color: '#8888aa', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>
-                    {leaderboard.isTie ? 'Split Payout (each)' : 'Payout'}
+                    {!manualWinner && leaderboard.isTie ? 'Split Payout (each)' : 'Payout'}
                   </div>
                   <div style={{ color: ACCENT, fontSize: 24, fontWeight: 700 }}>
                     ${leaderboard.splitAmount.toFixed(2)}
@@ -184,7 +187,86 @@ export default function GameAdvancement() {
                   }}>
                   {confirming ? 'Confirming...' : 'Confirm & Announce →'}
                 </button>
+
+                {manualWinner ? (
+                  <button
+                    onClick={() => { setManualWinner(null); setChangingWinner(false); setChangeSearch(''); }}
+                    style={{
+                      background: 'transparent', color: '#8888aa',
+                      border: `1px solid ${BORDER}`, borderRadius: 6,
+                      padding: '12px 16px', fontSize: 13, cursor: 'pointer',
+                    }}>
+                    Cancel
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => { setChangingWinner(true); setChangeSearch(''); }}
+                    style={{
+                      background: 'transparent', color: '#8888aa',
+                      border: `1px solid ${BORDER}`, borderRadius: 6,
+                      padding: '12px 16px', fontSize: 13, cursor: 'pointer',
+                    }}>
+                    Change winner
+                  </button>
+                )}
               </div>
+
+              {/* Autocomplete search */}
+              {changingWinner && (
+                <div style={{ marginTop: 12, position: 'relative' }}>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      autoFocus
+                      value={changeSearch}
+                      onChange={e => setChangeSearch(e.target.value)}
+                      placeholder="Type player name..."
+                      style={{
+                        flex: 1, background: '#0f1a2e', border: `1px solid ${BORDER}`,
+                        borderRadius: 6, padding: '8px 12px', color: '#ffffff',
+                        fontSize: 14, outline: 'none',
+                      }}
+                    />
+                    <button
+                      onClick={() => setChangingWinner(false)}
+                      style={{
+                        background: 'transparent', color: '#8888aa',
+                        border: `1px solid ${BORDER}`, borderRadius: 6,
+                        padding: '8px 12px', fontSize: 13, cursor: 'pointer',
+                      }}>
+                      ✕
+                    </button>
+                  </div>
+                  {changeSearch.length > 0 && (() => {
+                    const filtered = leaderboard.entries.filter(e =>
+                      e.isSubmitted &&
+                      e.normalized_name.toLowerCase().includes(changeSearch.toLowerCase())
+                    );
+                    return (
+                      <div style={{
+                        position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 52, zIndex: 10,
+                        background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 6,
+                        maxHeight: 200, overflowY: 'auto', boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+                      }}>
+                        {filtered.length === 0 ? (
+                          <div style={{ padding: '10px 12px', color: '#8888aa', fontSize: 13 }}>No matches</div>
+                        ) : filtered.map(e => (
+                          <div key={e.id}
+                            onClick={() => { setManualWinner(e); setChangingWinner(false); setChangeSearch(''); }}
+                            style={{
+                              padding: '10px 12px', cursor: 'pointer',
+                              borderBottom: `1px solid ${BORDER}`,
+                            }}>
+                            <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 600 }}>
+                              {e.normalized_name}
+                            </div>
+                            <div style={{ color: ACCENT, fontSize: 12 }}>{e.hand?.name || '—'}</div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
           )}
 
