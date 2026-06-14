@@ -283,7 +283,7 @@ export default function SessionSetupPage() {
           <div>
             <label style={label}>Current Progressive Pot</label>
             <div style={{ ...input, background: '#0a1a30', color: '#8888aa', cursor: 'default' }}>
-              ${progressivePot.toFixed(2)}
+              ${parseFloat(progressivePot || 0).toFixed(2)}
             </div>
           </div>
           <div>
