@@ -14,10 +14,13 @@ export async function POST(request) {
 
   let validationError = null;
   if (f >= 1 && f <= 9) {
-    if (s + sp > f) validationError = `${s} strikes + ${sp} spares doesn't look right for only ${f} frames. Please check your numbers again.`;
-  } else if (f === 10) {
-    if (sp > 1) validationError = `${s} strikes + ${sp} spares doesn't look right for only ${f} frames. Please check your numbers again.`;
-    else if (s > 3) validationError = `${s} strikes + ${sp} spares doesn't look right for only ${f} frames. Please check your numbers again.`;
+    if (s + sp > f) {
+      validationError = `${s} strikes + ${sp} spares doesn't look right for only ${f} frames. Please check your numbers again.`;
+    }
+  }
+  if (f === 10) {
+    if (s > 3) validationError = `${s} strikes + ${sp} spares doesn't look right for only ${f} frames. Please check your numbers again.`;
+    else if (sp > 1) validationError = `${s} strikes + ${sp} spares doesn't look right for only ${f} frames. Please check your numbers again.`;
     else if (s + sp > 3) validationError = `${s} strikes + ${sp} spares doesn't look right for only ${f} frames. Please check your numbers again.`;
     else if (sp === 1 && s > 1) validationError = `${s} strikes + ${sp} spares doesn't look right for only ${f} frames. Please check your numbers again.`;
   }

@@ -97,11 +97,12 @@ export default function PhoneDrawScreen({ player, session }) {
 
   async function executeDraw(count) {
     if (!activeGame) return;
+    const gameId = activeGame.id;
     setDrawing(true);
     const res = await fetch('/api/play/draw', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId: player.id, gameId: activeGame.id, count }),
+      body: JSON.stringify({ playerId: player.id, gameId, count }),
     });
     const data = await res.json();
     if (data.hand) setHand(data.hand);
@@ -112,8 +113,8 @@ export default function PhoneDrawScreen({ player, session }) {
         setTimeout(() => setDupMessage(''), 2200);
       }
     }
-    await fetchState(activeGame.id);
     await fetchGames();
+    await fetchState(gameId);
     setDrawing(false);
   }
 
