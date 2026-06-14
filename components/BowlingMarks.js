@@ -58,14 +58,14 @@ export default function BowlingMarks({ frame, strikes, spares, onChange, disable
         <Stepper
           label={isFrame10 ? 'Strikes Total' : 'Strikes So Far'}
           value={strikes}
-          min={0} max={isFrame10 ? 30 : 10}
+          min={0} max={12}
           onChange={v => onChange({ frame, strikes: v, spares })}
           disabled={disabled}
         />
         <Stepper
           label={isFrame10 ? 'Spares Total' : 'Spares So Far'}
           value={spares}
-          min={0} max={isFrame10 ? 10 : 10}
+          min={0} max={10}
           onChange={v => onChange({ frame, strikes, spares: v })}
           disabled={disabled}
         />
