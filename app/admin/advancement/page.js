@@ -60,12 +60,15 @@ export default function GameAdvancement() {
       }),
     });
     const data = await res.json();
-    if (data.confirmed) {
-      setConfirmed(true);
-      setConfirmResult(data);
-      await fetchDash();
+    try {
+      if (data.confirmed) {
+        setConfirmed(true);
+        setConfirmResult(data);
+        await fetchDash();
+      }
+    } finally {
+      setConfirming(false);
     }
-    setConfirming(false);
   }
 
   if (loading) return <div style={{ padding: 32, color: '#8888aa' }}>Loading...</div>;

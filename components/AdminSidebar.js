@@ -38,8 +38,8 @@ export default function AdminSidebar({ session }) {
   return (
     <aside style={{
       width: '190px',
-      background: '#16213e',
-      borderRight: '1px solid #2a2a5a',
+      background: '#1a1a2e',
+      borderRight: '1px solid #5555aa',
       position: 'fixed',
       top: 0,
       left: 0,
@@ -50,7 +50,7 @@ export default function AdminSidebar({ session }) {
     }}>
       <div style={{
         padding: '20px 16px 16px',
-        borderBottom: '1px solid #2a2a5a',
+        borderBottom: '1px solid #5555aa',
       }}>
         <div style={{ fontSize: '20px', marginBottom: '4px' }}>🎳</div>
         <div style={{ color: '#e8ff47', fontSize: '13px', fontWeight: 700, lineHeight: 1.2 }}>
@@ -97,19 +97,19 @@ export default function AdminSidebar({ session }) {
 
       <div style={{
         padding: '12px 16px',
-        borderTop: '1px solid #2a2a5a',
+        borderTop: '1px solid #5555aa',
       }}>
-        <div style={{ color: '#8888aa', fontSize: '11px', marginBottom: '2px' }}>
+        <div style={{ color: '#aaaacc', fontSize: '12px', fontWeight: 500, marginBottom: '2px' }}>
           {session?.user?.name || 'Admin'}
         </div>
         <div style={{ color: '#555577', fontSize: '10px', marginBottom: '10px' }}>
-          Summer 2026
+          {session?.user?.leagueName || 'League'} · Week {session?.user?.weekNumber || '—'}
         </div>
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
           style={{
             background: 'transparent',
-            border: '1px solid #2a2a5a',
+            border: '1px solid #5555aa',
             borderRadius: '4px',
             color: '#8888aa',
             fontSize: '11px',

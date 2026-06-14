@@ -26,7 +26,7 @@ export async function GET(request) {
 
   const players = await sql`
     SELECT
-      p.id, p.normalized_name, p.lane, p.lane_pair,
+      p.id, p.normalized_name, p.lane, p.lane_pair, p.checked_in,
       pgs.status, pgs.cards_earned, pgs.cards_drawn,
       pgs.best_hand_name, pgs.best_hand_score,
       pgs.submitted_at, pgs.forfeited_at
@@ -86,7 +86,7 @@ export async function GET(request) {
   const topScore = submittedEntries[0]?.score || 0;
   const isTie = submittedEntries.filter(e => e.score === topScore).length > 1 && topScore > 0;
 
-  const checkedInCount = players.filter(p => p.status !== null).length;
+  const checkedInCount = players.filter(p => p.checked_in === true).length;
   const payouts = calculatePayouts(
     checkedInCount,
     parseFloat(game.buyin_amount),
