@@ -60,6 +60,8 @@ export default function SessionSetupPage() {
   const [checkedInCount, setCheckedInCount] = useState(0);
   const fileRef = useRef(null);
 
+  const [deckCount, setDeckCount] = useState(6);
+  const [progressivePot, setProgressivePot] = useState(0);
   const [pin, setPin] = useState('');
   const [seasonName, setSeasonName] = useState('Summer 2026');
   const [weekNumber, setWeekNumber] = useState('');
@@ -84,6 +86,7 @@ export default function SessionSetupPage() {
       setBuyinAmount(String(data.session.buyin_amount || '5.00'));
       setProgressiveNightly(String(data.session.progressive_nightly || '3.00'));
       setCheckedInCount(data.checkedInCount || 0);
+      setProgressivePot(data.session.progressive_pot || 0);
       if (data.session.id) fetchPlayers(data.session.id);
     }
     setLoading(false);
@@ -131,7 +134,7 @@ export default function SessionSetupPage() {
     await fetch('/api/admin/session', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId: currentSession.id, action: 'lock' }),
+      body: JSON.stringify({ sessionId: currentSession.id, action: 'lock', deckCount }),
     });
     await fetchSession();
     setSaving(false);
@@ -186,7 +189,7 @@ export default function SessionSetupPage() {
   }
 
   const payouts = calculatePayouts(
-    players.length || checkedInCount || 0,
+    checkedInCount || players.length || 0,
     parseFloat(buyinAmount) || 5,
     parseFloat(progressiveNightly) || 3
   );
@@ -245,11 +248,11 @@ export default function SessionSetupPage() {
                 value={pin} maxLength={4} disabled={isLocked}
                 onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))} />
               {!isLocked && (
-                <button onClick={() => setPin(generatePin())} style={btnSecondary}>🎲</button>
+                <button onClick={() => setPin(generatePin())} style={btnSecondary}>Generate</button>
               )}
             </div>
             <p style={{ color: '#555577', fontSize: '11px', fontStyle: 'italic', marginTop: '4px' }}>
-              One PIN only, please. Get it? 😉
+              One PIN only, please. Get it? <span style={{ fontStyle: 'normal' }}>😉</span>
             </p>
           </div>
         </div>
@@ -277,6 +280,18 @@ export default function SessionSetupPage() {
             <input style={input} type="number" step="0.50" value={progressiveNightly} disabled={isLocked}
               onChange={e => setProgressiveNightly(e.target.value)} />
           </div>
+          <div>
+            <label style={label}>Current Progressive Pot</label>
+            <div style={{ ...input, background: '#0a1a30', color: '#8888aa', cursor: 'default' }}>
+              ${progressivePot.toFixed(2)}
+            </div>
+          </div>
+          <div>
+            <label style={label}>Players Checked In</label>
+            <div style={{ ...input, background: '#0a1a30', color: '#8888aa', cursor: 'default' }}>
+              {checkedInCount}
+            </div>
+          </div>
         </div>
         <div style={{ background: '#0f3460', borderRadius: '6px', padding: '16px',
           display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
@@ -295,7 +310,7 @@ export default function SessionSetupPage() {
           ))}
         </div>
         <p style={{ color: '#555577', fontSize: '11px', marginTop: '8px' }}>
-          Based on {players.length} players imported
+          Based on {checkedInCount || players.length} players
         </p>
       </div>
 
@@ -352,6 +367,44 @@ export default function SessionSetupPage() {
           )}
         </div>
       )}
+
+      {currentSession && !isLocked && (() => {
+        const recommended = players.length >= 29 ? 10 : players.length >= 21 ? 8 : 6;
+        return (
+          <div style={card}>
+            <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '8px' }}>Shoe Sizing</h2>
+            <p style={{ color: '#8888aa', fontSize: '12px', marginBottom: '16px' }}>
+              Recommended based on {players.length} players imported.
+            </p>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {[
+                { decks: 6, cards: 312, range: 'Up to 20 players' },
+                { decks: 8, cards: 416, range: '21–28 players' },
+                { decks: 10, cards: 520, range: '29+ players' },
+              ].map(({ decks, cards, range }) => (
+                <button key={decks} onClick={() => setDeckCount(decks)}
+                  style={{
+                    flex: 1, padding: '12px', borderRadius: '8px', cursor: 'pointer',
+                    background: deckCount === decks ? '#e8ff47' : '#0f1a2e',
+                    color: deckCount === decks ? '#1a1a2e' : '#ffffff',
+                    border: `1px solid ${decks === recommended ? '#e8ff47' : '#2a2a5a'}`,
+                    textAlign: 'center',
+                  }}>
+                  <div style={{ fontSize: '18px', fontWeight: 700 }}>{decks} Deck</div>
+                  <div style={{ fontSize: '11px', marginTop: '4px' }}>{cards} cards</div>
+                  <div style={{ fontSize: '10px', marginTop: '2px', color: deckCount === decks ? '#555' : '#8888aa' }}>{range}</div>
+                  {decks === recommended && (
+                    <div style={{ fontSize: '9px', marginTop: '4px', fontWeight: 700,
+                      color: deckCount === decks ? '#555' : '#e8ff47', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                      Recommended
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {currentSession && !isLocked && (
         <div style={{ ...card, border: '1px solid #7777cc' }}>

@@ -95,7 +95,7 @@ export async function PATCH(request) {
 
   const leagueId = session.user.leagueId;
   const body = await request.json();
-  const { sessionId, action, pin, seasonName, weekNumber, sessionDate } = body;
+  const { sessionId, action, pin, seasonName, weekNumber, sessionDate, deckCount } = body;
 
   if (action === 'lock') {
     const [updated] = await sql`
@@ -114,11 +114,13 @@ export async function PATCH(request) {
     if (games.length === 3) {
       const existingShoes = await sql`SELECT id FROM shoes WHERE game_id = ANY(${games.map(g => g.id)})`;
       if (existingShoes.length === 0) {
+        const decks = deckCount || 6;
+        const totalCards = decks * 52;
         for (const game of games) {
-          const cardOrder = buildShoe(6);
+          const cardOrder = buildShoe(decks);
           await sql`
             INSERT INTO shoes (game_id, league_id, deck_count, total_cards, cards_remaining, cards_drawn, dead_cards_count, card_order, drawn_indices)
-            VALUES (${game.id}, ${leagueId}, 6, 312, 312, 0, 0, ${JSON.stringify(cardOrder)}, ${JSON.stringify([])})
+            VALUES (${game.id}, ${leagueId}, ${decks}, ${totalCards}, ${totalCards}, 0, 0, ${JSON.stringify(cardOrder)}, ${JSON.stringify([])})
           `;
         }
         await sql`UPDATE games SET status = 'open', opened_at = NOW() WHERE id = ${games[0].id}`;
