@@ -33,7 +33,7 @@ export async function POST(request) {
   const adminId = session.user.id;
   const adminName = session.user.name;
   const body = await request.json();
-  const { action, playerId, gameId, sessionId, value } = body;
+  const { action, playerId, gameId, sessionId, value, gameNumber: bodyGameNumber, lanePair } = body;
 
   if (!action || !sessionId) return Response.json({ error: 'action and sessionId required' }, { status: 400 });
 
@@ -115,6 +115,18 @@ export async function POST(request) {
     await sql`UPDATE games SET status = 'open', opened_at = NOW() WHERE id = ${targetGame.id}`;
     details = { gameNumber };
     result = { success: true, gameId: targetGame.id };
+  }
+
+  // force_unlock_lane_pair
+  else if (action === 'force_unlock_lane_pair') {
+    const [targetGame] = await sql`
+      SELECT id FROM games WHERE game_session_id = ${sessionId}
+      AND game_number = ${bodyGameNumber} AND league_id = ${leagueId} LIMIT 1
+    `;
+    if (!targetGame) return Response.json({ error: 'Game not found' }, { status: 404 });
+    await sql`UPDATE games SET status = 'open', opened_at = NOW() WHERE id = ${targetGame.id}`;
+    details = { gameNumber: bodyGameNumber, lanePair };
+    result = { success: true };
   }
 
   else {

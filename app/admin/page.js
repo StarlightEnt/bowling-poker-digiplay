@@ -13,7 +13,7 @@ function StatCard({ label, value, sub, warning, onClick, active }) {
       onClick={onClick}
       style={{
         background: active ? '#1a2a1a' : SURFACE,
-        border: `1px solid ${active ? '#3dffa0' : warning ? '#ffaa44' : BORDER}`,
+        border: `1px solid ${active ? ACCENT : warning ? '#ffaa44' : BORDER}`,
         borderRadius: 8,
         padding: '16px 20px',
         cursor: onClick ? 'pointer' : 'default',
@@ -28,17 +28,34 @@ function StatCard({ label, value, sub, warning, onClick, active }) {
   );
 }
 
-function PlayerSlideOut({ playerId, gameId, onClose }) {
+function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [footerAction, setFooterAction] = useState(null);
+  const [adjustCount, setAdjustCount] = useState(0);
+  const [acting, setActing] = useState(false);
 
   useEffect(() => {
     if (!playerId || !gameId) return;
     setLoading(true);
+    setFooterAction(null);
     fetch(`/api/admin/player/${playerId}?gameId=${gameId}`)
       .then(r => r.json())
       .then(d => { setData(d); setLoading(false); });
   }, [playerId, gameId]);
+
+  async function doAction(action, value) {
+    setActing(true);
+    await fetch('/api/admin/overrides', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, playerId, gameId, sessionId, value }),
+    });
+    setActing(false);
+    setFooterAction(null);
+    onRefresh?.();
+    onClose();
+  }
 
   if (!playerId) return null;
 
@@ -137,12 +154,78 @@ function PlayerSlideOut({ playerId, gameId, onClose }) {
             </div>
 
             {/* Footer actions */}
-            <div style={{ padding: '12px 20px', borderTop: `1px solid ${BORDER}`, display: 'flex', gap: 8 }}>
-              <button onClick={onClose}
-                style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                  border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 13 }}>
-                Close
-              </button>
+            <div style={{ padding: '12px 20px', borderTop: `1px solid ${BORDER}` }}>
+              {footerAction === 'force_submit_confirm' ? (
+                <div>
+                  <p style={{ color: '#8888aa', fontSize: 12, marginBottom: 8 }}>
+                    Force submit {data.player.normalized_name}? Their current hand will be locked as-is.
+                  </p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={() => doAction('force_submit')} disabled={acting}
+                      style={{ flex: 1, background: ACCENT, color: '#1a1a2e', border: 'none',
+                        borderRadius: 6, padding: '8px', fontSize: 13, fontWeight: 700,
+                        opacity: acting ? 0.7 : 1 }}>
+                      {acting ? 'Submitting...' : 'Confirm'}
+                    </button>
+                    <button onClick={() => setFooterAction(null)}
+                      style={{ flex: 1, background: 'transparent', color: '#8888aa',
+                        border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 13 }}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : footerAction === 'adjust_draw' ? (
+                <div>
+                  <p style={{ color: '#8888aa', fontSize: 12, marginBottom: 8 }}>Set draw count:</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <button onClick={() => setAdjustCount(v => Math.max(0, v - 1))}
+                      style={{ width: 32, height: 32, background: '#2a2a45', border: `1px solid ${BORDER}`,
+                        borderRadius: 6, color: '#ffffff', fontSize: 18 }}>−</button>
+                    <span style={{ color: '#ffffff', fontSize: 20, fontWeight: 700,
+                      minWidth: 32, textAlign: 'center' }}>{adjustCount}</span>
+                    <button onClick={() => setAdjustCount(v => v + 1)}
+                      style={{ width: 32, height: 32, background: '#2a2a45', border: `1px solid ${BORDER}`,
+                        borderRadius: 6, color: '#ffffff', fontSize: 18 }}>+</button>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={() => doAction('adjust_draw_count', adjustCount)} disabled={acting}
+                      style={{ flex: 1, background: ACCENT, color: '#1a1a2e', border: 'none',
+                        borderRadius: 6, padding: '8px', fontSize: 13, fontWeight: 700,
+                        opacity: acting ? 0.7 : 1 }}>
+                      {acting ? 'Saving...' : 'Apply'}
+                    </button>
+                    <button onClick={() => setFooterAction(null)}
+                      style={{ flex: 1, background: 'transparent', color: '#8888aa',
+                        border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 13 }}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={onClose}
+                    style={{ flex: 1, background: 'transparent', color: '#8888aa',
+                      border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 13 }}>
+                    Close
+                  </button>
+                  <button
+                    onClick={() => setFooterAction('force_submit_confirm')}
+                    disabled={!data?.state || data.state.status === 'submitted' || data.state.status === 'forfeited'}
+                    style={{ flex: 1, background: 'transparent', color: '#8888aa',
+                      border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 12,
+                      cursor: 'pointer',
+                      opacity: (!data?.state || data.state.status === 'submitted' || data.state.status === 'forfeited') ? 0.4 : 1 }}>
+                    Force Submit
+                  </button>
+                  <button
+                    onClick={() => { setAdjustCount(data?.state?.cards_drawn || 0); setFooterAction('adjust_draw'); }}
+                    style={{ flex: 1, background: 'transparent', color: '#8888aa',
+                      border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 12,
+                      cursor: 'pointer' }}>
+                    Adjust Draws
+                  </button>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -364,6 +447,8 @@ export default function AdminDashboard() {
         <PlayerSlideOut
           playerId={selectedPlayer}
           gameId={activeGame.id}
+          sessionId={session.id}
+          onRefresh={fetchData}
           onClose={() => setSelectedPlayer(null)}
         />
       )}

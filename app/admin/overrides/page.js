@@ -53,7 +53,7 @@ export default function OverridesPage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  async function executeAction(action, playerId, gameId, value) {
+  async function executeAction(action, playerId, gameId, value, extra = {}) {
     const res = await fetch('/api/admin/overrides', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -61,6 +61,7 @@ export default function OverridesPage() {
         action, playerId, gameId,
         sessionId: dashData?.session?.id,
         value,
+        ...extra,
       }),
     });
     const data = await res.json();
@@ -68,6 +69,25 @@ export default function OverridesPage() {
       setModal(null);
       await fetchData();
     }
+  }
+
+  function exportAuditLog() {
+    const rows = [['Time', 'Action', 'Player', 'Admin']];
+    overrides.forEach(o => {
+      rows.push([
+        new Date(o.performed_at).toLocaleTimeString(),
+        o.action,
+        o.details?.playerName || o.target_type,
+        o.admin_name,
+      ]);
+    });
+    const csv = rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `overrides-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
   }
 
   if (loading) return <div style={{ padding: 32, color: '#8888aa' }}>Loading...</div>;
@@ -81,6 +101,7 @@ export default function OverridesPage() {
   const { players, activeGame, games, session } = dashData;
   const game2 = games?.find(g => g.game_number === 2);
   const game3 = games?.find(g => g.game_number === 3);
+  const lanePairs = [...new Set(players.filter(p => p.lane_pair).map(p => p.lane_pair))].sort();
 
   function formatTime(ts) {
     if (!ts) return '';
@@ -95,11 +116,19 @@ export default function OverridesPage() {
       case 'force_forfeit': return `Force forfeited — ${details.playerName}`;
       case 'undo_forfeit': return `Undo forfeit — ${details.playerName}`;
       case 'adjust_draw_count': return `Adjusted draw count to ${details.newCount} — ${details.playerName}`;
-      case 'force_unlock_game': return `Force unlocked Game ${details.gameNumber}`;
+      case 'force_unlock_game': return `Force unlocked Game ${details.gameNumber} — All Lanes`;
+      case 'force_unlock_lane_pair': return `Force unlocked Game ${details.gameNumber} — Lane ${details.lanePair}`;
       case 'confirm_winner': return `Confirmed winner — ${details.winners?.join(', ')} · ${details.handName}`;
       default: return ov.action;
     }
   }
+
+  const btnStyle = {
+    background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
+    borderRadius: 6, padding: '8px 14px', fontSize: 12, cursor: 'pointer',
+  };
+
+  const hasUnlockActions = game2?.status === 'pending' || game3?.status === 'pending';
 
   return (
     <div style={{ padding: 24 }}>
@@ -133,7 +162,6 @@ export default function OverridesPage() {
             <div style={{ color: '#8888aa', fontSize: 13 }}>{player.lane}</div>
             <StatusPill status={player.game_status || 'waiting'} />
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {/* Actions contextual to status */}
               {(player.game_status === 'drawing' || player.game_status === 'waiting') && (
                 <>
                   <button onClick={() => setModal({ action: 'force_submit', player, gameId: activeGame?.id })}
@@ -183,30 +211,45 @@ export default function OverridesPage() {
       <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
         borderRadius: 8, padding: 16, marginBottom: 16 }}>
         <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Game Controls</div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {game2?.status === 'pending' && (
-            <button onClick={() => setModal({ action: 'force_unlock_game', value: 2 })}
-              style={{ background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
-                borderRadius: 6, padding: '8px 16px', fontSize: 13, cursor: 'pointer' }}>
-              Force Unlock Game 2 — All Lanes
-            </button>
-          )}
-          {game3?.status === 'pending' && (
-            <button onClick={() => setModal({ action: 'force_unlock_game', value: 3 })}
-              style={{ background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
-                borderRadius: 6, padding: '8px 16px', fontSize: 13, cursor: 'pointer' }}>
-              Force Unlock Game 3 — All Lanes
-            </button>
-          )}
-          {game2?.status !== 'pending' && game3?.status !== 'pending' && (
-            <div style={{ color: '#555577', fontSize: 13 }}>No game unlock actions available.</div>
-          )}
-        </div>
+        {!hasUnlockActions ? (
+          <div style={{ color: '#555577', fontSize: 13 }}>No game unlock actions available.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[game2, game3].filter(g => g?.status === 'pending').map(game => (
+              <div key={game.id}>
+                <div style={{ color: '#8888aa', fontSize: 11, textTransform: 'uppercase',
+                  letterSpacing: 1, marginBottom: 8 }}>Game {game.game_number}</div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <button onClick={() => setModal({ action: 'force_unlock_game', value: game.game_number })}
+                    style={btnStyle}>
+                    All Lanes
+                  </button>
+                  {lanePairs.map(lp => (
+                    <button key={lp}
+                      onClick={() => setModal({ action: 'force_unlock_lane_pair', gameNumber: game.game_number, lanePair: lp })}
+                      style={btnStyle}>
+                      Lane {lp}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Audit trail */}
       <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 8, padding: 16 }}>
-        <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Audit Trail</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700 }}>Audit Trail</div>
+          {overrides.length > 0 && (
+            <button onClick={exportAuditLog}
+              style={{ background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
+                borderRadius: 6, padding: '4px 12px', fontSize: 11, cursor: 'pointer' }}>
+              Export CSV
+            </button>
+          )}
+        </div>
         {overrides.length === 0 ? (
           <div style={{ color: '#555577', fontSize: 13, fontStyle: 'italic' }}>
             No overrides performed yet tonight.
@@ -282,10 +325,19 @@ export default function OverridesPage() {
       )}
       {modal?.action === 'force_unlock_game' && (
         <ConfirmModal
-          title={`Force unlock Game ${modal.value}?`}
+          title={`Force unlock Game ${modal.value} — All Lanes?`}
           message={`This will open Game ${modal.value} for all lane pairs immediately.`}
           confirmLabel={`Unlock Game ${modal.value}`}
           onConfirm={() => executeAction('force_unlock_game', null, null, modal.value)}
+          onCancel={() => setModal(null)}
+        />
+      )}
+      {modal?.action === 'force_unlock_lane_pair' && (
+        <ConfirmModal
+          title={`Force unlock Game ${modal.gameNumber} — Lane ${modal.lanePair}?`}
+          message={`This will open Game ${modal.gameNumber} for Lane Pair ${modal.lanePair} only.`}
+          confirmLabel={`Unlock Lane ${modal.lanePair}`}
+          onConfirm={() => executeAction('force_unlock_lane_pair', null, null, null, { gameNumber: modal.gameNumber, lanePair: modal.lanePair })}
           onCancel={() => setModal(null)}
         />
       )}
