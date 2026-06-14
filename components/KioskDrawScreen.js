@@ -7,7 +7,7 @@ import { CardRow } from './CardDisplay.js';
 const ACCENT = '#e8ff47';
 const SURFACE = '#2a2a45';
 const BORDER = '#7777cc';
-const INACTIVITY_SECONDS = 30;
+const INACTIVITY_SECONDS = 3;
 
 const RANK_DISPLAY = {'2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','T':'10','J':'J','Q':'Q','K':'K','A':'A'};
 const SUIT_SYMBOL = {'s':'♠','h':'♥','c':'♣','d':'♦'};
@@ -216,7 +216,11 @@ export default function KioskDrawScreen({ player, session, onBack }) {
             Lane {player.lane} · {session.seasonName} · Week {session.weekNumber}
           </span>
         </div>
-        <div style={{ display: 'flex', gap: 4 }}>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          <button onClick={onBack} style={{
+            background: 'transparent', border: '1px solid #7777cc', color: '#aaaacc',
+            fontSize: 12, padding: '5px 12px', borderRadius: 6, cursor: 'pointer',
+          }}>I'm done →</button>
           {games.map((g, i) => {
             const isOpen = g.status === 'open';
             const isActive = i === activeGameIndex;

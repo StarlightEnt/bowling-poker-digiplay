@@ -48,7 +48,7 @@ export default function KioskPlayerList({ session, onNewWeek }) {
 
   if (confirmed) {
     return <KioskDrawScreen player={confirmed} session={session}
-      onBack={() => setConfirmed(null)} />;
+      onBack={() => { setConfirmed(null); setSelected(null); setConfirmMsg(''); }} />;
   }
 
   if (loading) {
