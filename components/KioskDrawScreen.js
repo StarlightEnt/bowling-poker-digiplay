@@ -7,7 +7,7 @@ import { CardRow } from './CardDisplay.js';
 const ACCENT = '#e8ff47';
 const SURFACE = '#2a2a45';
 const BORDER = '#7777cc';
-const INACTIVITY_SECONDS = 3;
+const INACTIVITY_SECONDS = 8;
 
 const RANK_DISPLAY = {'2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','T':'10','J':'J','Q':'Q','K':'K','A':'A'};
 const SUIT_SYMBOL = {'s':'♠','h':'♥','c':'♣','d':'♦'};
