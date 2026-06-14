@@ -1,6 +1,6 @@
 // PATH: app/admin/shoe/page.js
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const ACCENT = '#e8ff47';
 const SURFACE = '#16213e';
@@ -11,21 +11,67 @@ export default function CardShoePage() {
   const [shoeData, setShoeData] = useState({});
   const [activeTab, setActiveTab] = useState(null);
   const [loading, setLoading] = useState(true);
+  // toggles: sources 1-4 on by default, 5 always off
+  const [enabled, setEnabled] = useState({ 1: true, 2: true, 3: true, 4: true, 5: false });
+  const [showModal, setShowModal] = useState(false);
+  const [replenishing, setReplenishing] = useState(false);
 
-  useEffect(() => {
-    fetch('/api/admin/dashboard').then(r => r.json()).then(data => {
-      setDashData(data);
-      const openGames = data.games?.filter(g => g.status === 'open' || g.status === 'closed') || [];
-      if (openGames.length > 0) setActiveTab(openGames[0].id);
-      // Fetch shoe data for each open game
-      openGames.forEach(async (game) => {
-        const res = await fetch(`/api/admin/shoe-stats?gameId=${game.id}`);
-        const d = await res.json();
-        setShoeData(prev => ({ ...prev, [game.id]: d }));
-      });
-      setLoading(false);
+  const fetchAll = useCallback(async () => {
+    const res = await fetch('/api/admin/dashboard');
+    const data = await res.json();
+    setDashData(data);
+    const openGames = data.games?.filter(g => g.status === 'open' || g.status === 'closed') || [];
+    if (openGames.length > 0 && !activeTab) setActiveTab(openGames[0].id);
+    const newShoeData = {};
+    await Promise.all(openGames.map(async (game) => {
+      const r = await fetch(`/api/admin/shoe-stats?gameId=${game.id}`);
+      newShoeData[game.id] = await r.json();
+    }));
+    setShoeData(newShoeData);
+    setLoading(false);
+  }, [activeTab]);
+
+  useEffect(() => { fetchAll(); }, []);
+
+  function shoeColor(remaining, total) {
+    const pct = remaining / total;
+    if (pct > 0.4) return '#3dffa0';
+    if (pct > 0.15) return '#ffaa44';
+    return '#ff6666';
+  }
+
+  function toggleSource(priority) {
+    if (priority === 5) return; // nuclear — never toggled from UI
+    setEnabled(prev => ({ ...prev, [priority]: !prev[priority] }));
+  }
+
+  function getTotal(sources) {
+    if (!sources) return 0;
+    return sources.reduce((sum, s) => {
+      if (s.nuclear) return sum; // nuclear excluded unless explicitly enabled
+      return sum + (enabled[s.priority] ? (s.count || 0) : 0);
+    }, 0);
+  }
+
+  async function triggerReplenishment() {
+    setReplenishing(true);
+    const activeGame = dashData?.games?.find(g => g.id === activeTab);
+    const enabledSources = Object.entries(enabled)
+      .filter(([, on]) => on)
+      .map(([k]) => parseInt(k));
+    await fetch('/api/admin/shoe/replenish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        gameId: activeTab,
+        sessionId: dashData?.session?.id,
+        enabledSources,
+      }),
     });
-  }, []);
+    setShowModal(false);
+    setReplenishing(false);
+    await fetchAll();
+  }
 
   if (loading) return <div style={{ padding: 32, color: '#8888aa' }}>Loading...</div>;
   if (!dashData?.session) return (
@@ -37,21 +83,8 @@ export default function CardShoePage() {
 
   const openGames = dashData.games?.filter(g => g.status !== 'pending') || [];
   const activeShoe = shoeData[activeTab];
-
-  function shoeColor(remaining, total) {
-    const pct = remaining / total;
-    if (pct > 0.4) return '#3dffa0';
-    if (pct > 0.15) return '#ffaa44';
-    return '#ff6666';
-  }
-
-  const REPLENISHMENT_SOURCES = [
-    { label: 'Duplicate cards — all players', key: 'duplicates', nuclear: false },
-    { label: 'Undrawn earned — submitted/forfeited players', key: 'undrawn_inactive', nuclear: false },
-    { label: 'Dead cards — submitted/forfeited players', key: 'dead_inactive', nuclear: false },
-    { label: 'Also held — submitted/forfeited players', key: 'also_held_inactive', nuclear: false },
-    { label: 'Undrawn earned — active players', key: 'undrawn_active', nuclear: true },
-  ];
+  const sources = activeShoe?.replenishmentSources || [];
+  const totalAvailable = getTotal(sources);
 
   return (
     <div style={{ padding: 24 }}>
@@ -113,23 +146,34 @@ export default function CardShoePage() {
             }} />
           </div>
 
-          {/* Replenishment sources */}
+          {/* Replenishment sources table */}
           <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
-            borderRadius: 8, overflow: 'hidden' }}>
+            borderRadius: 8, overflow: 'hidden', marginBottom: 16 }}>
             <div style={{ padding: '12px 16px', borderBottom: `1px solid ${BORDER}` }}>
               <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700 }}>Replenishment Sources</div>
               <div style={{ color: '#555577', fontSize: 11, marginTop: 2 }}>
                 Priority order — Best 5 from any player is NEVER touched
               </div>
             </div>
-            {REPLENISHMENT_SOURCES.map((source, idx) => (
-              <div key={source.key} style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 16px', borderTop: `1px solid ${BORDER}`,
+
+            {/* Header row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '36px 1fr 80px 60px',
+              background: '#0f1a2e', padding: '8px 16px', gap: 8 }}>
+              {['#', 'Source', 'Available', 'Include'].map(h => (
+                <div key={h} style={{ color: '#555577', fontSize: 10,
+                  textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
+              ))}
+            </div>
+
+            {sources.map(source => (
+              <div key={source.priority} style={{
+                display: 'grid', gridTemplateColumns: '36px 1fr 80px 60px',
+                padding: '12px 16px', gap: 8, borderTop: `1px solid ${BORDER}`,
+                alignItems: 'center',
                 opacity: source.nuclear ? 0.5 : 1,
               }}>
-                <div style={{ color: '#555577', fontSize: 12, minWidth: 20 }}>{idx + 1}</div>
-                <div style={{ flex: 1 }}>
+                <div style={{ color: '#555577', fontSize: 12 }}>{source.priority}</div>
+                <div>
                   <div style={{ color: source.nuclear ? '#ff6666' : '#ffffff', fontSize: 13 }}>
                     {source.label}
                   </div>
@@ -139,16 +183,87 @@ export default function CardShoePage() {
                     </div>
                   )}
                 </div>
+                <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700 }}>
+                  {source.count}
+                </div>
+                {/* Toggle */}
+                <div>
+                  {source.nuclear ? (
+                    <div style={{ width: 36, height: 20, background: '#2a2a45',
+                      borderRadius: 10, cursor: 'not-allowed', border: `1px solid ${BORDER}` }} />
+                  ) : (
+                    <div onClick={() => toggleSource(source.priority)}
+                      style={{
+                        width: 36, height: 20, borderRadius: 10, cursor: 'pointer',
+                        background: enabled[source.priority] ? ACCENT : '#2a2a45',
+                        border: `1px solid ${enabled[source.priority] ? ACCENT : BORDER}`,
+                        position: 'relative', transition: 'background 0.2s',
+                      }}>
+                      <div style={{
+                        position: 'absolute', top: 3,
+                        left: enabled[source.priority] ? 18 : 3,
+                        width: 14, height: 14, borderRadius: '50%',
+                        background: enabled[source.priority] ? '#1a1a2e' : '#555577',
+                        transition: 'left 0.2s',
+                      }} />
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
-            <div style={{ padding: '12px 16px', borderTop: `1px solid ${BORDER}`,
-              color: '#555577', fontSize: 12, fontStyle: 'italic' }}>
-              Replenishment trigger available in a future build.
+
+            {/* Total + trigger */}
+            <div style={{ padding: '14px 16px', borderTop: `1px solid ${BORDER}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <span style={{ color: '#8888aa', fontSize: 12 }}>Total available to reclaim: </span>
+                <span style={{ color: '#ffffff', fontSize: 14, fontWeight: 700 }}>{totalAvailable} cards</span>
+              </div>
+              <button
+                onClick={() => setShowModal(true)}
+                disabled={totalAvailable === 0}
+                style={{
+                  background: totalAvailable > 0 ? ACCENT : '#2a2a45',
+                  color: totalAvailable > 0 ? '#1a1a2e' : '#555577',
+                  border: 'none', borderRadius: 6, padding: '8px 18px',
+                  fontSize: 13, fontWeight: 700,
+                  cursor: totalAvailable > 0 ? 'pointer' : 'not-allowed',
+                }}>
+                Trigger Replenishment
+              </button>
             </div>
           </div>
         </>
       ) : (
         <div style={{ color: '#555577', fontSize: 13 }}>Loading shoe data...</div>
+      )}
+
+      {/* Confirm modal */}
+      {showModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}>
+          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+            borderRadius: 12, padding: 28, maxWidth: 400, width: '90%' }}>
+            <h3 style={{ color: '#ffffff', marginBottom: 8 }}>Trigger Replenishment?</h3>
+            <p style={{ color: '#8888aa', fontSize: 13, marginBottom: 16 }}>
+              {totalAvailable} cards will be returned to the shoe. Players will see face-down
+              placeholders for reclaimed cards. This cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={triggerReplenishment} disabled={replenishing}
+                style={{ flex: 1, background: ACCENT, color: '#1a1a2e',
+                  border: 'none', borderRadius: 6, padding: '10px', fontWeight: 700,
+                  fontSize: 14, opacity: replenishing ? 0.7 : 1 }}>
+                {replenishing ? 'Running...' : 'Confirm'}
+              </button>
+              <button onClick={() => setShowModal(false)} disabled={replenishing}
+                style={{ flex: 1, background: 'transparent', color: '#8888aa',
+                  border: `1px solid ${BORDER}`, borderRadius: 6, padding: '10px' }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
