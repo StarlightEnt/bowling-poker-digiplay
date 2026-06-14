@@ -146,6 +146,19 @@ export async function PATCH(request) {
       WHERE id = ${sessionId} AND league_id = ${leagueId}
       RETURNING id, locked, status
     `;
+
+    // Delete shoes and game state so re-lock creates fresh ones
+    const games = await sql`
+      SELECT id FROM games WHERE game_session_id = ${sessionId}
+    `;
+    if (games.length > 0) {
+      const gameIds = games.map(g => g.id);
+      await sql`DELETE FROM player_cards WHERE game_id = ANY(${gameIds})`;
+      await sql`DELETE FROM player_game_state WHERE game_id = ANY(${gameIds})`;
+      await sql`DELETE FROM shoes WHERE game_id = ANY(${gameIds})`;
+      await sql`UPDATE games SET status = 'pending', opened_at = NULL WHERE id = ANY(${gameIds})`;
+    }
+
     return Response.json({ session: updated });
   }
 
