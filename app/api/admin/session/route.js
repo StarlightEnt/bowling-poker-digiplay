@@ -1,6 +1,7 @@
 import { auth } from '../../../../lib/auth.js';
 import sql from '../../../../lib/db.js';
 import { generatePin } from '../../../../lib/finance.js';
+import { buildShoe } from '../../../../lib/cards.js';
 
 export async function GET() {
   const session = await auth();
@@ -103,6 +104,38 @@ export async function PATCH(request) {
       WHERE id = ${sessionId} AND league_id = ${leagueId}
       RETURNING id, locked, status
     `;
+
+    const games = await sql`
+      SELECT id, game_number FROM games
+      WHERE game_session_id = ${sessionId}
+      ORDER BY game_number ASC
+    `;
+
+    if (games.length === 3) {
+      const existingShoes = await sql`SELECT id FROM shoes WHERE game_id = ANY(${games.map(g => g.id)})`;
+      if (existingShoes.length === 0) {
+        for (const game of games) {
+          const cardOrder = buildShoe(6);
+          await sql`
+            INSERT INTO shoes (game_id, league_id, deck_count, total_cards, cards_remaining, cards_drawn, dead_cards_count, card_order, drawn_indices)
+            VALUES (${game.id}, ${leagueId}, 6, 312, 312, 0, 0, ${JSON.stringify(cardOrder)}, ${JSON.stringify([])})
+          `;
+        }
+        await sql`UPDATE games SET status = 'open', opened_at = NOW() WHERE id = ${games[0].id}`;
+
+        const players = await sql`SELECT id FROM players WHERE game_session_id = ${sessionId} AND league_id = ${leagueId}`;
+        for (const player of players) {
+          for (const game of games) {
+            await sql`
+              INSERT INTO player_game_state (player_id, game_id, league_id, status)
+              VALUES (${player.id}, ${game.id}, ${leagueId}, 'waiting')
+              ON CONFLICT (player_id, game_id) DO NOTHING
+            `;
+          }
+        }
+      }
+    }
+
     return Response.json({ session: updated });
   }
 
