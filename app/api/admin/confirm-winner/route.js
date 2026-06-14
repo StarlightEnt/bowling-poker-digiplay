@@ -28,6 +28,9 @@ export async function POST(request) {
   if (!game) return Response.json({ error: 'Game not found' }, { status: 404 });
   if (game.status === 'closed') return Response.json({ error: 'Game already closed' }, { status: 400 });
 
+  const existing = await sql`SELECT id FROM game_results WHERE game_id = ${gameId} LIMIT 1`;
+  if (existing.length > 0) return Response.json({ error: 'Winner already confirmed' }, { status: 400 });
+
   const [countRow] = await sql`
     SELECT COUNT(*) as count FROM players
     WHERE game_session_id = ${game.game_session_id}

@@ -51,19 +51,19 @@ export default function GameAdvancement() {
       ? [manualWinner.id]
       : leaderboard.tiedPlayers.map(p => p.id);
 
-    const res = await fetch('/api/admin/confirm-winner', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        gameId: selectedGameId,
-        winnerPlayerIds: winnerIds,
-        handName: sourcePlayer.hand?.name,
-        handCards: sourcePlayer.hand?.best5 || [],
-        handScore: sourcePlayer.score,
-      }),
-    });
-    const data = await res.json();
     try {
+      const res = await fetch('/api/admin/confirm-winner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gameId: selectedGameId,
+          winnerPlayerIds: winnerIds,
+          handName: sourcePlayer.hand?.name,
+          handCards: sourcePlayer.hand?.best5 || [],
+          handScore: sourcePlayer.score,
+        }),
+      });
+      const data = await res.json();
       if (data.confirmed) {
         setConfirmed(true);
         setConfirmResult(data);
