@@ -52,7 +52,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
       } catch {}
     }, 5000);
     return () => clearInterval(interval);
-  }, [activeGame?.id, announcementDismissed]);
+  }, [games, activeGameIndex, announcementDismissed, session.id]);
 
   const resetInactivity = useCallback(() => {
     setInactivityCountdown(null);
@@ -206,7 +206,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 24px',
-        background: '#16213e', borderBottom: '1px solid #2a2a5a',
+        background: '#2a2a45', borderBottom: '1px solid #7777cc',
       }}>
         <div>
           <span style={{ color: '#ffffff', fontSize: 18, fontWeight: 700 }}>
@@ -246,7 +246,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
         <div style={{
           width: 320, flexShrink: 0,
           display: 'flex', flexDirection: 'column', gap: 12,
-          padding: 16, borderRight: '1px solid #2a2a5a',
+          padding: 16, borderRight: '1px solid #7777cc',
           overflowY: 'auto',
         }}>
           <BowlingMarks
@@ -257,7 +257,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
           />
 
           {/* Draw section */}
-          <div style={{ background: '#16213e', border: '1px solid #2a2a5a', borderRadius: 8, padding: 16 }}>
+          <div style={{ background: '#2a2a45', border: '1px solid #7777cc', borderRadius: 8, padding: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <div>
                 <div style={{ color: '#ffffff', fontSize: 32, fontWeight: 900 }}>
@@ -357,7 +357,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200,
         }}>
           <div style={{
-            background: '#16213e', border: '1px solid #2a2a5a',
+            background: '#2a2a45', border: '1px solid #7777cc',
             borderRadius: 12, padding: 32, maxWidth: 400,
           }}>
             <h3 style={{ color: '#ffffff', marginBottom: 8 }}>Ready to submit your hand?</h3>
@@ -372,7 +372,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
               </button>
               <button onClick={() => setShowSubmitConfirm(false)}
                 style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                  border: '1px solid #2a2a5a', borderRadius: 6, padding: '12px' }}>
+                  border: '1px solid #7777cc', borderRadius: 6, padding: '12px' }}>
                 Not yet
               </button>
             </div>
@@ -387,7 +387,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300,
         }}>
           <div style={{
-            background: '#16213e', border: '1px solid #2a2a5a',
+            background: '#2a2a45', border: '1px solid #7777cc',
             borderRadius: 12, padding: 32, maxWidth: 400,
           }}>
             <h3 style={{ color: '#ffffff', marginBottom: 8 }}>Forfeit Game {activeGame?.game_number}?</h3>
@@ -402,7 +402,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
               </button>
               <button onClick={() => setShowForfeitOverlay(false)}
                 style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                  border: '1px solid #2a2a5a', borderRadius: 6, padding: '12px' }}>
+                  border: '1px solid #7777cc', borderRadius: 6, padding: '12px' }}>
                 Never mind
               </button>
             </div>
@@ -438,12 +438,12 @@ export default function KioskDrawScreen({ player, session, onBack }) {
       {/* Winner announcement overlay — landscape, centered */}
       {announcement && !announcementDismissed && (
         <div style={{
-          position: 'fixed', inset: 0, zIndex: 200,
+          position: 'fixed', inset: 0, zIndex: 500,
           background: announcement.isRoyalFlush ? '#1a1000' : '#1a1a2e',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
-          padding: '40px 80px',
-        }} onClick={() => setAnnouncementDismissed(true)}>
+          padding: '40px 80px', cursor: 'pointer',
+        }} onClick={() => { setAnnouncementDismissed(true); resetInactivity(); }}>
           {/* Game badge */}
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 3,
             textTransform: 'uppercase', color: announcement.isRoyalFlush ? '#c9860a' : '#888899',

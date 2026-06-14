@@ -37,9 +37,8 @@ export default function KioskPlayerList({ session, onNewWeek }) {
       setConfirmMsg(`✓ Good luck tonight, ${data.player.normalized_name}!`);
       await fetchPlayers();
       setTimeout(() => {
-        setSelected(null);
-        setConfirmMsg('');
-      }, 4000);
+        setConfirmed(data.player);
+      }, 2000);
     }
   }
 
