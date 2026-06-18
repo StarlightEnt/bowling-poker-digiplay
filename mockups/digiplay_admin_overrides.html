@@ -1,0 +1,299 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.admin{display:flex;height:620px;background:var(--color-background-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;border:0.5px solid var(--color-border-tertiary);font-family:var(--font-sans)}
+.sidebar{width:190px;flex-shrink:0;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.sidebar-header{padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sidebar-logo{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.sidebar-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.sidebar-nav{flex:1;padding:8px 0}
+.nav-section{padding:8px 16px 4px;font-size:10px;color:var(--color-text-tertiary);letter-spacing:.5px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 16px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent}
+.nav-item:hover{background:var(--color-background-secondary)}
+.nav-item.active{color:var(--color-text-primary);border-left-color:#e8ff47;background:var(--color-background-secondary);font-weight:500}
+.nav-item i{font-size:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--color-background-danger);color:var(--color-text-danger);font-size:10px;font-weight:500;padding:1px 5px;border-radius:8px}
+.sidebar-footer{padding:10px 16px;border-top:0.5px solid var(--color-border-tertiary);font-size:11px;color:var(--color-text-tertiary)}
+.sidebar-footer span{display:block;color:var(--color-text-secondary);font-weight:500;font-size:12px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.main-header{padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.main-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.main-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.main-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);white-space:nowrap}
+.btn-sm:hover{background:var(--color-background-secondary)}
+.btn-danger{background:var(--color-background-danger);color:var(--color-text-danger);border-color:var(--color-border-danger)}
+.btn-warning{background:var(--color-background-warning);color:var(--color-text-warning);border-color:var(--color-border-warning)}
+.btn-primary{background:#e8ff47;color:#1a1a2e;border-color:#e8ff47;font-weight:500}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.card-header{padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.ov-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.ov-table th{padding:7px 12px;text-align:left;font-size:10px;color:var(--color-text-tertiary);font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);white-space:nowrap}
+.ov-table td{padding:8px 12px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.ov-table tr:last-child td{border-bottom:none}
+.ov-table tr:hover td{background:var(--color-background-secondary)}
+.actions-cell{display:flex;gap:5px;flex-wrap:nowrap}
+.status-pill{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:500;white-space:nowrap}
+.pill-submitted{background:var(--color-background-success);color:var(--color-text-success)}
+.pill-drawing{background:var(--color-background-info);color:var(--color-text-info)}
+.pill-forfeited{background:var(--color-background-danger);color:var(--color-text-danger)}
+.pill-waiting{background:var(--color-background-secondary);color:var(--color-text-tertiary);border:0.5px solid var(--color-border-tertiary)}
+.game-controls{padding:12px 14px;display:flex;gap:8px;flex-wrap:wrap}
+.audit-list{padding:0}
+.audit-item{padding:8px 14px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:baseline;gap:10px;font-size:12px}
+.audit-item:last-child{border-bottom:none}
+.audit-time{color:var(--color-text-tertiary);font-size:11px;white-space:nowrap;font-family:var(--font-mono)}
+.audit-action{color:var(--color-text-primary);flex:1}
+.audit-who{color:var(--color-text-tertiary);font-size:11px;white-space:nowrap}
+.audit-empty{padding:16px 14px;font-size:12px;color:var(--color-text-tertiary);text-align:center;font-style:italic}
+.modal-backdrop{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center;border-radius:var(--border-radius-lg)}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:20px;width:320px;position:relative}
+.modal-title{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.modal-body{font-size:12px;color:var(--color-text-secondary);margin-bottom:16px;line-height:1.6}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.stepper-row{display:flex;align-items:center;justify-content:center;gap:12px;margin:12px 0}
+.step-btn{width:32px;height:32px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);font-size:18px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.step-btn:hover{background:var(--color-background-secondary)}
+.step-val{font-size:20px;font-weight:500;color:var(--color-text-primary);min-width:40px;text-align:center}
+.step-label{font-size:11px;color:var(--color-text-tertiary);text-align:center;margin-top:2px}
+</style>
+
+<div class="admin" style="position:relative">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Bowling Poker</div>
+      <div class="sidebar-sub">Digiplay Admin</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Game Night</div>
+      <div class="nav-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</div>
+      <div class="nav-item"><i class="ti ti-trophy" aria-hidden="true"></i> Game Advancement</div>
+      <div class="nav-item active"><i class="ti ti-adjustments" aria-hidden="true"></i> Overrides</div>
+      <div class="nav-section">Setup</div>
+      <div class="nav-item"><i class="ti ti-calendar" aria-hidden="true"></i> Session Setup</div>
+      <div class="nav-item"><i class="ti ti-stack" aria-hidden="true"></i> Card Shoe</div>
+      <div class="nav-section">League</div>
+      <div class="nav-item"><i class="ti ti-settings" aria-hidden="true"></i> Settings</div>
+    </div>
+    <div class="sidebar-footer">
+      <span>Thursday Nite Strikers</span>
+      Summer 2026 · Week 7
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="main-header">
+      <div>
+        <div class="main-title">Overrides</div>
+        <div class="main-sub">Force actions on any player · all actions require confirmation · fully audited</div>
+      </div>
+    </div>
+    <div class="main-body">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Player overrides — Game 1</div>
+        </div>
+        <table class="ov-table">
+          <colgroup>
+            <col style="width:18%"><col style="width:10%"><col style="width:14%"><col style="width:58%">
+          </colgroup>
+          <thead>
+            <tr><th>Player</th><th>Lane</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="ov-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Game controls</div></div>
+        <div class="game-controls">
+          <button class="btn-sm" onclick="gameControl('unlock-all')">Force unlock Game 2 — all lanes</button>
+          <button class="btn-sm" onclick="gameControl('unlock-12')">Force unlock Game 2 — Lane 1-2</button>
+          <button class="btn-sm" onclick="gameControl('unlock-34')">Force unlock Game 2 — Lane 3-4</button>
+          <button class="btn-sm" onclick="gameControl('unlock-56')">Force unlock Game 2 — Lane 5-6</button>
+          <button class="btn-sm" onclick="gameControl('unlock-78')">Force unlock Game 2 — Lane 7-8</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Audit trail — tonight</div>
+          <button class="btn-sm">Export</button>
+        </div>
+        <div id="audit-list">
+          <div class="audit-empty" id="audit-empty">No overrides performed yet tonight.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Confirm modal -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <div class="modal-title" id="modal-title">Confirm action</div>
+      <div class="modal-body" id="modal-body">Are you sure?</div>
+      <div id="stepper-wrap" style="display:none">
+        <div class="stepper-row">
+          <button class="step-btn" onclick="stepAdj(-1)">−</button>
+          <div>
+            <div class="step-val" id="step-val">9</div>
+            <div class="step-label">draw count</div>
+          </div>
+          <button class="step-btn" onclick="stepAdj(1)">+</button>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-sm" onclick="closeModal()">Cancel</button>
+        <button class="btn-sm btn-primary" id="modal-confirm" onclick="doConfirm()">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let players=[
+  {name:'Alice B.',lane:'1-2',status:'submitted',drawn:14},
+  {name:'Bob C.',lane:'1-2',status:'drawing',drawn:9},
+  {name:'Carol D.',lane:'3-4',status:'drawing',drawn:4},
+  {name:'Dave E.',lane:'3-4',status:'submitted',drawn:11},
+  {name:'Ellen F.',lane:'5-6',status:'drawing',drawn:3},
+  {name:'Frank G.',lane:'5-6',status:'forfeited',drawn:8},
+  {name:'Grace H.',lane:'7-8',status:'drawing',drawn:2},
+  {name:'Hank I.',lane:'7-8',status:'waiting',drawn:0},
+];
+
+const statusHTML={
+  submitted:'<span class="status-pill pill-submitted"><i class="ti ti-check" style="font-size:10px"></i> Submitted</span>',
+  drawing:'<span class="status-pill pill-drawing"><i class="ti ti-cards" style="font-size:10px"></i> Drawing</span>',
+  forfeited:'<span class="status-pill pill-forfeited"><i class="ti ti-x" style="font-size:10px"></i> Forfeited</span>',
+  waiting:'<span class="status-pill pill-waiting">Waiting</span>',
+};
+
+let pendingAction=null,stepCurrent=0;
+const auditLog=[];
+
+function buildTable(){
+  const tbody=document.getElementById('ov-tbody');
+  tbody.innerHTML='';
+  players.forEach((p,i)=>{
+    const tr=document.createElement('tr');
+    let actions='';
+    if(p.status==='submitted'){
+      actions+=`<button class="btn-sm" onclick="doAction(${i},'undo-submit')">Undo submit</button>`;
+      actions+=`<button class="btn-sm" onclick="doAction(${i},'adjust')">Adjust draw count</button>`;
+    } else if(p.status==='forfeited'){
+      actions+=`<button class="btn-sm" onclick="doAction(${i},'undo-forfeit')">Undo forfeit</button>`;
+      actions+=`<button class="btn-sm" onclick="doAction(${i},'force-submit')">Force submit</button>`;
+      actions+=`<button class="btn-sm" onclick="doAction(${i},'adjust')">Adjust draw count</button>`;
+    } else if(p.status==='drawing'||p.status==='waiting'){
+      actions+=`<button class="btn-sm" onclick="doAction(${i},'force-submit')">Force submit</button>`;
+      actions+=`<button class="btn-sm btn-warning" onclick="doAction(${i},'force-forfeit')">Force forfeit</button>`;
+      actions+=`<button class="btn-sm" onclick="doAction(${i},'adjust')">Adjust draw count</button>`;
+    }
+    tr.innerHTML=`
+      <td style="font-weight:500">${p.name}</td>
+      <td>${p.lane}</td>
+      <td>${statusHTML[p.status]}</td>
+      <td><div class="actions-cell">${actions}</div></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function doAction(idx,type){
+  const p=players[idx];
+  pendingAction={idx,type};
+  const modal=document.getElementById('modal');
+  const stepWrap=document.getElementById('stepper-wrap');
+  stepWrap.style.display='none';
+  const msgs={
+    'undo-submit':{title:'Undo submission — '+p.name,body:'This will unlock '+p.name+'\'s hand and allow further drawing. Their current best 5 is preserved.'},
+    'undo-forfeit':{title:'Undo forfeit — '+p.name,body:'This will reinstate '+p.name+' into Game 1. They can resume drawing from where they left off.'},
+    'force-submit':{title:'Force submit — '+p.name,body:'This will lock '+p.name+'\'s current hand and mark Game 1 complete for them. They cannot draw further.'},
+    'force-forfeit':{title:'Force forfeit — '+p.name,body:'This will remove '+p.name+'\'s hand from the Game 1 pool. This cannot be undone without another override.'},
+    'adjust':{title:'Adjust draw count — '+p.name,body:'Current draw count: '+p.drawn+'. Use +/− to set the correct count.',stepper:true},
+  };
+  const m=msgs[type];
+  document.getElementById('modal-title').textContent=m.title;
+  document.getElementById('modal-body').textContent=m.body;
+  if(m.stepper){
+    stepCurrent=p.drawn;
+    document.getElementById('step-val').textContent=stepCurrent;
+    stepWrap.style.display='block';
+  }
+  const confirmBtn=document.getElementById('modal-confirm');
+  confirmBtn.className='btn-sm '+(type==='force-forfeit'?'btn-danger':'btn-primary');
+  modal.classList.add('open');
+}
+
+function gameControl(type){
+  const labels={
+    'unlock-all':'Force unlock Game 2 for all lane pairs?',
+    'unlock-12':'Force unlock Game 2 for Lane 1-2?',
+    'unlock-34':'Force unlock Game 2 for Lane 3-4?',
+    'unlock-56':'Force unlock Game 2 for Lane 5-6?',
+    'unlock-78':'Force unlock Game 2 for Lane 7-8?',
+  };
+  pendingAction={idx:null,type};
+  document.getElementById('modal-title').textContent='Game control';
+  document.getElementById('modal-body').textContent=labels[type]+' Players on that pair will be able to access Game 2 immediately.';
+  document.getElementById('stepper-wrap').style.display='none';
+  document.getElementById('modal-confirm').className='btn-sm btn-primary';
+  document.getElementById('modal').classList.add('open');
+}
+
+function stepAdj(d){
+  stepCurrent=Math.max(0,stepCurrent+d);
+  document.getElementById('step-val').textContent=stepCurrent;
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  pendingAction=null;
+}
+
+function doConfirm(){
+  if(!pendingAction){closeModal();return;}
+  const {idx,type}=pendingAction;
+  const now=new Date();
+  const time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+'pm';
+  let actionText='';
+  if(idx!==null){
+    const p=players[idx];
+    if(type==='undo-submit'){players[idx].status='drawing';actionText='Undo submit — '+p.name;}
+    else if(type==='undo-forfeit'){players[idx].status='drawing';actionText='Undo forfeit — '+p.name;}
+    else if(type==='force-submit'){players[idx].status='submitted';actionText='Force submitted — '+p.name;}
+    else if(type==='force-forfeit'){players[idx].status='forfeited';actionText='Force forfeited — '+p.name;}
+    else if(type==='adjust'){players[idx].drawn=stepCurrent;actionText='Adjusted draw count to '+stepCurrent+' — '+p.name;}
+  } else {
+    const labels={'unlock-all':'Force unlocked Game 2 — all lanes','unlock-12':'Force unlocked Game 2 — Lane 1-2','unlock-34':'Force unlocked Game 2 — Lane 3-4','unlock-56':'Force unlocked Game 2 — Lane 5-6','unlock-78':'Force unlocked Game 2 — Lane 7-8'};
+    actionText=labels[type]||type;
+  }
+  auditLog.unshift({time,action:actionText,who:'Alli L.'});
+  buildTable();
+  buildAudit();
+  closeModal();
+}
+
+function buildAudit(){
+  const container=document.getElementById('audit-list');
+  const empty=document.getElementById('audit-empty');
+  if(auditLog.length===0){
+    if(empty) empty.style.display='block';
+    return;
+  }
+  if(empty) empty.style.display='none';
+  container.innerHTML='';
+  auditLog.forEach(entry=>{
+    const div=document.createElement('div');
+    div.className='audit-item';
+    div.innerHTML=`<span class="audit-time">${entry.time}</span><span class="audit-action">${entry.action}</span><span class="audit-who">${entry.who}</span>`;
+    container.appendChild(div);
+  });
+}
+
+buildTable();
+</script>

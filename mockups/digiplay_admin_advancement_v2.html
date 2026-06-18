@@ -1,0 +1,371 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.admin{display:flex;height:620px;background:var(--color-background-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;border:0.5px solid var(--color-border-tertiary);font-family:var(--font-sans)}
+.sidebar{width:190px;flex-shrink:0;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.sidebar-header{padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sidebar-logo{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.sidebar-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.sidebar-nav{flex:1;padding:8px 0}
+.nav-section{padding:8px 16px 4px;font-size:10px;color:var(--color-text-tertiary);letter-spacing:.5px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 16px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent}
+.nav-item:hover{background:var(--color-background-secondary)}
+.nav-item.active{color:var(--color-text-primary);border-left-color:#e8ff47;background:var(--color-background-secondary);font-weight:500}
+.nav-item i{font-size:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--color-background-danger);color:var(--color-text-danger);font-size:10px;font-weight:500;padding:1px 5px;border-radius:8px}
+.sidebar-footer{padding:10px 16px;border-top:0.5px solid var(--color-border-tertiary);font-size:11px;color:var(--color-text-tertiary)}
+.sidebar-footer span{display:block;color:var(--color-text-secondary);font-weight:500;font-size:12px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.main-header{padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.main-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.main-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);white-space:nowrap}
+.btn-sm:hover{background:var(--color-background-secondary)}
+.btn-primary{background:#e8ff47;color:#1a1a2e;border-color:#e8ff47;font-weight:500}
+.btn-primary:hover{opacity:.88}
+.main-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.card-header{padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.lb-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.lb-table th{padding:7px 12px;text-align:left;font-size:10px;color:var(--color-text-tertiary);font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);white-space:nowrap}
+.lb-table td{padding:8px 12px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.lb-table tr:last-child td{border-bottom:none}
+.row-winner td{background:var(--color-background-success)}
+.row-tie td{background:var(--color-background-warning)}
+.row-rf td{background:#2a1f00}
+.row-rf td{color:#ffd700 !important}
+.row-rf .hand-name{color:#ffd700 !important}
+.row-rf .hand-cards{color:#c9860a !important}
+.row-rf .status-pill{background:#3a2800 !important;color:#ffd700 !important}
+.row-muted td{opacity:.45}
+.hand-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.hand-cards{font-size:11px;color:var(--color-text-secondary);font-family:var(--font-mono)}
+.tie-badge{display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;font-weight:500;background:var(--color-background-warning);color:var(--color-text-warning);margin-left:5px;vertical-align:middle}
+.rf-badge{display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;font-weight:500;background:#3a2800;color:#ffd700;margin-left:5px;vertical-align:middle}
+.ip-badge{display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;background:var(--color-background-secondary);color:var(--color-text-tertiary);border:0.5px solid var(--color-border-tertiary);margin-left:5px;vertical-align:middle}
+.status-pill{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:500}
+.pill-submitted{background:var(--color-background-success);color:var(--color-text-success)}
+.pill-drawing{background:var(--color-background-info);color:var(--color-text-info)}
+.pill-forfeited{background:var(--color-background-danger);color:var(--color-text-danger)}
+.confirm-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.confirm-header{padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.confirm-body{padding:14px}
+.winner-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-bottom:10px}
+.winner-name{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.winner-detail{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.confirm-note{font-size:11px;color:var(--color-text-tertiary)}
+.change-row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.autocomplete-wrap{position:relative;flex:1}
+.ac-input{width:100%;padding:6px 10px;font-size:12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary)}
+.ac-input:focus{outline:none;border-color:var(--color-border-primary)}
+.ac-drop{position:absolute;top:100%;left:0;right:0;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);z-index:20;margin-top:2px;display:none;max-height:150px;overflow-y:auto}
+.ac-drop.open{display:block}
+.ac-item{padding:7px 10px;font-size:12px;cursor:pointer;color:var(--color-text-primary)}
+.ac-item:hover{background:var(--color-background-secondary)}
+.split-note{font-size:11px;color:var(--color-text-warning);background:var(--color-background-warning);padding:6px 10px;border-radius:var(--border-radius-md);margin-bottom:10px}
+.announced-banner{background:var(--color-background-success);border:0.5px solid var(--color-border-success);border-radius:var(--border-radius-md);padding:12px 14px;text-align:center}
+.announced-banner p{font-size:13px;color:var(--color-text-success);font-weight:500}
+.announced-banner span{font-size:11px;color:var(--color-text-success)}
+</style>
+
+<div class="admin">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Bowling Poker</div>
+      <div class="sidebar-sub">Digiplay Admin</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Game Night</div>
+      <div class="nav-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</div>
+      <div class="nav-item active"><i class="ti ti-trophy" aria-hidden="true"></i> Game Advancement <span class="nav-badge">!</span></div>
+      <div class="nav-item"><i class="ti ti-adjustments" aria-hidden="true"></i> Overrides</div>
+      <div class="nav-section">Setup</div>
+      <div class="nav-item"><i class="ti ti-calendar" aria-hidden="true"></i> Session Setup</div>
+      <div class="nav-item"><i class="ti ti-stack" aria-hidden="true"></i> Card Shoe</div>
+      <div class="nav-section">League</div>
+      <div class="nav-item"><i class="ti ti-settings" aria-hidden="true"></i> Settings</div>
+    </div>
+    <div class="sidebar-footer">
+      <span>Thursday Nite Strikers</span>
+      Summer 2026 · Week 7
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="main-header">
+      <div>
+        <div class="main-title">Game Advancement — Game 1</div>
+        <div class="main-sub">Review all hands · confirm winner · announce to all screens</div>
+      </div>
+      <button class="btn-sm" onclick="cycleDemo()">Demo: cycle scenarios →</button>
+    </div>
+    <div class="main-body">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Game 1 leaderboard</div>
+          <div style="font-size:11px;color:var(--color-text-tertiary)" id="progress-note">17 of 25 submitted · 8 still drawing</div>
+        </div>
+        <table class="lb-table">
+          <colgroup>
+            <col style="width:6%"><col style="width:20%"><col style="width:17%">
+            <col style="width:29%"><col style="width:12%"><col style="width:16%">
+          </colgroup>
+          <thead>
+            <tr><th>Rank</th><th>Player</th><th>Hand</th><th>Cards</th><th>Lane</th><th>Status</th></tr>
+          </thead>
+          <tbody id="lb-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="confirm-card">
+        <div class="confirm-header">
+          <div class="card-title">Confirm winner</div>
+          <button class="btn-sm" id="change-btn" onclick="toggleChange()">Change winner</button>
+        </div>
+        <div class="confirm-body">
+          <div class="split-note" id="split-note" style="display:none">
+            <i class="ti ti-alert-triangle" style="font-size:12px;vertical-align:-1px" aria-hidden="true"></i>
+            Tie detected — pot will be split equally. No further action needed.
+          </div>
+          <div class="winner-row" id="winner-row">
+            <div>
+              <div class="winner-name" id="winner-name">—</div>
+              <div class="winner-detail" id="winner-detail">—</div>
+            </div>
+            <button class="btn-sm btn-primary" onclick="announce()">Confirm &amp; announce →</button>
+          </div>
+          <div class="change-row" id="change-row" style="display:none">
+            <div class="autocomplete-wrap">
+              <input class="ac-input" id="ac-input" type="text" placeholder="Type player name..." oninput="acSearch()" onfocus="acSearch()">
+              <div class="ac-drop" id="ac-drop"></div>
+            </div>
+            <button class="btn-sm" onclick="cancelChange()">Cancel</button>
+          </div>
+          <div class="confirm-note" id="confirm-note">Confirming will push the winner announcement to all active player screens simultaneously.</div>
+          <div class="announced-banner" id="announced-banner" style="display:none">
+            <p><i class="ti ti-check" aria-hidden="true"></i> Announced — winner pushed to all screens</p>
+            <span id="announced-sub">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const RANKS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+function rv(r){return RANKS.indexOf(r);}
+
+// Score a 5-card hand — returns [handTypeScore, ...cardRanks descending]
+// Used for true comparison including kickers
+function scoreDetailed(cards){
+  const ranks=cards.map(c=>rv(c.r)).sort((a,b)=>b-a);
+  const suits=cards.map(c=>c.s);
+  const flush=suits.every(s=>s===suits[0]);
+  const uniq=[...new Set(ranks)].sort((a,b)=>b-a);
+  const straight=uniq.length===5&&uniq[0]-uniq[4]===4;
+  const cnt={};ranks.forEach(r=>{cnt[r]=(cnt[r]||0)+1;});
+  const freq=Object.values(cnt).sort((a,b)=>b-a);
+  // Group ranks by count descending, then rank descending — for tiebreaking
+  const grouped=Object.entries(cnt)
+    .sort((a,b)=>b[1]-a[1]||b[0]-a[0])
+    .map(e=>parseInt(e[0]));
+  let type=0;
+  if(flush&&straight&&ranks[0]===12) type=9;
+  else if(flush&&straight) type=8;
+  else if(freq[0]===4) type=7;
+  else if(freq[0]===3&&freq[1]===2) type=6;
+  else if(flush) type=5;
+  else if(straight) type=4;
+  else if(freq[0]===3) type=3;
+  else if(freq[0]===2&&freq[1]===2) type=2;
+  else if(freq[0]===2) type=1;
+  return [type,...grouped];
+}
+
+function compareScores(a,b){
+  for(let i=0;i<Math.max(a.length,b.length);i++){
+    const av=a[i]||0,bv=b[i]||0;
+    if(av!==bv) return bv-av;
+  }
+  return 0; // true tie
+}
+
+const statusHTML={
+  submitted:'<span class="status-pill pill-submitted"><i class="ti ti-check" style="font-size:10px"></i> Submitted</span>',
+  drawing:'<span class="status-pill pill-drawing"><i class="ti ti-cards" style="font-size:10px"></i> Drawing</span>',
+  forfeited:'<span class="status-pill pill-forfeited"><i class="ti ti-x" style="font-size:10px"></i> Forfeited</span>',
+};
+
+// Three demo datasets
+const scenarios=[
+  // Normal — Alice clearly wins KKK99 over QQQ77 — NOT a tie
+  [
+    {name:'Alice B.',lane:'1-2',status:'submitted',
+     cards:[{r:'K',s:'♠'},{r:'K',s:'♥'},{r:'K',s:'♦'},{r:'9',s:'♥'},{r:'9',s:'♦'}]},
+    {name:'Rachel S.',lane:'3-4',status:'submitted',
+     cards:[{r:'Q',s:'♠'},{r:'Q',s:'♥'},{r:'Q',s:'♦'},{r:'7',s:'♥'},{r:'7',s:'♦'}]},
+    {name:'Dave E.',lane:'3-4',status:'submitted',
+     cards:[{r:'A',s:'♠'},{r:'J',s:'♠'},{r:'9',s:'♠'},{r:'7',s:'♠'},{r:'3',s:'♠'}]},
+    {name:'Bob C.',lane:'1-2',status:'submitted',
+     cards:[{r:'Q',s:'♥'},{r:'Q',s:'♦'},{r:'8',s:'♣'},{r:'8',s:'♠'},{r:'A',s:'♦'}]},
+    {name:'Grace H.',lane:'7-8',status:'drawing',
+     cards:[{r:'7',s:'♠'},{r:'4',s:'♥'},{r:'2',s:'♣'},{r:'J',s:'♦'},{r:'5',s:'♠'}]},
+    {name:'Hank I.',lane:'7-8',status:'drawing',
+     cards:[{r:'A',s:'♠'},{r:'3',s:'♦'},{r:'6',s:'♣'},{r:'9',s:'♥'},{r:'2',s:'♠'}]},
+  ],
+  // True tie — both K-high straight flush (different suits = true tie)
+  [
+    {name:'Alice B.',lane:'1-2',status:'submitted',
+     cards:[{r:'9',s:'♠'},{r:'10',s:'♠'},{r:'J',s:'♠'},{r:'Q',s:'♠'},{r:'K',s:'♠'}]},
+    {name:'Rachel S.',lane:'3-4',status:'submitted',
+     cards:[{r:'9',s:'♥'},{r:'10',s:'♥'},{r:'J',s:'♥'},{r:'Q',s:'♥'},{r:'K',s:'♥'}]},
+    {name:'Dave E.',lane:'3-4',status:'submitted',
+     cards:[{r:'A',s:'♠'},{r:'J',s:'♦'},{r:'9',s:'♦'},{r:'7',s:'♦'},{r:'3',s:'♦'}]},
+    {name:'Bob C.',lane:'1-2',status:'drawing',
+     cards:[{r:'Q',s:'♥'},{r:'Q',s:'♦'},{r:'8',s:'♣'},{r:'8',s:'♠'},{r:'A',s:'♦'}]},
+  ],
+  // Royal Flush
+  [
+    {name:'Rachel S.',lane:'3-4',status:'submitted',
+     cards:[{r:'10',s:'♠'},{r:'J',s:'♠'},{r:'Q',s:'♠'},{r:'K',s:'♠'},{r:'A',s:'♠'}]},
+    {name:'Alice B.',lane:'1-2',status:'submitted',
+     cards:[{r:'K',s:'♠'},{r:'K',s:'♥'},{r:'K',s:'♦'},{r:'9',s:'♥'},{r:'9',s:'♦'}]},
+    {name:'Dave E.',lane:'3-4',status:'submitted',
+     cards:[{r:'A',s:'♠'},{r:'J',s:'♠'},{r:'9',s:'♠'},{r:'7',s:'♠'},{r:'3',s:'♠'}]},
+    {name:'Bob C.',lane:'1-2',status:'drawing',
+     cards:[{r:'Q',s:'♥'},{r:'Q',s:'♦'},{r:'8',s:'♣'},{r:'8',s:'♠'},{r:'A',s:'♦'}]},
+  ]
+];
+
+function handLabel(cards){
+  const s=scoreDetailed(cards);
+  const names=['High Card','One Pair','Two Pair','Three of a Kind','Straight','Flush','Full House','Four of a Kind','Straight Flush','Royal Flush'];
+  return names[s[0]];
+}
+function cardsStr(cards){return cards.map(c=>c.r+c.s).join(' ');}
+
+let demo=0;
+let changingWinner=false;
+let announced=false;
+let manualWinner=null;
+
+function buildLeaderboard(){
+  announced=false;changingWinner=false;manualWinner=null;
+  document.getElementById('winner-row').style.display='flex';
+  document.getElementById('change-btn').style.display='';
+  document.getElementById('confirm-note').style.display='block';
+  document.getElementById('announced-banner').style.display='none';
+  document.getElementById('change-row').style.display='none';
+  document.getElementById('change-btn').textContent='Change winner';
+
+  const raw=scenarios[demo];
+  // Score and sort
+  const scored=raw.map(p=>({...p,score:scoreDetailed(p.cards),label:handLabel(p.cards),str:cardsStr(p.cards)}));
+  scored.sort((a,b)=>compareScores(a.score,b.score));
+  // Assign ranks with tie detection
+  let currentRank=1;
+  for(let i=0;i<scored.length;i++){
+    if(i===0){scored[i].rank=1;}
+    else{
+      const cmp=compareScores(scored[i].score,scored[i-1].score);
+      if(cmp===0){scored[i].rank=scored[i-1].rank;scored[i-1].tie=true;scored[i].tie=true;}
+      else{currentRank=i+1;scored[i].rank=currentRank;}
+    }
+  }
+
+  const tbody=document.getElementById('lb-tbody');
+  tbody.innerHTML='';
+  scored.forEach(p=>{
+    const isRF=p.score[0]===9;
+    const isIP=p.status==='drawing';
+    const isForfeited=p.status==='forfeited';
+    const isWinner=p.rank===1&&!isIP;
+    const tr=document.createElement('tr');
+    if(isRF) tr.className='row-rf';
+    else if(p.tie&&isWinner) tr.className='row-tie';
+    else if(isWinner) tr.className='row-winner';
+    else if(isIP||isForfeited) tr.className='row-muted';
+    const rfBadge=isRF?'<span class="rf-badge">Royal Flush</span>':'';
+    const tieBadge=p.tie?'<span class="tie-badge">TIE</span>':'';
+    const ipBadge=isIP?'<span class="ip-badge">in progress</span>':'';
+    tr.innerHTML=`
+      <td style="font-weight:500">${p.rank}</td>
+      <td style="font-weight:500">${p.name}${tieBadge}${rfBadge}</td>
+      <td class="hand-name">${p.label}</td>
+      <td class="hand-cards">${p.str}${ipBadge}</td>
+      <td>${p.lane}</td>
+      <td>${statusHTML[p.status]||''}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Confirm card
+  const winners=scored.filter(p=>p.rank===1&&p.status==='submitted');
+  const isTie=winners.length>1;
+  const isRF=winners[0]&&winners[0].score[0]===9;
+  document.getElementById('split-note').style.display=isTie?'block':'none';
+  if(winners.length>0){
+    const w=winners[0];
+    if(isTie){
+      const names=winners.map(p=>p.name).join(' & ');
+      const split=(42/winners.length).toFixed(2);
+      document.getElementById('winner-name').textContent=names;
+      document.getElementById('winner-detail').textContent=w.label+' (tied) · Split pot: $'+split+' each';
+    } else if(isRF){
+      document.getElementById('winner-name').textContent=w.name;
+      document.getElementById('winner-detail').textContent='Royal Flush · '+w.str+' · Lane '+w.lane+' · Game $42.00 + Progressive $33.00';
+    } else {
+      document.getElementById('winner-name').textContent=w.name;
+      document.getElementById('winner-detail').textContent=w.label+' · '+w.str+' · Lane '+w.lane+' · Payout $42.00';
+    }
+  }
+  // Populate autocomplete pool
+  window._acPlayers=scored;
+}
+
+function cycleDemo(){demo=(demo+1)%3;buildLeaderboard();}
+
+function toggleChange(){
+  changingWinner=true;
+  document.getElementById('change-row').style.display='flex';
+  document.getElementById('winner-row').style.display='none';
+  document.getElementById('change-btn').style.display='none';
+  setTimeout(()=>document.getElementById('ac-input').focus(),50);
+}
+function cancelChange(){
+  changingWinner=false;
+  document.getElementById('change-row').style.display='none';
+  document.getElementById('winner-row').style.display='flex';
+  document.getElementById('change-btn').style.display='';
+  document.getElementById('ac-drop').classList.remove('open');
+}
+function acSearch(){
+  const val=document.getElementById('ac-input').value.toLowerCase();
+  const drop=document.getElementById('ac-drop');
+  const matches=(window._acPlayers||[]).filter(p=>p.name.toLowerCase().includes(val));
+  drop.innerHTML='';
+  matches.forEach(p=>{
+    const d=document.createElement('div');d.className='ac-item';
+    d.textContent=p.name+' — '+p.label;
+    d.onclick=()=>{
+      document.getElementById('winner-name').textContent=p.name;
+      document.getElementById('winner-detail').textContent=p.label+' · '+p.str+' · Lane '+p.lane+' · Payout $42.00';
+      cancelChange();
+    };
+    drop.appendChild(d);
+  });
+  drop.classList.toggle('open',matches.length>0);
+}
+function announce(){
+  document.getElementById('winner-row').style.display='none';
+  document.getElementById('change-btn').style.display='none';
+  document.getElementById('confirm-note').style.display='none';
+  document.getElementById('split-note').style.display='none';
+  document.getElementById('announced-banner').style.display='block';
+  const name=document.getElementById('winner-name').textContent;
+  document.getElementById('announced-sub').textContent=name+' · winner announced on all screens';
+}
+
+buildLeaderboard();
+</script>

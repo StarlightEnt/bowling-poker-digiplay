@@ -1,0 +1,362 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.admin{display:flex;height:620px;background:var(--color-background-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;border:0.5px solid var(--color-border-tertiary);position:relative;font-family:var(--font-sans)}
+.sidebar{width:190px;flex-shrink:0;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.sidebar-header{padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sidebar-logo{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.sidebar-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.sidebar-nav{flex:1;padding:8px 0;overflow-y:auto}
+.nav-section{padding:8px 16px 4px;font-size:10px;color:var(--color-text-tertiary);letter-spacing:.5px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 16px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent}
+.nav-item:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.nav-item.active{color:var(--color-text-primary);border-left-color:#e8ff47;background:var(--color-background-secondary);font-weight:500}
+.nav-item i{font-size:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--color-background-danger);color:var(--color-text-danger);font-size:10px;font-weight:500;padding:1px 5px;border-radius:8px}
+.sidebar-footer{padding:10px 16px;border-top:0.5px solid var(--color-border-tertiary);font-size:11px;color:var(--color-text-tertiary)}
+.sidebar-footer span{display:block;color:var(--color-text-secondary);font-weight:500;font-size:12px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.main-header{padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.main-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.main-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);white-space:nowrap}
+.btn-sm:hover{background:var(--color-background-secondary)}
+.btn-primary{background:#e8ff47;color:#1a1a2e;border-color:#e8ff47;font-weight:500}
+.btn-primary:hover{opacity:.88}
+.main-body{flex:1;overflow-y:auto;padding:16px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 14px;cursor:pointer;border:1.5px solid transparent;transition:border-color .15s}
+.stat-card:hover{border-color:var(--color-border-secondary)}
+.stat-card.active-filter{border-color:#e8ff47}
+.stat-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px}
+.stat-val{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.stat-sub{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.card-header{padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary);white-space:nowrap}
+.filters{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.filter-label{font-size:11px;color:var(--color-text-tertiary);white-space:nowrap}
+.pill{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:500;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);transition:all .15s;white-space:nowrap}
+.pill:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.pill.active{background:#e8ff47;color:#1a1a2e;border-color:#e8ff47}
+select.filter-select{font-size:11px;padding:3px 6px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer}
+.filter-result{font-size:11px;color:var(--color-text-tertiary);white-space:nowrap}
+.clear-link{font-size:11px;color:var(--color-text-info);cursor:pointer;white-space:nowrap}
+.clear-link:hover{text-decoration:underline}
+.player-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.player-table th{padding:7px 12px;text-align:left;font-size:10px;color:var(--color-text-tertiary);font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-table td{padding:7px 12px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.player-table tr:last-child td{border-bottom:none}
+.player-table tr.clickable{cursor:pointer}
+.player-table tr.clickable:hover td{background:var(--color-background-secondary)}
+.player-table tr.selected td{background:var(--color-background-info)}
+.status-pill{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:500;white-space:nowrap}
+.pill-drawing{background:var(--color-background-info);color:var(--color-text-info)}
+.pill-submitted{background:var(--color-background-success);color:var(--color-text-success)}
+.pill-forfeited{background:var(--color-background-danger);color:var(--color-text-danger)}
+.pill-waiting{background:var(--color-background-secondary);color:var(--color-text-tertiary);border:0.5px solid var(--color-border-tertiary)}
+.progress-bar{height:3px;background:var(--color-border-tertiary);border-radius:2px;overflow:hidden;min-width:50px}
+.progress-fill{height:100%;background:#e8ff47;border-radius:2px}
+.slideout{position:absolute;top:0;right:0;width:320px;height:100%;background:var(--color-background-primary);border-left:0.5px solid var(--color-border-tertiary);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;z-index:50}
+.slideout.open{transform:translateX(0)}
+.so-header{padding:12px 14px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.so-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.so-meta{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.so-body{flex:1;overflow-y:auto;padding:12px}
+.so-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.so-stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px;text-align:center}
+.so-stat-val{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.so-stat-label{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.so-section{font-size:10px;color:var(--color-text-tertiary);letter-spacing:1px;text-transform:uppercase;margin:8px 0 5px}
+.so-hand{font-size:16px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px}
+.cards-row{display:flex;flex-wrap:wrap;gap:4px}
+.scard{width:32px;height:46px;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.scard.best{border:1.5px solid #e8ff47}
+.scard.dim{opacity:.4}
+.scard.dead{background:var(--color-background-danger);border-color:var(--color-border-danger)}
+.scard .cr{font-size:12px;font-weight:500;line-height:1;color:var(--color-text-primary)}
+.scard .cs{font-size:10px;line-height:1;color:var(--color-text-primary)}
+.scard.red .cr,.scard.red .cs{color:var(--color-text-danger)}
+.scard.dead .cr,.scard.dead .cs{color:var(--color-text-danger)}
+.so-footer{padding:10px 14px;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:6px;flex-shrink:0}
+.close-btn{background:none;border:none;cursor:pointer;color:var(--color-text-secondary);font-size:16px;padding:2px;display:flex;align-items:center}
+.close-btn:hover{color:var(--color-text-primary)}
+.so-status{margin-bottom:8px}
+</style>
+
+<div class="admin">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Bowling Poker</div>
+      <div class="sidebar-sub">Digiplay Admin</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Game Night</div>
+      <div class="nav-item active"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</div>
+      <div class="nav-item"><i class="ti ti-trophy" aria-hidden="true"></i> Game Advancement <span class="nav-badge">!</span></div>
+      <div class="nav-item"><i class="ti ti-adjustments" aria-hidden="true"></i> Overrides</div>
+      <div class="nav-section">Setup</div>
+      <div class="nav-item"><i class="ti ti-calendar" aria-hidden="true"></i> Session Setup</div>
+      <div class="nav-item"><i class="ti ti-stack" aria-hidden="true"></i> Card Shoe</div>
+      <div class="nav-section">League</div>
+      <div class="nav-item"><i class="ti ti-settings" aria-hidden="true"></i> Settings</div>
+    </div>
+    <div class="sidebar-footer">
+      <span>Thursday Nite Strikers</span>
+      Summer 2026 · Week 7
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="main-header">
+      <div>
+        <div class="main-title">Game Night Dashboard</div>
+        <div class="main-sub" id="game-status">Game 1 in progress · 25 players checked in</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-sm">Export</button>
+        <button class="btn-sm btn-primary">End Game 1 →</button>
+      </div>
+    </div>
+    <div class="main-body">
+      <div class="stat-grid">
+        <div class="stat-card" id="sc-all" onclick="statFilter('all')">
+          <div class="stat-label">Players checked in</div>
+          <div class="stat-val">25</div>
+          <div class="stat-sub">of 28 registered</div>
+        </div>
+        <div class="stat-card" id="sc-submitted" onclick="statFilter('submitted')">
+          <div class="stat-label">Hands submitted</div>
+          <div class="stat-val">8</div>
+          <div class="stat-sub">of 25 active</div>
+        </div>
+        <div class="stat-card" id="sc-forfeited" onclick="statFilter('forfeited')">
+          <div class="stat-label">Forfeited</div>
+          <div class="stat-val">2</div>
+          <div class="stat-sub">Game 1</div>
+        </div>
+        <div class="stat-card" id="sc-shoe">
+          <div class="stat-label">Cards remaining</div>
+          <div class="stat-val">87</div>
+          <div class="stat-sub">of 312 in shoe</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">All players — Game 1</div>
+          <div class="filters">
+            <span class="filter-label">Status:</span>
+            <span class="pill active" id="pill-all" onclick="setPill('all')">All</span>
+            <span class="pill" id="pill-drawing" onclick="setPill('drawing')">Drawing</span>
+            <span class="pill" id="pill-submitted" onclick="setPill('submitted')">Submitted</span>
+            <span class="pill" id="pill-forfeited" onclick="setPill('forfeited')">Forfeited</span>
+            <span class="pill" id="pill-waiting" onclick="setPill('waiting')">Waiting</span>
+            <span class="filter-label" style="margin-left:4px">Lane:</span>
+            <select class="filter-select" id="lane-filter" onchange="applyFilters()">
+              <option value="all">All lanes</option>
+              <option value="1-2">Lane 1-2</option>
+              <option value="3-4">Lane 3-4</option>
+              <option value="5-6">Lane 5-6</option>
+              <option value="7-8">Lane 7-8</option>
+            </select>
+            <span class="filter-result" id="filter-result"></span>
+            <span class="clear-link" id="clear-link" style="display:none" onclick="clearFilters()">Clear filters</span>
+          </div>
+        </div>
+        <table class="player-table">
+          <colgroup>
+            <col style="width:18%"><col style="width:10%"><col style="width:9%">
+            <col style="width:14%"><col style="width:14%"><col style="width:16%"><col style="width:19%">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Player</th><th>Lane</th><th>Frame</th>
+              <th>Drawn / Earned</th><th>Progress</th><th>Status</th><th>Best hand</th>
+            </tr>
+          </thead>
+          <tbody id="player-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="slideout" id="slideout">
+    <div class="so-header">
+      <div>
+        <div class="so-name" id="so-name">—</div>
+        <div class="so-meta" id="so-meta">—</div>
+      </div>
+      <button class="close-btn" onclick="closeSlideout()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="so-body">
+      <div class="so-stats">
+        <div class="so-stat"><div class="so-stat-val" id="so-drawn">—</div><div class="so-stat-label">Drawn</div></div>
+        <div class="so-stat"><div class="so-stat-val" id="so-earned">—</div><div class="so-stat-label">Earned</div></div>
+        <div class="so-stat"><div class="so-stat-val" id="so-dead-count">—</div><div class="so-stat-label">Dead</div></div>
+      </div>
+      <div class="so-status" id="so-status-pill"></div>
+      <div class="so-section">Best hand</div>
+      <div class="so-hand" id="so-hand">—</div>
+      <div class="so-section">Best 5</div>
+      <div class="cards-row" id="so-best"></div>
+      <div id="so-also-wrap" style="display:none">
+        <div class="so-section">Also held</div>
+        <div class="cards-row" id="so-also"></div>
+      </div>
+      <div id="so-dead-wrap" style="display:none">
+        <div class="so-section" style="color:var(--color-text-danger)">Dead cards</div>
+        <div class="cards-row" id="so-dead-cards"></div>
+      </div>
+    </div>
+    <div class="so-footer">
+      <button class="btn-sm" onclick="closeSlideout()">Close</button>
+      <button class="btn-sm">Force submit</button>
+      <button class="btn-sm">Adjust draws</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const RED=['♥','♦'];
+const players=[
+  {name:'Alice B.',lane:'1-2',frame:10,drawn:14,earned:14,deadCount:2,status:'submitted',hand:'Full House',
+   best:[{r:'K',s:'♠'},{r:'K',s:'♥'},{r:'K',s:'♦'},{r:'9',s:'♥'},{r:'9',s:'♦'}],
+   also:[{r:'Q',s:'♠'},{r:'J',s:'♣'}],dead:[{r:'A',s:'♥'},{r:'K',s:'♣'}]},
+  {name:'Bob C.',lane:'1-2',frame:8,drawn:9,earned:12,deadCount:1,status:'drawing',hand:'Two Pair',
+   best:[{r:'Q',s:'♥'},{r:'Q',s:'♦'},{r:'8',s:'♣'},{r:'8',s:'♠'},{r:'A',s:'♦'}],
+   also:[{r:'5',s:'♠'}],dead:[{r:'Q',s:'♠'}]},
+  {name:'Carol D.',lane:'3-4',frame:7,drawn:4,earned:8,deadCount:0,status:'drawing',hand:'One Pair',
+   best:[{r:'J',s:'♠'},{r:'J',s:'♥'},{r:'K',s:'♣'},{r:'9',s:'♦'},{r:'5',s:'♠'}],
+   also:[],dead:[]},
+  {name:'Dave E.',lane:'3-4',frame:10,drawn:11,earned:11,deadCount:1,status:'submitted',hand:'Flush',
+   best:[{r:'A',s:'♠'},{r:'J',s:'♠'},{r:'9',s:'♠'},{r:'7',s:'♠'},{r:'3',s:'♠'}],
+   also:[{r:'10',s:'♣'},{r:'6',s:'♦'}],dead:[{r:'A',s:'♦'}]},
+  {name:'Ellen F.',lane:'5-6',frame:6,drawn:3,earned:6,deadCount:0,status:'drawing',hand:'High Card',
+   best:[{r:'A',s:'♠'},{r:'K',s:'♥'},{r:'9',s:'♦'},{r:'6',s:'♣'},{r:'2',s:'♠'}],
+   also:[],dead:[]},
+  {name:'Frank G.',lane:'5-6',frame:10,drawn:8,earned:8,deadCount:3,status:'forfeited',hand:'Straight',
+   best:[{r:'10',s:'♠'},{r:'9',s:'♥'},{r:'8',s:'♦'},{r:'7',s:'♣'},{r:'6',s:'♠'}],
+   also:[],dead:[{r:'K',s:'♠'},{r:'K',s:'♥'},{r:'Q',s:'♦'}]},
+  {name:'Grace H.',lane:'7-8',frame:5,drawn:2,earned:4,deadCount:0,status:'drawing',hand:'Drawing...',
+   best:[{r:'7',s:'♠'},{r:'4',s:'♥'}],also:[],dead:[]},
+  {name:'Hank I.',lane:'7-8',frame:1,drawn:0,earned:0,deadCount:0,status:'waiting',hand:'No cards yet',
+   best:[],also:[],dead:[]},
+];
+
+const statusHTML={
+  submitted:'<span class="status-pill pill-submitted"><i class="ti ti-check" style="font-size:10px"></i> Submitted</span>',
+  drawing:'<span class="status-pill pill-drawing"><i class="ti ti-cards" style="font-size:10px"></i> Drawing</span>',
+  forfeited:'<span class="status-pill pill-forfeited"><i class="ti ti-x" style="font-size:10px"></i> Forfeited</span>',
+  waiting:'<span class="status-pill pill-waiting">Waiting</span>'
+};
+
+let activePill='all', activeLane='all', activeStatFilter=null, selectedIdx=null;
+
+function getFiltered(){
+  return players.filter((p,i)=>{
+    const statusMatch = activePill==='all' || p.status===activePill;
+    const laneMatch = activeLane==='all' || p.lane===activeLane;
+    return statusMatch && laneMatch;
+  });
+}
+
+function buildTable(){
+  const filtered=getFiltered();
+  const tbody=document.getElementById('player-tbody');
+  tbody.innerHTML='';
+  filtered.forEach((p)=>{
+    const idx=players.indexOf(p);
+    const pct=p.earned>0?Math.round((p.drawn/p.earned)*100):0;
+    const tr=document.createElement('tr');
+    tr.className='clickable'+(selectedIdx===idx?' selected':'');
+    tr.onclick=()=>openSlideout(idx);
+    tr.innerHTML=`<td style="font-weight:500">${p.name}</td>
+      <td>${p.lane}</td><td>${p.frame}</td>
+      <td>${p.drawn} / ${p.earned}</td>
+      <td><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></td>
+      <td>${statusHTML[p.status]}</td>
+      <td style="color:var(--color-text-secondary)">${p.hand}</td>`;
+    tbody.appendChild(tr);
+  });
+  const total=players.length;
+  const shown=filtered.length;
+  const resultEl=document.getElementById('filter-result');
+  const clearEl=document.getElementById('clear-link');
+  const isFiltered=activePill!=='all'||activeLane!=='all';
+  resultEl.textContent=isFiltered?`Showing ${shown} of ${total} players`:'';
+  clearEl.style.display=isFiltered?'inline':'none';
+}
+
+function setPill(val){
+  activePill=val;
+  activeStatFilter=null;
+  document.querySelectorAll('.pill[id^="pill-"]').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pill-'+val).classList.add('active');
+  document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('active-filter'));
+  buildTable();
+}
+
+function applyFilters(){
+  activeLane=document.getElementById('lane-filter').value;
+  buildTable();
+}
+
+function statFilter(type){
+  document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('active-filter'));
+  if(type==='all'){
+    clearFilters();return;
+  }
+  document.getElementById('sc-'+type).classList.add('active-filter');
+  activePill=type;
+  document.querySelectorAll('.pill[id^="pill-"]').forEach(p=>p.classList.remove('active'));
+  if(document.getElementById('pill-'+type)) document.getElementById('pill-'+type).classList.add('active');
+  buildTable();
+}
+
+function clearFilters(){
+  activePill='all';activeLane='all';activeStatFilter=null;
+  document.querySelectorAll('.pill[id^="pill-"]').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pill-all').classList.add('active');
+  document.getElementById('lane-filter').value='all';
+  document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('active-filter'));
+  buildTable();
+}
+
+function makeCard(c,cls){
+  const d=document.createElement('div');
+  d.className='scard'+(RED.includes(c.s)?' red':'')+' '+cls;
+  d.innerHTML='<div class="cr">'+c.r+'</div><div class="cs">'+c.s+'</div>';
+  return d;
+}
+
+function openSlideout(i){
+  selectedIdx=i;
+  const p=players[i];
+  document.getElementById('so-name').textContent=p.name;
+  document.getElementById('so-meta').textContent='Lane '+p.lane+' · Game 1 · Frame '+p.frame;
+  document.getElementById('so-drawn').textContent=p.drawn;
+  document.getElementById('so-earned').textContent=p.earned;
+  document.getElementById('so-dead-count').textContent=p.deadCount;
+  document.getElementById('so-status-pill').innerHTML=statusHTML[p.status];
+  document.getElementById('so-hand').textContent=p.hand;
+  const bestEl=document.getElementById('so-best');bestEl.innerHTML='';
+  p.best.forEach(c=>bestEl.appendChild(makeCard(c,'best')));
+  const alsoEl=document.getElementById('so-also');alsoEl.innerHTML='';
+  p.also.forEach(c=>alsoEl.appendChild(makeCard(c,'dim')));
+  document.getElementById('so-also-wrap').style.display=p.also.length?'block':'none';
+  const deadEl=document.getElementById('so-dead-cards');deadEl.innerHTML='';
+  p.dead.forEach(c=>deadEl.appendChild(makeCard(c,'dead')));
+  document.getElementById('so-dead-wrap').style.display=p.dead.length?'block':'none';
+  document.getElementById('slideout').classList.add('open');
+  buildTable();
+}
+
+function closeSlideout(){
+  selectedIdx=null;
+  document.getElementById('slideout').classList.remove('open');
+  buildTable();
+}
+
+buildTable();
+</script>

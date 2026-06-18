@@ -1,0 +1,140 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.phone-frame{
+  width:390px;
+  height:844px;
+  background:#000;
+  border-radius:44px;
+  border:8px solid #222;
+  margin:20px auto;
+  overflow:hidden;
+  position:relative;
+  box-shadow:0 0 0 2px #444;
+}
+.notch{
+  width:120px;
+  height:34px;
+  background:#000;
+  border-radius:0 0 20px 20px;
+  position:absolute;
+  top:0;left:50%;
+  transform:translateX(-50%);
+  z-index:10;
+}
+.screen{
+  background:#1a1a2e;
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:56px 16px 24px;
+  overflow-y:auto;
+  font-family:var(--font-sans);
+}
+.eyebrow{font-size:10px;font-weight:500;letter-spacing:3px;color:#888888;text-transform:uppercase;margin-bottom:3px}
+.appname{font-size:20px;font-weight:500;color:#ffffff;letter-spacing:1px;margin-bottom:2px}
+.appsub{font-size:9px;color:#e8ff47;letter-spacing:3px;text-transform:uppercase;margin-bottom:18px}
+.prompt{font-size:12px;color:#aaaaaa;margin-bottom:14px;letter-spacing:.3px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;width:100%;margin-bottom:16px}
+button.name-btn{
+  background:#2a2a45 !important;
+  border:1px solid #7777cc !important;
+  border-radius:8px !important;
+  color:#ffffff !important;
+  font-size:11px !important;
+  font-weight:500 !important;
+  padding:12px 4px !important;
+  cursor:pointer !important;
+  text-align:center !important;
+  line-height:1.2 !important;
+  width:100% !important;
+  transition:background .15s,color .15s !important;
+}
+button.name-btn:active{background:#ffffff !important;color:#1a1a2e !important;border-color:#ffffff !important}
+button.name-btn.selected{background:#ffffff !important;color:#1a1a2e !important;border-color:#ffffff !important;font-weight:600 !important}
+.confirm-bar{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  background:#2a2a45;
+  border:1px solid #7777cc;
+  border-radius:12px;
+  padding:16px;
+  text-align:center;
+  margin-bottom:12px;
+}
+.confirm-bar.visible{display:flex}
+.confirm-name{font-size:18px;font-weight:600;color:#ffffff}
+.confirm-q{font-size:11px;color:#aaaaaa}
+.confirm-btns{display:flex;gap:8px;width:100%}
+button.yes-btn{flex:1 !important;padding:11px !important;background:#e8ff47 !important;color:#1a1a2e !important;border:none !important;border-radius:8px !important;font-size:13px !important;font-weight:600 !important;cursor:pointer !important}
+button.no-btn{flex:1 !important;padding:11px !important;background:#2a2a45 !important;color:#ffffff !important;border:1px solid #7777cc !important;border-radius:8px !important;font-size:13px !important;font-weight:500 !important;cursor:pointer !important}
+.week{font-size:10px;color:#444466;margin-top:auto;padding-top:12px;letter-spacing:1px}
+</style>
+
+<div class="phone-frame">
+  <div class="notch"></div>
+  <div class="screen">
+    <div class="eyebrow">Welcome to</div>
+    <div class="appname">Bowling Poker</div>
+    <div class="appsub">Digiplay</div>
+    <div class="prompt">Who are you?</div>
+
+    <div class="confirm-bar" id="confirm">
+      <div class="confirm-name" id="confirm-name"></div>
+      <div class="confirm-q">Is that you?</div>
+      <div class="confirm-btns">
+        <button class="yes-btn" onclick="confirmYes()">That's me!</button>
+        <button class="no-btn" onclick="confirmNo()">Not me</button>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div class="week">Summer 2026 · Week 7</div>
+  </div>
+</div>
+
+<script>
+const players=[
+  'Alice B.','Bob C.','Carol D.','Dave E.',
+  'Ellen F.','Frank G.','Grace H.','Hank I.',
+  'Irene J.','Jack K.','Karen L.','Larry M.',
+  'Maria N.','Nick O.','Olivia P.','Pete Q.',
+  'Quinn R.','Rachel S.','Steve T.','Tina U.',
+  'Uma V.','Victor W.','Wendy X.','Xavier Y.',
+  'Yolanda Z.','Zack A.','Brett B.','Cathy C.'
+].sort((a,b)=>a.localeCompare(b));
+
+const grid=document.getElementById('grid');
+const confirm=document.getElementById('confirm');
+const confirmNameEl=document.getElementById('confirm-name');
+let selected=null,selectedName='';
+
+players.forEach(name=>{
+  const btn=document.createElement('button');
+  btn.className='name-btn';
+  btn.textContent=name;
+  btn.onclick=()=>selectPlayer(btn,name);
+  grid.appendChild(btn);
+});
+
+function selectPlayer(btn,name){
+  if(selected)selected.classList.remove('selected');
+  btn.classList.add('selected');
+  selected=btn;selectedName=name;
+  confirmNameEl.textContent=name;
+  confirm.classList.add('visible');
+}
+function confirmYes(){
+  confirm.innerHTML='<div style="font-size:16px;font-weight:600;color:#e8ff47;padding:6px 0">✓ Good luck tonight, '+selectedName+'!</div>';
+}
+function confirmNo(){
+  if(selected)selected.classList.remove('selected');
+  selected=null;
+  confirm.classList.remove('visible');
+}
+</script>

@@ -1,0 +1,417 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.kiosk{background:#1a1a2e;width:100%;min-height:520px;display:flex;flex-direction:column;font-family:var(--font-sans);position:relative;border-radius:12px;overflow:hidden}
+.kiosk-header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px 10px;border-bottom:1px solid #222244}
+.kiosk-player{font-size:18px;font-weight:600;color:#ffffff}
+.kiosk-session{font-size:11px;color:#444466;letter-spacing:1px}
+.game-tabs{display:flex;gap:6px}
+button.tab{background:#2a2a45 !important;border:1px solid #5555aa !important;border-radius:6px !important;color:#aaaacc !important;font-size:12px !important;font-weight:600 !important;padding:6px 14px !important;cursor:pointer !important}
+button.tab.active{background:#e8ff47 !important;border-color:#e8ff47 !important;color:#1a1a2e !important}
+button.tab.locked{opacity:.35 !important;cursor:default !important}
+.kiosk-body{display:flex;flex:1;gap:0}
+.left-panel{width:320px;flex-shrink:0;padding:16px 20px;border-right:1px solid #222244;display:flex;flex-direction:column;gap:12px}
+.left-panel-top{flex:1;display:flex;flex-direction:column;gap:12px}
+.right-panel{flex:1;padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.section-card{background:#2a2a45;border:1px solid #5555aa;border-radius:10px;padding:14px}
+.section-title{font-size:10px;color:#666688;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.input-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.input-row:last-child{margin-bottom:0}
+.input-label{font-size:13px;color:#aaaacc;flex:1}
+.stepper{display:flex;align-items:center;gap:8px}
+button.step{background:#1a1a2e !important;border:1px solid #7777cc !important;border-radius:6px !important;color:#ffffff !important;font-size:18px !important;font-weight:600 !important;width:32px !important;height:32px !important;cursor:pointer !important;padding:0 !important;line-height:1 !important}
+.step-val{font-size:18px;font-weight:700;color:#ffffff;min-width:28px;text-align:center}
+.divider{border:none;border-top:1px solid #333355;margin:8px 0}
+.nudge{font-size:11px;color:#ffaa44;line-height:1.5;padding:7px 9px;background:rgba(255,170,68,0.08);border-radius:6px;border-left:2px solid #ffaa44;margin-bottom:8px;display:none}
+.nudge.visible{display:block}
+.draw-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cards-info{flex:1}
+.cards-avail{font-size:32px;font-weight:700;color:#e8ff47;line-height:1}
+.cards-label{font-size:12px;color:#aaaacc;margin-top:2px}
+.cards-sub{font-size:11px;color:#666688;margin-top:1px}
+button.draw-btn{padding:16px 24px !important;background:#e8ff47 !important;border:none !important;border-radius:10px !important;font-size:18px !important;font-weight:700 !important;color:#1a1a2e !important;cursor:pointer !important;text-transform:uppercase !important;letter-spacing:.5px !important;white-space:nowrap !important;transition:opacity .1s,transform .1s !important}
+button.draw-btn:disabled{opacity:.25 !important;cursor:default !important}
+button.draw-btn.queued{background:#ffcc00 !important}
+.queue-ind{font-size:11px;color:#ffcc00;text-align:center;min-height:14px;margin-top:3px}
+.submit-area{display:none}
+.submit-area.visible{display:block}
+button.submit-btn{width:100% !important;padding:14px !important;background:#2a2a45 !important;border:2px solid #7777cc !important;border-radius:10px !important;color:#ffffff !important;font-size:15px !important;font-weight:600 !important;cursor:pointer !important;letter-spacing:.5px !important;transition:background .15s,border-color .15s !important}
+button.submit-btn:hover{background:#3a3a65 !important;border-color:#aaaaff !important}
+.submit-hint{font-size:11px;color:#555577;text-align:center;margin-top:6px}
+button.forfeit-btn{width:100% !important;padding:10px !important;background:transparent !important;border:1px solid #443333 !important;border-radius:8px !important;color:#664444 !important;font-size:12px !important;font-weight:500 !important;cursor:pointer !important;transition:border-color .15s,color .15s !important;margin-top:auto !important}
+button.forfeit-btn:hover{border-color:#996666 !important;color:#cc8888 !important}
+.hand-name-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.hand-name{font-size:26px;font-weight:700;color:#e8ff47;min-height:32px}
+.hand-section-label{font-size:10px;color:#666688;letter-spacing:2px;text-transform:uppercase;margin:8px 0 5px}
+.cards-display{display:flex;flex-wrap:wrap;gap:6px}
+.card{width:52px;height:74px;background:#ffffff;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #cccccc;flex-shrink:0}
+.card.red .card-rank,.card.red .card-suit{color:#cc2222}
+.card-rank{font-size:18px;font-weight:800;line-height:1;color:#1a1a2e}
+.card-suit{font-size:14px;line-height:1;color:#1a1a2e}
+.card.best{border:2px solid #e8ff47;box-shadow:0 0 6px rgba(232,255,71,0.3)}
+.card.dim{opacity:.45;border-color:#888888}
+.card.dead{background:#2a1010;border-color:#663333}
+.card.dead .card-rank,.card.dead .card-suit{color:#ff6666}
+.card.flip-in{animation:flipin .35s ease-out}
+@keyframes flipin{0%{transform:rotateY(90deg);opacity:0}100%{transform:rotateY(0);opacity:1}}
+.dead-section{border-top:1px solid #333355;padding-top:8px;margin-top:6px}
+.dup-msg{font-size:12px;color:#ff6666;font-weight:600;text-align:center;min-height:16px;margin-top:4px}
+.total-count{font-size:11px;color:#555577;margin-top:6px;text-align:right}
+.countdown-bar{display:none;position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.75);border-top:1px solid #333355;padding:10px 20px;text-align:center;font-size:13px;color:#aaaaaa;letter-spacing:.5px;cursor:pointer;z-index:50}
+.countdown-bar.visible{display:block}
+.countdown-bar span{color:#e8ff47;font-weight:700}
+.overlay{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(10,8,24,0.92);z-index:100;align-items:center;justify-content:center;padding:32px;border-radius:12px}
+.overlay.visible{display:flex}
+.overlay-card{background:#2a1a1a;border:1px solid #774444;border-radius:16px;padding:28px 32px;text-align:center;max-width:420px;width:100%}
+.overlay-card.submit-card{background:#1a2a1a;border-color:#447744}
+.overlay-title{font-size:22px;font-weight:700;color:#ff8888;margin-bottom:10px}
+.overlay-title.submit{color:#88ff88}
+.overlay-text{font-size:14px;color:#ccaaaa;line-height:1.6;margin-bottom:24px}
+.overlay-text.submit{color:#aaccaa}
+.overlay-btns{display:flex;gap:12px}
+button.btn-danger{flex:1 !important;padding:14px !important;background:#cc3333 !important;border:none !important;border-radius:10px !important;color:#ffffff !important;font-size:15px !important;font-weight:600 !important;cursor:pointer !important}
+button.btn-confirm{flex:1 !important;padding:14px !important;background:#336633 !important;border:none !important;border-radius:10px !important;color:#ffffff !important;font-size:15px !important;font-weight:600 !important;cursor:pointer !important}
+button.btn-cancel{flex:1 !important;padding:14px !important;background:#2a2a45 !important;border:1px solid #7777cc !important;border-radius:10px !important;color:#ffffff !important;font-size:15px !important;font-weight:500 !important;cursor:pointer !important}
+</style>
+
+<div class="kiosk" id="kiosk">
+  <div class="kiosk-header">
+    <div>
+      <div class="kiosk-player">Allison L.</div>
+      <div class="kiosk-session">Summer 2026 · Week 7 · Lane 5</div>
+    </div>
+    <div class="game-tabs">
+      <button class="tab active">Game 1</button>
+      <button class="tab">Game 2</button>
+      <button class="tab locked">Game 3</button>
+    </div>
+  </div>
+
+  <div class="kiosk-body">
+    <div class="left-panel">
+      <div class="left-panel-top">
+        <div class="section-card">
+          <div class="section-title">Bowling marks</div>
+          <div class="input-row">
+            <div class="input-label">Current Frame</div>
+            <div class="stepper">
+              <button class="step" onclick="adj('frame',-1)">−</button>
+              <div class="step-val" id="frame-val">8</div>
+              <button class="step" onclick="adj('frame',1)">+</button>
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-label" id="strikes-label">Strikes So Far</div>
+            <div class="stepper">
+              <button class="step" onclick="adj('strikes',-1)">−</button>
+              <div class="step-val" id="strikes-val">6</div>
+              <button class="step" onclick="adj('strikes',1)">+</button>
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-label" id="spares-label">Spares So Far</div>
+            <div class="stepper">
+              <button class="step" onclick="adj('spares',-1)">−</button>
+              <div class="step-val" id="spares-val">2</div>
+              <button class="step" onclick="adj('spares',1)">+</button>
+            </div>
+          </div>
+          <hr class="divider">
+          <div class="nudge" id="nudge"></div>
+          <div class="draw-row">
+            <div class="cards-info">
+              <div class="cards-avail" id="avail-num">12</div>
+              <div class="cards-label">Cards to draw</div>
+              <div class="cards-sub" id="drawn-sub">Already drawn: 2</div>
+            </div>
+            <div>
+              <button class="draw-btn" id="draw-btn" onclick="tapDraw()">Draw</button>
+              <div class="queue-ind" id="queue-ind"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="submit-area" id="submit-area">
+          <button class="submit-btn" onclick="showSubmit()">Submit Hand for Game 1</button>
+          <div class="submit-hint">Frame 10 complete · all cards drawn</div>
+        </div>
+      </div>
+
+      <button class="forfeit-btn" onclick="showForfeit()">Forfeit this game</button>
+    </div>
+
+    <div class="right-panel">
+      <div class="section-card" style="flex:1">
+        <div class="section-title">Your hand — Game 1</div>
+        <div class="hand-name" id="hand-name">One Pair</div>
+        <div class="hand-section-label">Best 5</div>
+        <div class="cards-display" id="best-cards"></div>
+        <div id="also-section" style="display:none">
+          <div class="hand-section-label">Also held</div>
+          <div class="cards-display" id="also-cards"></div>
+        </div>
+        <div id="dead-section" class="dead-section" style="display:none">
+          <div class="hand-section-label" style="color:#ff6666">Dead cards</div>
+          <div class="cards-display" id="dead-cards"></div>
+        </div>
+        <div class="dup-msg" id="dup-msg"></div>
+        <div class="total-count" id="total-count">Total in hand: 2</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="countdown-bar" id="countdown" onclick="resetInactivity()">
+    Returning to player list in <span id="countnum">3</span>... — tap anywhere to stay
+  </div>
+
+  <!-- Submit confirm overlay -->
+  <div class="overlay" id="submit-overlay">
+    <div class="overlay-card submit-card">
+      <div class="overlay-title submit">Submit your hand?</div>
+      <div class="overlay-text submit">Make sure you've drawn all your cards — this locks your Game 1 hand and signals you're done.</div>
+      <div class="overlay-btns">
+        <button class="btn-confirm" onclick="confirmSubmit()">Yes, submit my hand</button>
+        <button class="btn-cancel" onclick="cancelSubmit()">Not yet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submitted confirmation overlay -->
+  <div class="overlay" id="submitted-overlay">
+    <div class="overlay-card submit-card">
+      <div class="overlay-title submit">Hand submitted!</div>
+      <div class="overlay-text submit">Your Game 1 hand is locked.<br><br>Good luck — results will be announced at the end of the game.</div>
+    </div>
+  </div>
+
+  <!-- Forfeit confirm overlay -->
+  <div class="overlay" id="forfeit-overlay">
+    <div class="overlay-card">
+      <div class="overlay-title">Forfeit Game 1?</div>
+      <div class="overlay-text">Your hand will be removed from the pool. This cannot be undone.</div>
+      <div class="overlay-btns">
+        <button class="btn-danger" onclick="confirmForfeit()">Yes, forfeit</button>
+        <button class="btn-cancel" onclick="cancelForfeit()">Never mind</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forfeited confirmation overlay -->
+  <div class="overlay" id="forfeited-overlay">
+    <div class="overlay-card">
+      <div class="overlay-title">Game 1 Forfeited</div>
+      <div class="overlay-text" style="margin-bottom:0">Your hand has been removed from the pool.<br><br>Good luck in Game 2!</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUITS=['♠','♥','♦','♣'],RANKS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'],RED=['♥','♦'];
+const state={frame:8,strikes:6,spares:2,drawn:2};
+let legalPool=[{r:'A',s:'♠'},{r:'A',s:'♥'}],deadCards=[],bestFive=[],alsoHeld=[],forfeited=false,submitted=false;
+let queueCount=0,queueTimer=null,animating=false;
+let inactivityTimer=null,countdownTimer=null,countVal=3;
+
+function isInvalid(){return state.frame<10&&(state.strikes+state.spares)>state.frame;}
+function earned(){return state.strikes*2+state.spares;}
+function avail(){return Math.max(0,earned()-state.drawn);}
+function totalCards(){return legalPool.length+deadCards.length;}
+function canSubmit(){return state.frame===10&&avail()===0&&!submitted&&!forfeited&&legalPool.length>0;}
+
+function checkNudge(){
+  const el=document.getElementById('nudge');
+  if(isInvalid()){
+    el.textContent=state.strikes+' strikes + '+state.spares+' spares doesn\'t look right for only '+state.frame+' frames. Please check your numbers again.';
+    el.classList.add('visible');
+  } else el.classList.remove('visible');
+}
+
+function adj(f,d){
+  resetInactivity();
+  if(f==='frame') state.frame=Math.max(1,Math.min(10,state.frame+d));
+  if(f==='strikes') state.strikes=Math.max(0,state.strikes+d);
+  if(f==='spares') state.spares=Math.max(0,state.spares+d);
+  document.getElementById('frame-val').textContent=state.frame;
+  document.getElementById('strikes-val').textContent=state.strikes;
+  document.getElementById('spares-val').textContent=state.spares;
+  document.getElementById('strikes-label').textContent=state.frame===10?'Strikes Total':'Strikes So Far';
+  document.getElementById('spares-label').textContent=state.frame===10?'Spares Total':'Spares So Far';
+  checkNudge();refreshUI();
+}
+
+function refreshUI(){
+  const a=avail(),blocked=isInvalid()||forfeited||submitted||animating;
+  document.getElementById('avail-num').textContent=isInvalid()?'—':a;
+  document.getElementById('drawn-sub').textContent='Already drawn: '+state.drawn;
+  document.getElementById('draw-btn').disabled=blocked||(a<=0&&queueCount===0);
+  document.getElementById('total-count').textContent='Total in hand: '+totalCards();
+  document.getElementById('submit-area').className=canSubmit()?'submit-area visible':'submit-area';
+}
+
+function tapDraw(){
+  if(avail()<=0||forfeited||submitted||isInvalid()) return;
+  resetInactivity();
+  queueCount++;
+  document.getElementById('draw-btn').classList.add('queued');
+  document.getElementById('queue-ind').textContent=queueCount>1?'Queued: '+queueCount+'...':'';
+  clearTimeout(queueTimer);
+  queueTimer=setTimeout(flushQueue,500);
+}
+function flushQueue(){
+  const toProcess=Math.min(queueCount,avail());
+  queueCount=0;
+  document.getElementById('draw-btn').classList.remove('queued');
+  document.getElementById('queue-ind').textContent='';
+  if(toProcess<=0){refreshUI();return;}
+  animating=true;refreshUI();flipNext(toProcess);
+}
+function flipNext(remaining){
+  if(remaining<=0){animating=false;refreshUI();startInactivityWatch();return;}
+  state.drawn++;
+  const r=RANKS[Math.floor(Math.random()*RANKS.length)];
+  const s=SUITS[Math.floor(Math.random()*SUITS.length)];
+  const isDup=[...legalPool,...deadCards].some(c=>c.r===r&&c.s===s);
+  if(isDup){
+    deadCards.push({r,s});
+    evaluateAndRender(false,true);
+    document.getElementById('dup-msg').textContent='Oh no! Duplicate '+r+s+' — moved to dead cards';
+    setTimeout(()=>document.getElementById('dup-msg').textContent='',2500);
+    setTimeout(()=>flipNext(remaining-1),900);
+  } else {
+    legalPool.push({r,s});
+    evaluateAndRender(true,false);
+    setTimeout(()=>flipNext(remaining-1),550);
+  }
+  refreshUI();
+}
+
+function rankVal(r){return RANKS.indexOf(r);}
+function scoreHand(cards){
+  const rv=cards.map(c=>rankVal(c.r)).sort((a,b)=>b-a);
+  const su=cards.map(c=>c.s);
+  const flush=su.every(s=>s===su[0]);
+  const uniq=[...new Set(rv)].sort((a,b)=>b-a);
+  const straight=uniq.length===5&&uniq[0]-uniq[4]===4;
+  const cnt={};rv.forEach(r=>{cnt[r]=(cnt[r]||0)+1;});
+  const freq=Object.values(cnt).sort((a,b)=>b-a);
+  if(flush&&straight&&rv[0]===12) return 90000;
+  if(flush&&straight) return 80000+rv[0];
+  if(freq[0]===4) return 70000+rv[0];
+  if(freq[0]===3&&freq[1]===2) return 60000+rv[0];
+  if(flush) return 50000+rv[0];
+  if(straight) return 40000+rv[0];
+  if(freq[0]===3) return 30000+rv[0];
+  if(freq[0]===2&&freq[1]===2) return 20000+rv[0];
+  if(freq[0]===2) return 10000+rv[0];
+  return rv[0];
+}
+function handName(cards){
+  const rv=cards.map(c=>rankVal(c.r)).sort((a,b)=>b-a);
+  const su=cards.map(c=>c.s);
+  const flush=su.every(s=>s===su[0]);
+  const uniq=[...new Set(rv)].sort((a,b)=>b-a);
+  const straight=uniq.length===5&&uniq[0]-uniq[4]===4;
+  const cnt={};rv.forEach(r=>{cnt[r]=(cnt[r]||0)+1;});
+  const freq=Object.values(cnt).sort((a,b)=>b-a);
+  if(flush&&straight&&rv[0]===12) return 'ROYAL FLUSH!';
+  if(flush&&straight) return 'Straight Flush';
+  if(freq[0]===4) return 'Four of a Kind';
+  if(freq[0]===3&&freq[1]===2) return 'Full House';
+  if(flush) return 'Flush';
+  if(straight) return 'Straight';
+  if(freq[0]===3) return 'Three of a Kind';
+  if(freq[0]===2&&freq[1]===2) return 'Two Pair';
+  if(freq[0]===2) return 'One Pair';
+  return 'High Card';
+}
+function sortForDisplay(cards){
+  const cnt={};cards.forEach(c=>{cnt[c.r]=(cnt[c.r]||0)+1;});
+  return [...cards].sort((a,b)=>{const fc=cnt[b.r]-cnt[a.r];if(fc!==0)return fc;return rankVal(b.r)-rankVal(a.r);});
+}
+function getCombos(arr,k){
+  if(k===0)return [[]];if(arr.length<k)return [];
+  const [f,...rest]=arr;
+  return [...getCombos(rest,k-1).map(c=>[f,...c]),...getCombos(rest,k)];
+}
+function evaluateAndRender(animateLast=false,animateDead=false){
+  if(legalPool.length<=5){bestFive=sortForDisplay([...legalPool]);alsoHeld=[];}
+  else{
+    const combos=getCombos(legalPool,5);
+    let best=null,bestScore=-1,bestKicker=-1;
+    combos.forEach(combo=>{
+      const sc=scoreHand(combo);
+      const kicker=combo.map(c=>rankVal(c.r)).sort((a,b)=>b-a).reduce((s,v,i)=>s+v*(100-i*10),0);
+      if(sc>bestScore||(sc===bestScore&&kicker>bestKicker)){bestScore=sc;bestKicker=kicker;best=combo;}
+    });
+    bestFive=sortForDisplay(best);
+    alsoHeld=legalPool.filter(c=>!best.includes(c));
+  }
+  renderHand(animateLast,animateDead);
+}
+function makeCard(c,cls,animate){
+  const d=document.createElement('div');
+  d.className='card'+(RED.includes(c.s)?' red':'')+' '+cls+(animate?' flip-in':'');
+  d.innerHTML='<div class="card-rank">'+c.r+'</div><div class="card-suit">'+c.s+'</div>';
+  return d;
+}
+function renderHand(animateLast=false,animateDead=false){
+  const name=legalPool.length>=5?handName(bestFive):(legalPool.length>0?'Drawing...':'No cards yet');
+  document.getElementById('hand-name').textContent=name;
+  const bestEl=document.getElementById('best-cards');bestEl.innerHTML='';
+  bestFive.forEach((c,i)=>bestEl.appendChild(makeCard(c,'best',animateLast&&i===bestFive.length-1)));
+  const alsoEl=document.getElementById('also-cards');const alsoSec=document.getElementById('also-section');
+  if(alsoHeld.length>0){alsoEl.innerHTML='';sortForDisplay(alsoHeld).forEach(c=>alsoEl.appendChild(makeCard(c,'dim',false)));alsoSec.style.display='block';}
+  else alsoSec.style.display='none';
+  const deadEl=document.getElementById('dead-cards');const deadSec=document.getElementById('dead-section');
+  if(deadCards.length>0){deadEl.innerHTML='';deadCards.forEach((c,i)=>deadEl.appendChild(makeCard(c,'dead',animateDead&&i===deadCards.length-1)));deadSec.style.display='block';}
+  else deadSec.style.display='none';
+  document.getElementById('total-count').textContent='Total in hand: '+totalCards();
+}
+
+function showSubmit(){resetInactivity();document.getElementById('submit-overlay').classList.add('visible');}
+function cancelSubmit(){document.getElementById('submit-overlay').classList.remove('visible');resetInactivity();}
+function confirmSubmit(){
+  submitted=true;
+  document.getElementById('submit-overlay').classList.remove('visible');
+  document.getElementById('submitted-overlay').classList.add('visible');
+  document.getElementById('draw-btn').disabled=true;
+  document.getElementById('submit-area').className='submit-area';
+}
+function showForfeit(){resetInactivity();document.getElementById('forfeit-overlay').classList.add('visible');}
+function cancelForfeit(){document.getElementById('forfeit-overlay').classList.remove('visible');resetInactivity();}
+function confirmForfeit(){
+  forfeited=true;
+  document.getElementById('forfeit-overlay').classList.remove('visible');
+  document.getElementById('forfeited-overlay').classList.add('visible');
+  document.getElementById('draw-btn').disabled=true;
+  document.getElementById('submit-area').className='submit-area';
+}
+
+function startInactivityWatch(){
+  clearTimeout(inactivityTimer);
+  inactivityTimer=setTimeout(startCountdown,2000);
+}
+function startCountdown(){
+  countVal=3;
+  document.getElementById('countnum').textContent=countVal;
+  document.getElementById('countdown').classList.add('visible');
+  countdownTimer=setInterval(()=>{
+    countVal--;
+    document.getElementById('countnum').textContent=countVal;
+    if(countVal<=0){clearInterval(countdownTimer);returnToList();}
+  },1000);
+}
+function returnToList(){
+  document.getElementById('countdown').classList.remove('visible');
+  document.getElementById('hand-name').textContent='Returned to player list';
+}
+function resetInactivity(){
+  clearTimeout(inactivityTimer);clearInterval(countdownTimer);
+  document.getElementById('countdown').classList.remove('visible');
+  countVal=3;startInactivityWatch();
+}
+document.getElementById('kiosk').addEventListener('click',resetInactivity);
+document.getElementById('kiosk').addEventListener('touchstart',resetInactivity);
+
+evaluateAndRender();refreshUI();startInactivityWatch();
+</script>

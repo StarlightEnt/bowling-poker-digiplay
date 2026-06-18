@@ -1,0 +1,162 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.screen{background:#1a1a2e;min-height:480px;display:flex;flex-direction:column;align-items:center;padding:24px 24px 24px;font-family:var(--font-sans)}
+.header{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.appname{font-size:22px;font-weight:500;color:#ffffff;letter-spacing:1px}
+.appsub{font-size:10px;color:#e8ff47;letter-spacing:3px;text-transform:uppercase}
+.prompt{font-size:13px;color:#aaaaaa;margin-bottom:16px;letter-spacing:.3px}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;width:100%;max-width:680px;margin-bottom:20px}
+button.name-btn{
+  background:#2a2a45 !important;
+  border:1px solid #5555aa !important;
+  border-radius:8px !important;
+  color:#ffffff !important;
+  font-size:12px !important;
+  font-weight:500 !important;
+  padding:11px 4px !important;
+  cursor:pointer !important;
+  text-align:center !important;
+  line-height:1.2 !important;
+  transition:background .15s,color .15s,transform .1s !important;
+  width:100% !important;
+}
+button.name-btn:hover{background:#ffffff !important;color:#1a1a2e !important;border-color:#ffffff !important;font-weight:600 !important}
+button.name-btn.selected{background:#ffffff !important;color:#1a1a2e !important;border-color:#ffffff !important;font-weight:600 !important}
+button.name-btn:active{transform:scale(.96) !important}
+.confirm-bar{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  max-width:360px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:12px;
+  padding:18px 20px;
+  text-align:center;
+}
+.confirm-bar.visible{display:flex}
+.confirm-name{font-size:20px;font-weight:600;color:#ffffff}
+.confirm-q{font-size:12px;color:#888888}
+.confirm-btns{display:flex;gap:10px;width:100%}
+.yes-btn{flex:1;padding:11px;background:#e8ff47;color:#1a1a2e;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.no-btn{flex:1;padding:11px;background:transparent;color:#aaaaaa;border:1px solid #555555;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.countdown{
+  display:none;
+  position:fixed;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,0.75);
+  border:1px solid #444444;
+  border-radius:20px;
+  padding:8px 20px;
+  font-size:12px;
+  color:#aaaaaa;
+  letter-spacing:.5px;
+  cursor:pointer;
+}
+.countdown.visible{display:block}
+.countdown span{color:#e8ff47;font-weight:600}
+.week{font-size:11px;color:#444466;margin-top:16px;letter-spacing:1px}
+</style>
+
+<div class="screen" id="screen">
+  <div class="header">
+    <div class="appname">Bowling Poker</div>
+    <div class="appsub">Digiplay</div>
+  </div>
+  <div class="prompt">Tap your name to get started</div>
+  <div class="grid" id="grid"></div>
+  <div class="confirm-bar" id="confirm">
+    <div class="confirm-name" id="confirm-name"></div>
+    <div class="confirm-q">Is that you?</div>
+    <div class="confirm-btns">
+      <button class="yes-btn" onclick="confirmYes()">That's me!</button>
+      <button class="no-btn" onclick="confirmNo()">Not me</button>
+    </div>
+  </div>
+  <div class="week">Summer 2026 · Week 7</div>
+</div>
+
+<div class="countdown" id="countdown" onclick="resetInactivity()">
+  Returning to player list in <span id="countnum">3</span>...
+</div>
+
+<script>
+const players=[
+  'Alice B.','Bob C.','Carol D.','Dave E.',
+  'Ellen F.','Frank G.','Grace H.','Hank I.',
+  'Irene J.','Jack K.','Karen L.','Larry M.',
+  'Maria N.','Nick O.','Olivia P.','Pete Q.',
+  'Quinn R.','Rachel S.','Steve T.','Tina U.',
+  'Uma V.','Victor W.','Wendy X.','Xavier Y.',
+  'Yolanda Z.','Zack A.','Brett B.','Cathy C.'
+].sort((a,b)=>a.localeCompare(b));
+
+const grid=document.getElementById('grid');
+const confirm=document.getElementById('confirm');
+const confirmNameEl=document.getElementById('confirm-name');
+const countdown=document.getElementById('countdown');
+const countnum=document.getElementById('countnum');
+let selected=null,inactivityTimer=null,countdownTimer=null,countVal=3,selectedName='';
+
+players.forEach(name=>{
+  const btn=document.createElement('button');
+  btn.className='name-btn';
+  btn.textContent=name;
+  btn.onclick=()=>selectPlayer(btn,name);
+  grid.appendChild(btn);
+});
+
+function selectPlayer(btn,name){
+  resetInactivity();
+  if(selected)selected.classList.remove('selected');
+  btn.classList.add('selected');
+  selected=btn;selectedName=name;
+  confirmNameEl.textContent=name;
+  confirm.classList.add('visible');
+}
+function confirmYes(){
+  resetInactivity();
+  confirm.innerHTML='<div style="font-size:18px;font-weight:600;color:#e8ff47;padding:8px 0">✓ Good luck tonight, '+selectedName+'!</div>';
+  setTimeout(()=>resetToList(),4000);
+}
+function confirmNo(){
+  resetInactivity();
+  if(selected)selected.classList.remove('selected');
+  selected=null;
+  confirm.classList.remove('visible');
+}
+function resetToList(){
+  if(selected)selected.classList.remove('selected');
+  selected=null;selectedName='';
+  confirm.classList.remove('visible');
+  confirm.innerHTML=`<div class="confirm-name" id="confirm-name"></div><div class="confirm-q">Is that you?</div><div class="confirm-btns"><button class="yes-btn" onclick="confirmYes()">That's me!</button><button class="no-btn" onclick="confirmNo()">Not me</button></div>`;
+  countdown.classList.remove('visible');
+  clearInterval(countdownTimer);
+  startInactivityWatch();
+}
+function startInactivityWatch(){
+  clearTimeout(inactivityTimer);
+  inactivityTimer=setTimeout(()=>startCountdown(),2000);
+}
+function startCountdown(){
+  countVal=3;countnum.textContent=countVal;
+  countdown.classList.add('visible');
+  countdownTimer=setInterval(()=>{
+    countVal--;countnum.textContent=countVal;
+    if(countVal<=0){clearInterval(countdownTimer);resetToList();}
+  },1000);
+}
+function resetInactivity(){
+  clearTimeout(inactivityTimer);clearInterval(countdownTimer);
+  countdown.classList.remove('visible');countVal=3;
+  startInactivityWatch();
+}
+document.addEventListener('click',resetInactivity);
+document.addEventListener('touchstart',resetInactivity);
+startInactivityWatch();
+</script>

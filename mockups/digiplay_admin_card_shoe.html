@@ -1,0 +1,250 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.admin{display:flex;height:620px;background:var(--color-background-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;border:0.5px solid var(--color-border-tertiary);font-family:var(--font-sans)}
+.sidebar{width:190px;flex-shrink:0;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.sidebar-header{padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sidebar-logo{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.sidebar-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.sidebar-nav{flex:1;padding:8px 0}
+.nav-section{padding:8px 16px 4px;font-size:10px;color:var(--color-text-tertiary);letter-spacing:.5px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 16px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent}
+.nav-item:hover{background:var(--color-background-secondary)}
+.nav-item.active{color:var(--color-text-primary);border-left-color:#e8ff47;background:var(--color-background-secondary);font-weight:500}
+.nav-item i{font-size:15px;flex-shrink:0}
+.sidebar-footer{padding:10px 16px;border-top:0.5px solid var(--color-border-tertiary);font-size:11px;color:var(--color-text-tertiary)}
+.sidebar-footer span{display:block;color:var(--color-text-secondary);font-weight:500;font-size:12px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.main-header{padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.main-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.main-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.main-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);white-space:nowrap}
+.btn-sm:hover{background:var(--color-background-secondary)}
+.btn-primary{background:#e8ff47;color:#1a1a2e;border-color:#e8ff47;font-weight:500}
+.btn-danger{background:var(--color-background-danger);color:var(--color-text-danger);border-color:var(--color-border-danger)}
+.btn-warning{background:var(--color-background-warning);color:var(--color-text-warning);border-color:var(--color-border-warning)}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.card-header{padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.card-body{padding:14px}
+.game-tabs{display:flex;gap:6px;margin-bottom:14px}
+.gtab{padding:5px 14px;font-size:12px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);font-weight:500}
+.gtab:hover{background:var(--color-background-secondary)}
+.gtab.active{background:#e8ff47;color:#1a1a2e;border-color:#e8ff47}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 14px}
+.stat-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px}
+.stat-val{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.stat-sub{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.stat-val.warning{color:var(--color-text-warning)}
+.shoe-bar-wrap{margin-bottom:14px}
+.shoe-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--color-text-secondary);margin-bottom:5px}
+.shoe-bar{height:8px;background:var(--color-border-tertiary);border-radius:4px;overflow:hidden}
+.shoe-bar-fill{height:100%;border-radius:4px;transition:width .3s}
+.shoe-bar-fill.ok{background:#e8ff47}
+.shoe-bar-fill.warn{background:var(--color-text-warning)}
+.shoe-bar-fill.critical{background:var(--color-text-danger)}
+.warn-banner{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--color-background-warning);border-radius:var(--border-radius-md);font-size:12px;color:var(--color-text-warning);margin-bottom:14px}
+.replen-table{width:100%;border-collapse:collapse;font-size:12px}
+.replen-table th{padding:6px 12px;text-align:left;font-size:10px;color:var(--color-text-tertiary);font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.replen-table td{padding:8px 12px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:middle}
+.replen-table tr:last-child td{border-bottom:none}
+.priority-badge{display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;background:var(--color-background-secondary);color:var(--color-text-tertiary);border:0.5px solid var(--color-border-tertiary);margin-right:4px}
+.nuclear-row td{opacity:.5}
+.nuclear-row td .priority-badge{background:var(--color-background-danger);color:var(--color-text-danger);border-color:var(--color-border-danger)}
+.toggle-wrap{display:flex;align-items:center;gap:8px}
+.toggle{width:32px;height:18px;border-radius:9px;background:var(--color-border-secondary);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle.on{background:#e8ff47}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:7px;background:#fff;top:2px;left:2px;transition:left .2s}
+.toggle.on::after{left:16px}
+.replen-footer{padding:12px 14px;border-top:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.replen-total{font-size:13px;color:var(--color-text-primary)}
+.replen-total span{font-weight:500}
+.modal-backdrop{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center;border-radius:var(--border-radius-lg)}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:20px;width:300px}
+.modal-title{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.modal-body{font-size:12px;color:var(--color-text-secondary);margin-bottom:16px;line-height:1.6}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+</style>
+
+<div class="admin" style="position:relative">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Bowling Poker</div>
+      <div class="sidebar-sub">Digiplay Admin</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Game Night</div>
+      <div class="nav-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</div>
+      <div class="nav-item"><i class="ti ti-trophy" aria-hidden="true"></i> Game Advancement</div>
+      <div class="nav-item"><i class="ti ti-adjustments" aria-hidden="true"></i> Overrides</div>
+      <div class="nav-section">Setup</div>
+      <div class="nav-item"><i class="ti ti-calendar" aria-hidden="true"></i> Session Setup</div>
+      <div class="nav-item active"><i class="ti ti-stack" aria-hidden="true"></i> Card Shoe</div>
+      <div class="nav-section">League</div>
+      <div class="nav-item"><i class="ti ti-settings" aria-hidden="true"></i> Settings</div>
+    </div>
+    <div class="sidebar-footer">
+      <span>Thursday Nite Strikers</span>
+      Summer 2026 · Week 7
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="main-header">
+      <div>
+        <div class="main-title">Card Shoe</div>
+        <div class="main-sub">Active games only · auto-initialized at session lock · 8 deck shoe</div>
+      </div>
+    </div>
+    <div class="main-body">
+
+      <div class="game-tabs">
+        <div class="gtab active" id="gtab-1" onclick="setGame(1)">Game 1</div>
+        <div class="gtab" id="gtab-2" onclick="setGame(2)">Game 2</div>
+      </div>
+
+      <div id="shoe-content"></div>
+
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <div class="modal-title" id="modal-title">Confirm replenishment</div>
+      <div class="modal-body" id="modal-body">—</div>
+      <div class="modal-btns">
+        <button class="btn-sm" onclick="closeModal()">Cancel</button>
+        <button class="btn-sm btn-danger" onclick="doReplenish()">Yes, replenish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const games={
+  1:{total:416,drawn:329,dead:14,threshold:20,
+     sources:[
+       {priority:1,label:'Duplicate cards — all players',count:14,nuclear:false,enabled:true},
+       {priority:2,label:'Undrawn earned cards — submitted/forfeited players',count:8,nuclear:false,enabled:true},
+       {priority:3,label:'Dead cards — submitted/forfeited players',count:6,nuclear:false,enabled:true},
+       {priority:4,label:'Also held — submitted/forfeited players',count:11,nuclear:false,enabled:false},
+       {priority:5,label:'Undrawn earned — active players (nuclear)',count:22,nuclear:true,enabled:false},
+     ]},
+  2:{total:416,drawn:12,dead:0,threshold:20,
+     sources:[
+       {priority:1,label:'Duplicate cards — all players',count:0,nuclear:false,enabled:true},
+       {priority:2,label:'Undrawn earned cards — submitted/forfeited players',count:0,nuclear:false,enabled:true},
+       {priority:3,label:'Dead cards — submitted/forfeited players',count:0,nuclear:false,enabled:true},
+       {priority:4,label:'Also held — submitted/forfeited players',count:0,nuclear:false,enabled:false},
+       {priority:5,label:'Undrawn earned — active players (nuclear)',count:0,nuclear:true,enabled:false},
+     ]},
+};
+
+let activeGame=1;
+
+function remaining(g){return games[g].total-games[g].drawn;}
+function pct(g){return Math.round((remaining(g)/games[g].total)*100);}
+function isWarn(g){return remaining(g)<=games[g].threshold;}
+function barClass(g){const r=remaining(g);if(r<=20) return 'critical';if(r<=60) return 'warn';return 'ok';}
+
+function setGame(g){
+  activeGame=g;
+  [1,2].forEach(n=>{
+    document.getElementById('gtab-'+n).classList.toggle('active',n===g);
+  });
+  renderShoe();
+}
+
+function toggleSource(idx){
+  const src=games[activeGame].sources[idx];
+  if(src.nuclear) return;
+  src.enabled=!src.enabled;
+  renderShoe();
+}
+
+function calcTotal(){
+  return games[activeGame].sources.filter(s=>s.enabled).reduce((t,s)=>t+s.count,0);
+}
+
+function renderShoe(){
+  const g=activeGame;
+  const rem=remaining(g);
+  const p=pct(g);
+  const warn=isWarn(g);
+  const bc=barClass(g);
+  let html='';
+  if(warn){
+    html+=`<div class="warn-banner"><i class="ti ti-alert-triangle" style="font-size:14px" aria-hidden="true"></i> Low shoe warning — only ${rem} cards remaining. Replenishment recommended.</div>`;
+  }
+  html+=`<div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Cards remaining</div>
+      <div class="stat-val ${warn?'warning':''}">${rem}</div>
+      <div class="stat-sub">of ${games[g].total} total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Cards drawn</div>
+      <div class="stat-val">${games[g].drawn}</div>
+      <div class="stat-sub">across all players</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Dead cards</div>
+      <div class="stat-val">${games[g].dead}</div>
+      <div class="stat-sub">duplicates in play</div>
+    </div>
+  </div>`;
+  html+=`<div class="shoe-bar-wrap">
+    <div class="shoe-bar-label"><span>Shoe level</span><span>${p}% remaining</span></div>
+    <div class="shoe-bar"><div class="shoe-bar-fill ${bc}" style="width:${p}%"></div></div>
+  </div>`;
+  html+=`<div class="card">
+    <div class="card-header">
+      <div class="card-title">Replenishment sources</div>
+      <div style="font-size:11px;color:var(--color-text-tertiary)">Toggle to include in replenishment</div>
+    </div>
+    <table class="replen-table">
+      <thead><tr><th>Priority</th><th>Source</th><th>Available</th><th>Include</th></tr></thead>
+      <tbody>`;
+  games[g].sources.forEach((s,i)=>{
+    const rowClass=s.nuclear?'nuclear-row':'';
+    html+=`<tr class="${rowClass}">
+      <td><span class="priority-badge">${s.priority}</span></td>
+      <td>${s.label}</td>
+      <td style="font-weight:500">${s.count}</td>
+      <td><div class="toggle-wrap">
+        <div class="toggle ${s.enabled&&!s.nuclear?'on':''}" onclick="toggleSource(${i})" ${s.nuclear?'title="Nuclear — admin override only"':''}></div>
+        ${s.nuclear?'<span style="font-size:10px;color:var(--color-text-danger)">Admin override only</span>':''}
+      </div></td>
+    </tr>`;
+  });
+  html+=`</tbody></table>
+    <div class="replen-footer">
+      <div class="replen-total">Total available to replenish: <span id="replen-total">${calcTotal()}</span> cards</div>
+      <button class="btn-sm btn-warning" onclick="showReplenModal()"><i class="ti ti-refresh" style="font-size:12px" aria-hidden="true"></i> Trigger replenishment</button>
+    </div>
+  </div>`;
+  document.getElementById('shoe-content').innerHTML=html;
+}
+
+function showReplenModal(){
+  const total=calcTotal();
+  document.getElementById('modal-title').textContent='Replenish Game '+activeGame+' shoe?';
+  document.getElementById('modal-body').textContent=total+' cards will be returned to the shoe from selected sources. Players will see face-down placeholders for any reclaimed cards. This cannot be undone.';
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function doReplenish(){
+  const g=games[activeGame];
+  const total=calcTotal();
+  g.drawn=Math.max(0,g.drawn-total);
+  g.dead=0;
+  g.sources.forEach(s=>{if(s.enabled&&!s.nuclear)s.count=0;});
+  closeModal();
+  renderShoe();
+}
+
+renderShoe();
+</script>

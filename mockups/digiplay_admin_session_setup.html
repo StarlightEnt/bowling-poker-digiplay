@@ -1,0 +1,284 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.admin{display:flex;height:620px;background:var(--color-background-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;border:0.5px solid var(--color-border-tertiary);font-family:var(--font-sans)}
+.sidebar{width:190px;flex-shrink:0;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.sidebar-header{padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sidebar-logo{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.sidebar-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.sidebar-nav{flex:1;padding:8px 0}
+.nav-section{padding:8px 16px 4px;font-size:10px;color:var(--color-text-tertiary);letter-spacing:.5px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 16px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent}
+.nav-item:hover{background:var(--color-background-secondary)}
+.nav-item.active{color:var(--color-text-primary);border-left-color:#e8ff47;background:var(--color-background-secondary);font-weight:500}
+.nav-item i{font-size:15px;flex-shrink:0}
+.sidebar-footer{padding:10px 16px;border-top:0.5px solid var(--color-border-tertiary);font-size:11px;color:var(--color-text-tertiary)}
+.sidebar-footer span{display:block;color:var(--color-text-secondary);font-weight:500;font-size:12px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.main-header{padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.main-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.main-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.main-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);white-space:nowrap}
+.btn-sm:hover{background:var(--color-background-secondary)}
+.btn-primary{background:#e8ff47;color:#1a1a2e;border-color:#e8ff47;font-weight:500}
+.btn-primary:hover{opacity:.88}
+.btn-danger{background:var(--color-background-danger);color:var(--color-text-danger);border-color:var(--color-border-danger)}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.card-header{padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.card-body{padding:14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group.full{grid-column:1/-1}
+label{font-size:11px;color:var(--color-text-secondary);font-weight:500}
+input[type=text],input[type=number],input[type=date],select{width:100%;padding:6px 10px;font-size:12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary)}
+input:focus,select:focus{outline:none;border-color:var(--color-border-primary)}
+input[readonly]{background:var(--color-background-secondary);color:var(--color-text-tertiary);cursor:default}
+.pin-row{display:flex;gap:8px;align-items:center}
+.pin-row input{flex:1}
+.pin-hint{font-size:11px;color:var(--color-text-tertiary);margin-top:2px;font-style:italic}
+.payout-preview{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.payout-item{text-align:center}
+.payout-val{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.payout-label{font-size:10px;color:var(--color-text-tertiary);margin-top:2px}
+.payout-item.highlight .payout-val{color:#e8a800}
+.import-options{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.import-status{font-size:11px;color:var(--color-text-secondary)}
+.import-status.success{color:var(--color-text-success)}
+.import-status.warning{color:var(--color-text-warning)}
+.player-preview{margin-top:10px;max-height:120px;overflow-y:auto;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md)}
+.player-preview-table{width:100%;border-collapse:collapse;font-size:11px}
+.player-preview-table th{padding:5px 10px;text-align:left;font-size:10px;color:var(--color-text-tertiary);background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);position:sticky;top:0}
+.player-preview-table td{padding:5px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+.player-preview-table tr:last-child td{border-bottom:none}
+.lock-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--color-background-secondary);border-radius:var(--border-radius-md)}
+.lock-info{font-size:12px;color:var(--color-text-secondary)}
+.lock-info strong{display:block;font-size:13px;color:var(--color-text-primary);margin-bottom:2px}
+.locked-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:500;background:var(--color-background-success);color:var(--color-text-success)}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:12px 0}
+</style>
+
+<div class="admin">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Bowling Poker</div>
+      <div class="sidebar-sub">Digiplay Admin</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Game Night</div>
+      <div class="nav-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</div>
+      <div class="nav-item"><i class="ti ti-trophy" aria-hidden="true"></i> Game Advancement</div>
+      <div class="nav-item"><i class="ti ti-adjustments" aria-hidden="true"></i> Overrides</div>
+      <div class="nav-section">Setup</div>
+      <div class="nav-item active"><i class="ti ti-calendar" aria-hidden="true"></i> Session Setup</div>
+      <div class="nav-item"><i class="ti ti-stack" aria-hidden="true"></i> Card Shoe</div>
+      <div class="nav-section">League</div>
+      <div class="nav-item"><i class="ti ti-settings" aria-hidden="true"></i> Settings</div>
+    </div>
+    <div class="sidebar-footer">
+      <span>Thursday Nite Strikers</span>
+      Summer 2026 · Week 7
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="main-header">
+      <div>
+        <div class="main-title">Session Setup</div>
+        <div class="main-sub">Configure this week's game night · lock when ready to start</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span id="locked-badge" style="display:none" class="locked-badge"><i class="ti ti-lock" style="font-size:12px" aria-hidden="true"></i> Session locked</span>
+      </div>
+    </div>
+    <div class="main-body">
+
+      <!-- Session details -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">Session details</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Season</label>
+              <input type="text" id="f-season" value="Summer 2026">
+            </div>
+            <div class="form-group">
+              <label>Week number</label>
+              <input type="number" id="f-week" value="7" min="1" max="40">
+            </div>
+            <div class="form-group">
+              <label>Game date</label>
+              <input type="date" id="f-date" value="2026-06-11">
+            </div>
+            <div class="form-group">
+              <label>Weekly PIN</label>
+              <div class="pin-row">
+                <input type="text" id="f-pin" value="7742" maxlength="4">
+                <button class="btn-sm" onclick="genPin()"><i class="ti ti-refresh" style="font-size:12px" aria-hidden="true"></i> Generate</button>
+              </div>
+              <div class="pin-hint">One PIN only, please. Get it? 😉</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">Financial</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Buy-in amount ($)</label>
+              <input type="number" id="f-buyin" value="5" min="1" oninput="calcPayout()">
+            </div>
+            <div class="form-group">
+              <label>Progressive nightly ($)</label>
+              <input type="number" id="f-prog" value="3" min="0" oninput="calcPayout()">
+            </div>
+            <div class="form-group">
+              <label>Current progressive pot</label>
+              <input type="text" id="f-pot" value="$33.00" readonly>
+            </div>
+            <div class="form-group">
+              <label>Players checked in</label>
+              <input type="number" id="f-players" value="25" min="1" oninput="calcPayout()">
+            </div>
+          </div>
+          <div class="payout-preview" id="payout-preview">
+            <div class="payout-item">
+              <div class="payout-val" id="pp-pool">$125.00</div>
+              <div class="payout-label">Total pool</div>
+            </div>
+            <div class="payout-item highlight">
+              <div class="payout-val" id="pp-pergame">$29.00</div>
+              <div class="payout-label">Per game payout</div>
+            </div>
+            <div class="payout-item">
+              <div class="payout-val" id="pp-charity">$3.00</div>
+              <div class="payout-label">Charity</div>
+            </div>
+            <div class="payout-item">
+              <div class="payout-val" id="pp-prog">$3.00</div>
+              <div class="payout-label">Progressive add</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player import -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Player import</div>
+          <span class="import-status success" id="import-status">25 players loaded</span>
+        </div>
+        <div class="card-body">
+          <div class="import-options">
+            <button class="btn-sm btn-primary" onclick="importMode('manager')"><i class="ti ti-plug" style="font-size:12px" aria-hidden="true"></i> Import from Manager</button>
+            <button class="btn-sm" onclick="importMode('csv')"><i class="ti ti-upload" style="font-size:12px" aria-hidden="true"></i> Upload CSV</button>
+            <button class="btn-sm" onclick="importMode('template')"><i class="ti ti-download" style="font-size:12px" aria-hidden="true"></i> Download template</button>
+          </div>
+          <div class="player-preview">
+            <table class="player-preview-table">
+              <thead><tr><th>#</th><th>Name</th><th>Lane</th></tr></thead>
+              <tbody id="player-preview-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lock session -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">Session lock</div></div>
+        <div class="card-body">
+          <div class="lock-bar">
+            <div class="lock-info">
+              <strong id="lock-status-text">Ready to lock</strong>
+              <span id="lock-sub">Locking will initialize card shoes, save PIN, and open the kiosk player list.</span>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-sm btn-primary" id="lock-btn" onclick="toggleLock()"><i class="ti ti-lock" style="font-size:12px" aria-hidden="true"></i> Lock session</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const samplePlayers=[
+  {n:'Alice B.',lane:'1-2'},{n:'Bob C.',lane:'1-2'},{n:'Carol D.',lane:'3-4'},
+  {n:'Dave E.',lane:'3-4'},{n:'Ellen F.',lane:'5-6'},{n:'Frank G.',lane:'5-6'},
+  {n:'Grace H.',lane:'7-8'},{n:'Hank I.',lane:'7-8'},{n:'Irene J.',lane:'9-10'},
+  {n:'Jack K.',lane:'9-10'},{n:'Karen L.',lane:'11-12'},{n:'Larry M.',lane:'11-12'},
+  {n:'Maria N.',lane:'13-14'},{n:'Nick O.',lane:'13-14'},{n:'Olivia P.',lane:'15-16'},
+];
+
+let locked=false;
+
+function buildPreview(){
+  const tbody=document.getElementById('player-preview-body');
+  tbody.innerHTML='';
+  samplePlayers.forEach((p,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td><td>${p.n}</td><td>${p.lane}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function calcPayout(){
+  const players=parseInt(document.getElementById('f-players').value)||0;
+  const buyin=parseFloat(document.getElementById('f-buyin').value)||0;
+  const prog=parseFloat(document.getElementById('f-prog').value)||0;
+  const pool=players*buyin;
+  const payoutTotal=Math.floor((pool-prog)/4)*3;
+  const charity=pool-prog-payoutTotal;
+  const perGame=payoutTotal/3;
+  document.getElementById('pp-pool').textContent='$'+pool.toFixed(2);
+  document.getElementById('pp-pergame').textContent='$'+perGame.toFixed(2);
+  document.getElementById('pp-charity').textContent='$'+charity.toFixed(2);
+  document.getElementById('pp-prog').textContent='$'+prog.toFixed(2);
+}
+
+function genPin(){
+  if(locked) return;
+  const pin=Math.floor(1000+Math.random()*9000).toString();
+  document.getElementById('f-pin').value=pin;
+}
+
+function importMode(mode){
+  const status=document.getElementById('import-status');
+  if(mode==='manager'){status.textContent='Imported from Manager — 25 players';status.className='import-status success';}
+  else if(mode==='csv'){status.textContent='Upload a CSV file to load players';status.className='import-status warning';}
+  else if(mode==='template'){status.textContent='Template download started';}
+}
+
+function toggleLock(){
+  locked=!locked;
+  const btn=document.getElementById('lock-btn');
+  const badge=document.getElementById('locked-badge');
+  const statusText=document.getElementById('lock-status-text');
+  const lockSub=document.getElementById('lock-sub');
+  const inputs=document.querySelectorAll('input,select');
+  if(locked){
+    btn.innerHTML='<i class="ti ti-lock-open" style="font-size:12px" aria-hidden="true"></i> Unlock session';
+    btn.className='btn-sm btn-danger';
+    badge.style.display='inline-flex';
+    statusText.textContent='Session locked';
+    lockSub.textContent='Card shoes initialized · PIN active · Players loaded · Game night is live.';
+    inputs.forEach(i=>i.setAttribute('readonly','true'));
+  } else {
+    btn.innerHTML='<i class="ti ti-lock" style="font-size:12px" aria-hidden="true"></i> Lock session';
+    btn.className='btn-sm btn-primary';
+    badge.style.display='none';
+    statusText.textContent='Ready to lock';
+    lockSub.textContent='Locking will initialize card shoes, save PIN, and open the kiosk player list.';
+    inputs.forEach(i=>i.removeAttribute('readonly'));
+  }
+}
+
+buildPreview();
+calcPayout();
+</script>

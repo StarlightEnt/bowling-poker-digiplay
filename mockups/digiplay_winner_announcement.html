@@ -1,0 +1,172 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrapper{display:flex;flex-direction:column;gap:32px;padding:16px 0}
+.toggle-row{display:flex;gap:10px;margin-bottom:8px;align-items:center}
+button.tog{background:#2a2a45 !important;border:1px solid #5555aa !important;border-radius:6px !important;color:#aaaacc !important;font-size:12px !important;font-weight:600 !important;padding:6px 14px !important;cursor:pointer !important}
+button.tog.active{background:#e8ff47 !important;border-color:#e8ff47 !important;color:#1a1a2e !important}
+.tog-label{font-size:12px;color:#888;margin-right:4px}
+
+.screen{border-radius:12px;overflow:hidden;position:relative}
+.kiosk-screen{background:#1a1a2e;min-height:400px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 48px;text-align:center}
+.phone-frame{width:390px;height:620px;background:#000;border-radius:44px;border:8px solid #222;margin:0 auto;overflow:hidden;position:relative;box-shadow:0 0 0 2px #444}
+.notch{width:120px;height:34px;background:#000;border-radius:0 0 20px 20px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10}
+.phone-inner{background:#1a1a2e;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 24px 32px;text-align:center}
+
+.game-badge{font-size:12px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#888899;margin-bottom:16px}
+.winner-label{font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#888899;margin-bottom:8px}
+.winner-name{font-size:42px;font-weight:700;color:#ffffff;margin-bottom:4px;line-height:1.1}
+.winner-name.kiosk{font-size:56px}
+.hand-name{font-size:18px;font-weight:600;letter-spacing:1px;color:#e8ff47;margin-bottom:24px}
+.hand-name.kiosk{font-size:24px;margin-bottom:32px}
+.cards-row{display:flex;gap:10px;justify-content:center;margin-bottom:28px}
+.cards-row.kiosk{gap:14px;margin-bottom:36px}
+.wcard{background:#ffffff;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #e8ff47;flex-shrink:0}
+.wcard.sm{width:48px;height:68px}
+.wcard.lg{width:64px;height:90px}
+.wcard.red .wr,.wcard.red .ws{color:#cc2222}
+.wr{font-size:16px;font-weight:800;line-height:1;color:#1a1a2e}
+.ws{font-size:13px;line-height:1;color:#1a1a2e}
+.wr.lg-r{font-size:22px}
+.ws.lg-s{font-size:16px}
+.payout-label{font-size:12px;color:#666688;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.payout-amount{font-size:32px;font-weight:700;color:#e8ff47}
+.payout-amount.kiosk{font-size:44px}
+.dismiss-hint{font-size:11px;color:#444466;margin-top:24px;letter-spacing:.5px}
+
+.rf-screen{background:#1a1000}
+.rf-badge{font-size:12px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#c9860a;margin-bottom:16px}
+.rf-label{font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#c9860a;margin-bottom:8px}
+.rf-winner{color:#ffd700}
+.rf-hand{color:#ffd700;font-size:18px;font-weight:700;letter-spacing:2px;margin-bottom:8px}
+.rf-hand.kiosk{font-size:26px}
+.rf-sub{font-size:12px;color:#c9860a;letter-spacing:1px;margin-bottom:24px}
+.wcard.gold{border-color:#ffd700;background:#fff9e6}
+.wcard.gold .wr,.wcard.gold .ws{color:#7a4f00}
+.wcard.gold.red .wr,.wcard.gold.red .ws{color:#cc2200}
+.rf-payout-label{font-size:12px;color:#c9860a;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.rf-payout{font-size:13px;color:#c9860a;margin-bottom:4px}
+.rf-prog-label{font-size:12px;color:#c9860a;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+.rf-prog{font-size:36px;font-weight:700;color:#ffd700}
+.rf-prog.kiosk{font-size:52px}
+.rf-dismiss{font-size:11px;color:#7a4f00;margin-top:20px;letter-spacing:.5px}
+.divider-line{border:none;border-top:1px solid #3a2800;margin:12px 0}
+</style>
+
+<div class="wrapper">
+  <div>
+    <div class="tog-label" style="color:#aaa;font-size:12px;margin-bottom:8px">Toggle view:</div>
+    <div class="toggle-row">
+      <button class="tog active" onclick="show('kiosk-normal')">Kiosk — regular win</button>
+      <button class="tog" onclick="show('phone-normal')">Phone — regular win</button>
+      <button class="tog" onclick="show('kiosk-rf')">Kiosk — Royal Flush</button>
+      <button class="tog" onclick="show('phone-rf')">Phone — Royal Flush</button>
+    </div>
+  </div>
+
+  <!-- KIOSK NORMAL WIN -->
+  <div class="screen" id="kiosk-normal">
+    <div class="kiosk-screen">
+      <div class="game-badge">Game 1 Winner</div>
+      <div class="winner-label">Congratulations</div>
+      <div class="winner-name kiosk">Allison L.</div>
+      <div class="hand-name kiosk">Full House</div>
+      <div class="cards-row kiosk">
+        <div class="wcard lg"><div class="wr lg-r">K</div><div class="ws lg-s">♠</div></div>
+        <div class="wcard lg"><div class="wr lg-r">K</div><div class="ws lg-s">♥</div></div>
+        <div class="wcard lg"><div class="wr lg-r">K</div><div class="ws lg-s">♦</div></div>
+        <div class="wcard lg red"><div class="wr lg-r">9</div><div class="ws lg-s">♥</div></div>
+        <div class="wcard lg red"><div class="wr lg-r">9</div><div class="ws lg-s">♦</div></div>
+      </div>
+      <div class="payout-label">Game payout</div>
+      <div class="payout-amount kiosk">$42.00</div>
+      <div class="dismiss-hint">Tap anywhere to dismiss</div>
+    </div>
+  </div>
+
+  <!-- PHONE NORMAL WIN -->
+  <div class="screen" id="phone-normal" style="display:none">
+    <div class="phone-frame">
+      <div class="notch"></div>
+      <div class="phone-inner">
+        <div class="game-badge">Game 1 Winner</div>
+        <div class="winner-label">Congratulations</div>
+        <div class="winner-name">Allison L.</div>
+        <div class="hand-name">Full House</div>
+        <div class="cards-row">
+          <div class="wcard sm"><div class="wr">K</div><div class="ws">♠</div></div>
+          <div class="wcard sm"><div class="wr">K</div><div class="ws">♥</div></div>
+          <div class="wcard sm"><div class="wr">K</div><div class="ws">♦</div></div>
+          <div class="wcard sm red"><div class="wr">9</div><div class="ws">♥</div></div>
+          <div class="wcard sm red"><div class="wr">9</div><div class="ws">♦</div></div>
+        </div>
+        <div class="payout-label">Game payout</div>
+        <div class="payout-amount">$42.00</div>
+        <div class="dismiss-hint">Tap anywhere to dismiss</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KIOSK ROYAL FLUSH -->
+  <div class="screen" id="kiosk-rf" style="display:none">
+    <div class="kiosk-screen rf-screen">
+      <div class="rf-badge">Game 2 Winner</div>
+      <div class="rf-label">Congratulations</div>
+      <div class="winner-name kiosk rf-winner">Rachel S.</div>
+      <div class="rf-hand kiosk">Royal Flush</div>
+      <div class="rf-sub">Spades · 10 J Q K A</div>
+      <div class="cards-row kiosk">
+        <div class="wcard lg gold"><div class="wr lg-r">10</div><div class="ws lg-s">♠</div></div>
+        <div class="wcard lg gold"><div class="wr lg-r">J</div><div class="ws lg-s">♠</div></div>
+        <div class="wcard lg gold"><div class="wr lg-r">Q</div><div class="ws lg-s">♠</div></div>
+        <div class="wcard lg gold"><div class="wr lg-r">K</div><div class="ws lg-s">♠</div></div>
+        <div class="wcard lg gold"><div class="wr lg-r">A</div><div class="ws lg-s">♠</div></div>
+      </div>
+      <hr class="divider-line" style="width:100%;max-width:400px">
+      <div class="rf-payout-label">Game payout</div>
+      <div class="rf-payout">$42.00</div>
+      <div class="rf-prog-label">Progressive pot won</div>
+      <div class="rf-prog kiosk">$386.00</div>
+      <div class="rf-dismiss">Tap anywhere to dismiss</div>
+    </div>
+  </div>
+
+  <!-- PHONE ROYAL FLUSH -->
+  <div class="screen" id="phone-rf" style="display:none">
+    <div class="phone-frame">
+      <div class="notch"></div>
+      <div class="phone-inner rf-screen" style="border-radius:36px">
+        <div class="rf-badge">Game 2 Winner</div>
+        <div class="rf-label">Congratulations</div>
+        <div class="winner-name rf-winner">Rachel S.</div>
+        <div class="rf-hand">Royal Flush</div>
+        <div class="rf-sub" style="font-size:11px;margin-bottom:18px">Spades · 10 J Q K A</div>
+        <div class="cards-row">
+          <div class="wcard sm gold"><div class="wr">10</div><div class="ws">♠</div></div>
+          <div class="wcard sm gold"><div class="wr">J</div><div class="ws">♠</div></div>
+          <div class="wcard sm gold"><div class="wr">Q</div><div class="ws">♠</div></div>
+          <div class="wcard sm gold"><div class="wr">K</div><div class="ws">♠</div></div>
+          <div class="wcard sm gold"><div class="wr">A</div><div class="ws">♠</div></div>
+        </div>
+        <hr class="divider-line" style="width:100%">
+        <div class="rf-payout-label">Game payout</div>
+        <div class="rf-payout">$42.00</div>
+        <div class="rf-prog-label">Progressive pot won</div>
+        <div class="rf-prog">$386.00</div>
+        <div class="rf-dismiss">Tap anywhere to dismiss</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id){
+  ['kiosk-normal','phone-normal','kiosk-rf','phone-rf'].forEach(s=>{
+    document.getElementById(s).style.display=s===id?'block':'none';
+  });
+  document.querySelectorAll('.tog').forEach((b,i)=>{
+    const ids=['kiosk-normal','phone-normal','kiosk-rf','phone-rf'];
+    b.classList.toggle('active',ids[i]===id);
+  });
+}
+</script>

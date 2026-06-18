@@ -1,0 +1,42 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.screen{background:#1a1a2e;min-height:480px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;font-family:var(--font-sans)}
+.eyebrow{font-size:11px;font-weight:500;letter-spacing:3px;color:#888888;text-transform:uppercase;margin-bottom:6px}
+.appname{font-size:32px;font-weight:500;color:#ffffff;letter-spacing:1px;margin-bottom:4px}
+.appsub{font-size:11px;color:#e8ff47;letter-spacing:3px;text-transform:uppercase;margin-bottom:48px}
+.btns{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:20px;width:100%;max-width:560px;margin-bottom:48px}
+button.choice{
+  flex:1 !important;
+  padding:32px 16px !important;
+  background:#2a2a45 !important;
+  border:2px solid #7777cc !important;
+  border-radius:12px !important;
+  color:#ffffff !important;
+  font-size:20px !important;
+  font-weight:700 !important;
+  letter-spacing:.5px !important;
+  cursor:pointer !important;
+  text-align:center !important;
+  transition:background .15s,color .15s,border-color .15s,transform .1s !important;
+  line-height:1.3 !important;
+}
+button.choice:hover{background:#ffffff !important;color:#1a1a2e !important;border-color:#ffffff !important}
+button.choice:active{transform:scale(.97) !important}
+.session-label{font-size:12px;color:#666688;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.session-name{font-size:18px;font-weight:500;color:#aaaacc}
+</style>
+
+<div class="screen">
+  <div class="eyebrow">Welcome back to</div>
+  <div class="appname">Bowling Poker</div>
+  <div class="appsub">Digiplay</div>
+
+  <div class="btns">
+    <button class="choice">Continue Current 🎳</button>
+    <button class="choice">New Week</button>
+  </div>
+
+  <div class="session-label">Current Session</div>
+  <div class="session-name">Summer 2026 · Week 7</div>
+</div>
