@@ -3,27 +3,28 @@ import { useState, useEffect, useCallback } from 'react';
 import StatusPill from '../../components/StatusPill.js';
 import { CardRow } from '../../components/CardDisplay.js';
 
+const BG = '#1a1a2e';
+const SURFACE = '#2a2a45';
+const BORDER = '#333355';
+const BORDER_MAIN = '#7777cc';
 const ACCENT = '#e8ff47';
-const SURFACE = '#16213e';
-const BORDER = '#2a2a5a';
 
 function StatCard({ label, value, sub, warning, onClick, active }) {
   return (
     <div
       onClick={onClick}
       style={{
-        background: active ? '#1a2a1a' : SURFACE,
+        background: SURFACE,
         border: `1px solid ${active ? ACCENT : warning ? '#ffaa44' : BORDER}`,
         borderRadius: 8,
-        padding: '16px 20px',
+        padding: '14px 16px',
         cursor: onClick ? 'pointer' : 'default',
-        flex: 1,
       }}
     >
-      <div style={{ color: '#8888aa', fontSize: 10, textTransform: 'uppercase',
+      <div style={{ color: '#666688', fontSize: 10, textTransform: 'uppercase',
         letterSpacing: 1, marginBottom: 6 }}>{label}</div>
-      <div style={{ color: warning ? '#ffaa44' : '#ffffff', fontSize: 28, fontWeight: 700 }}>{value ?? '—'}</div>
-      {sub && <div style={{ color: '#555577', fontSize: 11, marginTop: 2 }}>{sub}</div>}
+      <div style={{ color: warning ? '#ffaa44' : '#ffffff', fontSize: 26, fontWeight: 700 }}>{value ?? '—'}</div>
+      {sub && <div style={{ color: '#666688', fontSize: 11, marginTop: 2 }}>{sub}</div>}
     </div>
   );
 }
@@ -61,14 +62,12 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
 
   return (
     <>
-      {/* Backdrop */}
       <div onClick={onClose} style={{
         position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 99,
       }} />
-      {/* Panel */}
       <div style={{
         position: 'fixed', top: 0, right: 0, bottom: 0,
-        width: 320, background: '#0f1a2e',
+        width: 320, background: BG,
         borderLeft: `1px solid ${BORDER}`,
         zIndex: 100, display: 'flex', flexDirection: 'column',
         overflowY: 'auto',
@@ -86,10 +85,10 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
               <div>
-                <div style={{ color: '#ffffff', fontSize: 16, fontWeight: 700 }}>
+                <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 500 }}>
                   {data.player.normalized_name}
                 </div>
-                <div style={{ color: '#8888aa', fontSize: 12 }}>
+                <div style={{ color: '#8888aa', fontSize: 11 }}>
                   Lane {data.player.lane} · Pair {data.player.lane_pair}
                 </div>
               </div>
@@ -99,7 +98,7 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
               }}>✕</button>
             </div>
 
-            {/* Stats row */}
+            {/* Stats row — 3 cols */}
             <div style={{
               display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
               gap: 8, padding: '12px 20px', borderBottom: `1px solid ${BORDER}`,
@@ -110,7 +109,7 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
                 { label: 'Dead', value: data.state?.cards_dead ?? 0 },
               ].map(({ label, value }) => (
                 <div key={label} style={{ textAlign: 'center' }}>
-                  <div style={{ color: '#8888aa', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</div>
+                  <div style={{ color: '#666688', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</div>
                   <div style={{ color: '#ffffff', fontSize: 20, fontWeight: 700 }}>{value}</div>
                 </div>
               ))}
@@ -122,24 +121,24 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
                 <StatusPill status={data.state?.status || 'waiting'} />
               </div>
               {data.hand?.name && (
-                <div style={{ color: ACCENT, fontSize: 16, fontWeight: 700 }}>
+                <div style={{ color: '#ffffff', fontSize: 16, fontWeight: 500 }}>
                   {data.hand.name}
                 </div>
               )}
             </div>
 
-            {/* Cards */}
+            {/* Cards — best5, alsoHeld, deadCards */}
             <div style={{ padding: '12px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
               {data.hand?.best5?.length > 0 && (
                 <div>
-                  <div style={{ color: '#8888aa', fontSize: 10, textTransform: 'uppercase',
+                  <div style={{ color: '#888899', fontSize: 10, textTransform: 'uppercase',
                     letterSpacing: 1, marginBottom: 6 }}>Best 5</div>
                   <CardRow cards={data.hand.best5} status="best5" size="sm" />
                 </div>
               )}
               {data.hand?.alsoHeld?.length > 0 && (
                 <div style={{ opacity: 0.5 }}>
-                  <div style={{ color: '#8888aa', fontSize: 10, textTransform: 'uppercase',
+                  <div style={{ color: '#888899', fontSize: 10, textTransform: 'uppercase',
                     letterSpacing: 1, marginBottom: 6 }}>Also Held</div>
                   <CardRow cards={data.hand.alsoHeld} status="legal" size="sm" />
                 </div>
@@ -179,13 +178,13 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
                   <p style={{ color: '#8888aa', fontSize: 12, marginBottom: 8 }}>Set draw count:</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                     <button onClick={() => setAdjustCount(v => Math.max(0, v - 1))}
-                      style={{ width: 32, height: 32, background: '#2a2a45', border: `1px solid ${BORDER}`,
-                        borderRadius: 6, color: '#ffffff', fontSize: 18 }}>−</button>
+                      style={{ width: 32, height: 32, background: SURFACE, border: `1px solid ${BORDER_MAIN}`,
+                        borderRadius: 6, color: '#ffffff', fontSize: 18, cursor: 'pointer' }}>−</button>
                     <span style={{ color: '#ffffff', fontSize: 20, fontWeight: 700,
                       minWidth: 32, textAlign: 'center' }}>{adjustCount}</span>
                     <button onClick={() => setAdjustCount(v => v + 1)}
-                      style={{ width: 32, height: 32, background: '#2a2a45', border: `1px solid ${BORDER}`,
-                        borderRadius: 6, color: '#ffffff', fontSize: 18 }}>+</button>
+                      style={{ width: 32, height: 32, background: SURFACE, border: `1px solid ${BORDER_MAIN}`,
+                        borderRadius: 6, color: '#ffffff', fontSize: 18, cursor: 'pointer' }}>+</button>
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button onClick={() => doAction('adjust_draw_count', adjustCount)} disabled={acting}
@@ -205,7 +204,7 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button onClick={onClose}
                     style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                      border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 13 }}>
+                      border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 13, cursor: 'pointer' }}>
                     Close
                   </button>
                   <button
@@ -251,7 +250,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 10000); // auto-refresh every 10s
+    const interval = setInterval(fetchData, 10000);
     return () => clearInterval(interval);
   }, [fetchData]);
 
@@ -259,20 +258,21 @@ export default function AdminDashboard() {
 
   if (!data?.session) {
     return (
-      <div style={{ padding: 32 }}>
-        <h1 style={{ color: ACCENT, fontSize: 28, marginBottom: 8 }}>Dashboard</h1>
+      <div style={{ padding: 24 }}>
+        <div style={{ fontSize: 15, fontWeight: 500, color: '#ffffff', marginBottom: 4 }}>
+          Game Night Dashboard
+        </div>
         <p style={{ color: '#8888aa', marginBottom: 32 }}>No active session.</p>
-        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 8,
-          padding: 40, textAlign: 'center', color: '#555577' }}>
+        <div style={{ background: SURFACE, border: `0.5px solid ${BORDER}`, borderRadius: 8,
+          padding: 40, textAlign: 'center', color: '#666688' }}>
           No active session. Go to Session Setup to start game night.
         </div>
       </div>
     );
   }
 
-  const { session, activeGame, players, stats, shoeStats } = data;
+  const { session, activeGame, players, stats } = data;
 
-  // Filter players
   const lanePairs = [...new Set(players.map(p => p.lane_pair))].sort();
   const filtered = players.filter(p => {
     const statusMatch = statusFilter === 'all' || p.game_status === statusFilter;
@@ -282,7 +282,6 @@ export default function AdminDashboard() {
 
   const isFiltered = statusFilter !== 'all' || lanePairFilter !== 'all';
 
-  // Progress bar per player: cards_drawn / cards_earned
   function drawProgress(p) {
     if (!p.cards_earned) return 0;
     return Math.min(100, Math.round((p.cards_drawn / p.cards_earned) * 100));
@@ -290,22 +289,22 @@ export default function AdminDashboard() {
 
   return (
     <div style={{ padding: 24, position: 'relative' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
+      {/* Header — "Game Night Dashboard" text-primary 15px/500, matching mockup main-header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
         <div>
-          <h1 style={{ color: ACCENT, fontSize: 26, marginBottom: 2 }}>Dashboard</h1>
-          <div style={{ color: '#8888aa', fontSize: 13 }}>
+          <div style={{ color: '#ffffff', fontSize: 15, fontWeight: 500, marginBottom: 2 }}>
+            Game Night Dashboard
+          </div>
+          <div style={{ color: '#666688', fontSize: 11 }}>
             {session.season_name} · Week {session.week_number}
-            {activeGame && ` · Game ${activeGame.game_number} Open`}
+            {activeGame && ` · Game ${activeGame.game_number} in progress`}
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <div style={{ color: '#555577', fontSize: 11 }}>Auto-refreshes every 10s</div>
-        </div>
+        <div style={{ color: '#555577', fontSize: 11, paddingTop: 4 }}>Auto-refreshes every 10s</div>
       </div>
 
-      {/* Stat cards */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+      {/* Stat cards — 4-column grid per mockup */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 14 }}>
         <StatCard
           label="Players Checked In"
           value={stats.checkedIn}
@@ -335,67 +334,75 @@ export default function AdminDashboard() {
         />
       </div>
 
-      {/* Filter row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        {['all', 'drawing', 'submitted', 'forfeited', 'waiting'].map(s => (
-          <button key={s} onClick={() => setStatusFilter(s)}
-            style={{
-              background: statusFilter === s ? ACCENT : 'transparent',
-              color: statusFilter === s ? '#1a1a2e' : '#8888aa',
-              border: `1px solid ${statusFilter === s ? ACCENT : BORDER}`,
-              borderRadius: 20, padding: '4px 12px', fontSize: 11,
-              textTransform: 'capitalize', cursor: 'pointer',
-            }}>
-            {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
-          </button>
-        ))}
-
-        <select
-          value={lanePairFilter}
-          onChange={e => setLanePairFilter(e.target.value)}
-          style={{
-            background: '#16213e', border: `1px solid ${BORDER}`,
-            borderRadius: 6, color: '#8888aa', padding: '4px 8px',
-            fontSize: 11, marginLeft: 8,
-          }}
-        >
-          <option value="all">All Lanes</option>
-          {lanePairs.map(lp => (
-            <option key={lp} value={lp}>Pair {lp}</option>
-          ))}
-        </select>
-
-        <div style={{ color: '#555577', fontSize: 11, marginLeft: 8 }}>
-          Showing {filtered.length} of {players.length} players
+      {/* Single card: card-header (title + filter pills) → column headers → rows */}
+      <div style={{ background: SURFACE, border: `0.5px solid #666688`, borderRadius: 8, overflow: 'hidden' }}>
+        {/* Card header — title left, filter pills right */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          gap: 8, padding: '10px 14px',
+          borderBottom: `0.5px solid ${BORDER}`,
+          flexWrap: 'wrap',
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 500, color: '#ffffff', whiteSpace: 'nowrap' }}>
+            {activeGame ? `All players — Game ${activeGame.game_number}` : 'All players'}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            {['all', 'drawing', 'submitted', 'forfeited', 'waiting'].map(s => (
+              <button key={s} onClick={() => setStatusFilter(s)}
+                style={{
+                  background: statusFilter === s ? ACCENT : 'transparent',
+                  color: statusFilter === s ? '#1a1a2e' : '#8888aa',
+                  border: `1px solid ${statusFilter === s ? ACCENT : BORDER}`,
+                  borderRadius: 20, padding: '3px 10px', fontSize: 11,
+                  textTransform: 'capitalize', cursor: 'pointer',
+                }}>
+                {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
+              </button>
+            ))}
+            <select
+              value={lanePairFilter}
+              onChange={e => setLanePairFilter(e.target.value)}
+              style={{
+                background: BG, border: `1px solid ${BORDER}`,
+                borderRadius: 6, color: '#8888aa', padding: '3px 8px',
+                fontSize: 11,
+              }}
+            >
+              <option value="all">All Lanes</option>
+              {lanePairs.map(lp => (
+                <option key={lp} value={lp}>Pair {lp}</option>
+              ))}
+            </select>
+            <div style={{ color: '#555577', fontSize: 11 }}>
+              {filtered.length} of {players.length}
+            </div>
+            {isFiltered && (
+              <button onClick={() => { setStatusFilter('all'); setLanePairFilter('all'); }}
+                style={{ background: 'transparent', color: BORDER_MAIN, border: 'none',
+                  fontSize: 11, cursor: 'pointer', textDecoration: 'underline' }}>
+                Clear
+              </button>
+            )}
+          </div>
         </div>
-        {isFiltered && (
-          <button onClick={() => { setStatusFilter('all'); setLanePairFilter('all'); }}
-            style={{ background: 'transparent', color: '#7777cc', border: 'none',
-              fontSize: 11, cursor: 'pointer', textDecoration: 'underline' }}>
-            Clear filters
-          </button>
-        )}
-      </div>
 
-      {/* Player table */}
-      <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 8, overflow: 'hidden' }}>
-        {/* Table header */}
+        {/* Column headers */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 60px 70px 100px 120px 100px 120px',
-          background: '#0f1a2e',
+          background: BG,
           padding: '8px 16px',
           gap: 8,
         }}>
           {['Player', 'Lane', 'Frame', 'Drawn/Earned', 'Progress', 'Status', 'Best Hand'].map(h => (
-            <div key={h} style={{ color: '#555577', fontSize: 10,
+            <div key={h} style={{ color: '#666688', fontSize: 10,
               textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
           ))}
         </div>
 
         {/* Rows */}
         {filtered.length === 0 ? (
-          <div style={{ padding: '24px 16px', color: '#555577', textAlign: 'center', fontSize: 13 }}>
+          <div style={{ padding: '24px 16px', color: '#666688', textAlign: 'center', fontSize: 13 }}>
             No players match the current filters.
           </div>
         ) : filtered.map(player => (
@@ -407,9 +414,9 @@ export default function AdminDashboard() {
               gridTemplateColumns: '1fr 60px 70px 100px 120px 100px 120px',
               padding: '10px 16px',
               gap: 8,
-              borderTop: `1px solid ${BORDER}`,
+              borderTop: `0.5px solid ${BORDER}`,
               cursor: 'pointer',
-              background: selectedPlayer === player.id ? '#1a2a3a' : 'transparent',
+              background: selectedPlayer === player.id ? '#222240' : 'transparent',
               alignItems: 'center',
             }}
           >
@@ -422,8 +429,7 @@ export default function AdminDashboard() {
             <div style={{ color: '#8888aa', fontSize: 13 }}>
               {player.cards_drawn || 0}/{player.cards_earned || 0}
             </div>
-            {/* Progress bar */}
-            <div style={{ background: '#0f1a2e', borderRadius: 4, height: 6, overflow: 'hidden' }}>
+            <div style={{ background: BG, borderRadius: 4, height: 6, overflow: 'hidden' }}>
               <div style={{
                 width: `${drawProgress(player)}%`,
                 height: '100%',

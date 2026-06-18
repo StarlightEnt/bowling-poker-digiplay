@@ -72,37 +72,46 @@ export default function KioskPage() {
       alignItems: 'center',
       justifyContent: 'center',
       fontFamily: 'system-ui, sans-serif',
-      padding: '40px',
+      padding: '40px 24px',
     }}>
-      <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-        <div style={{ color: '#8888aa', fontSize: '16px', letterSpacing: '2px',
-          textTransform: 'uppercase', marginBottom: '4px' }}>Welcome back to</div>
-        <div style={{ color: '#ffffff', fontSize: '48px', fontWeight: 900, letterSpacing: '2px' }}>
+      {/* Branding — matching kiosk continue mockup (lighter weights, smaller subtitle) */}
+      <div style={{ textAlign: 'center', marginBottom: 48 }}>
+        <div style={{ fontSize: 11, fontWeight: 500, letterSpacing: 3,
+          color: '#888888', textTransform: 'uppercase', marginBottom: 6 }}>Welcome back to</div>
+        <div style={{ color: '#ffffff', fontSize: 32, fontWeight: 500, letterSpacing: 1, marginBottom: 4 }}>
           Bowling Poker
         </div>
-        <div style={{ color: ACCENT, fontSize: '42px', fontWeight: 900, letterSpacing: '8px' }}>
-          DIGIPLAY
+        <div style={{ color: ACCENT, fontSize: 11, letterSpacing: 3, textTransform: 'uppercase' }}>
+          Digiplay
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '24px', marginBottom: '32px' }}>
+      {/* Two equal buttons — identical styling per mockup */}
+      <div style={{
+        display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+        gap: 20, width: '100%', maxWidth: 560, marginBottom: 48,
+      }}>
         {[
-          { label: 'Continue Current 🎳', action: handleContinue, primary: true },
-          { label: 'New Week', action: handleNewWeek, primary: false },
-        ].map(({ label, action, primary }) => (
+          { label: 'Continue Current 🎳', action: handleContinue },
+          { label: 'New Week', action: handleNewWeek },
+        ].map(({ label, action }) => (
           <button
             key={label}
             onClick={action}
             style={{
-              background: primary ? '#ffffff' : SURFACE,
-              color: primary ? '#1a1a2e' : '#ffffff',
+              flex: 1,
+              padding: '32px 16px',
+              background: SURFACE,
+              color: '#ffffff',
               border: `2px solid ${BORDER}`,
-              borderRadius: '12px',
-              padding: '32px 48px',
-              fontSize: '20px',
+              borderRadius: 12,
+              fontSize: 20,
               fontWeight: 700,
-              minWidth: '220px',
-              transition: 'all 0.15s',
+              letterSpacing: '0.5px',
+              lineHeight: 1.3,
+              cursor: 'pointer',
+              transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+              textAlign: 'center',
             }}
           >
             {label}
@@ -112,9 +121,9 @@ export default function KioskPage() {
 
       {savedSession && (
         <div style={{ textAlign: 'center' }}>
-          <div style={{ color: '#555577', fontSize: '11px', textTransform: 'uppercase',
-            letterSpacing: '2px', marginBottom: '4px' }}>Current Session</div>
-          <div style={{ color: '#8888aa', fontSize: '16px' }}>
+          <div style={{ fontSize: 12, color: '#666688', letterSpacing: 2,
+            textTransform: 'uppercase', marginBottom: 8 }}>Current Session</div>
+          <div style={{ fontSize: 18, fontWeight: 500, color: '#aaaacc' }}>
             {savedSession.seasonName} · Week {savedSession.weekNumber}
           </div>
         </div>

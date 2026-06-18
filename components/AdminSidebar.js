@@ -39,34 +39,32 @@ export default function AdminSidebar({ session }) {
     <aside style={{
       width: '190px',
       background: '#1a1a2e',
-      borderRight: '1px solid #5555aa',
+      borderRight: '0.5px solid #333355',
       position: 'fixed',
-      top: 0,
-      left: 0,
-      bottom: 0,
+      top: 0, left: 0, bottom: 0,
       display: 'flex',
       flexDirection: 'column',
       zIndex: 100,
     }}>
-      <div style={{
-        padding: '20px 16px 16px',
-        borderBottom: '1px solid #5555aa',
-      }}>
-        <div style={{ fontSize: '20px', marginBottom: '4px' }}>🎳</div>
-        <div style={{ color: '#e8ff47', fontSize: '13px', fontWeight: 700, lineHeight: 1.2 }}>
-          Bowling Poker<br />Digiplay
+      {/* Sidebar header — "Bowling Poker" (text-primary) + "Digiplay Admin" (text-tertiary) */}
+      <div style={{ padding: '14px 16px', borderBottom: '0.5px solid #333355' }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: '#ffffff' }}>
+          Bowling Poker
         </div>
-        <div style={{ color: '#555577', fontSize: '10px', marginTop: '2px' }}>Admin Console</div>
+        <div style={{ fontSize: 11, color: '#666688', marginTop: 2 }}>
+          Digiplay Admin
+        </div>
       </div>
 
-      <nav style={{ flex: 1, padding: '12px 0', overflowY: 'auto' }}>
+      {/* Nav */}
+      <nav style={{ flex: 1, padding: '8px 0', overflowY: 'auto' }}>
         {NAV.map(({ section, items }) => (
-          <div key={section} style={{ marginBottom: '8px' }}>
+          <div key={section}>
             <div style={{
-              color: '#555577',
-              fontSize: '9px',
+              color: '#666688',
+              fontSize: 10,
               textTransform: 'uppercase',
-              letterSpacing: '1.5px',
+              letterSpacing: '0.5px',
               padding: '8px 16px 4px',
             }}>
               {section}
@@ -78,16 +76,18 @@ export default function AdminSidebar({ session }) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '8px 16px',
-                  fontSize: '13px',
-                  color: isActive(href) ? '#e8ff47' : '#8888aa',
-                  background: isActive(href) ? 'rgba(232,255,71,0.08)' : 'transparent',
+                  gap: 9,
+                  padding: '7px 16px',
+                  fontSize: 13,
+                  color: isActive(href) ? '#ffffff' : '#8888aa',
+                  background: isActive(href) ? '#2a2a45' : 'transparent',
                   borderLeft: isActive(href) ? '2px solid #e8ff47' : '2px solid transparent',
+                  fontWeight: isActive(href) ? 500 : 400,
                   transition: 'all 0.15s',
+                  textDecoration: 'none',
                 }}
               >
-                <span style={{ fontSize: '14px' }}>{icon}</span>
+                <span style={{ fontSize: 14, flexShrink: 0 }}>{icon}</span>
                 {label}
               </Link>
             ))}
@@ -95,26 +95,19 @@ export default function AdminSidebar({ session }) {
         ))}
       </nav>
 
-      <div style={{
-        padding: '12px 16px',
-        borderTop: '1px solid #5555aa',
-      }}>
-        <div style={{ color: '#aaaacc', fontSize: '12px', fontWeight: 500, marginBottom: '2px' }}>
-          {session?.user?.name || 'Admin'}
+      {/* Footer — league name prominent, week info, sign out */}
+      <div style={{ padding: '10px 16px', borderTop: '0.5px solid #333355', fontSize: 11, color: '#666688' }}>
+        <div style={{ display: 'block', color: '#8888aa', fontWeight: 500, fontSize: 12, marginBottom: 2 }}>
+          {session?.user?.leagueName || 'League'}
         </div>
-        <div style={{ color: '#555577', fontSize: '10px', marginBottom: '10px' }}>
-          {session?.user?.leagueName || 'League'} · Week {session?.user?.weekNumber || '—'}
-        </div>
+        Week {session?.user?.weekNumber || '—'}
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
           style={{
-            background: 'transparent',
-            border: '1px solid #5555aa',
-            borderRadius: '4px',
-            color: '#8888aa',
-            fontSize: '11px',
-            padding: '5px 10px',
-            width: '100%',
+            display: 'block', marginTop: 8,
+            background: 'transparent', border: '0.5px solid #333355',
+            borderRadius: 4, color: '#666688', fontSize: 10,
+            padding: '4px 8px', cursor: 'pointer', width: '100%',
           }}
         >
           Sign Out

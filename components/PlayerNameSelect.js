@@ -52,59 +52,66 @@ export default function PlayerNameSelect({ session }) {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: BG, padding: '24px',
-      fontFamily: 'system-ui, sans-serif' }}>
-
-      {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-        <div style={{ color: ACCENT, fontSize: '13px', fontWeight: 700,
-          letterSpacing: '2px', textTransform: 'uppercase' }}>
-          ✓ PIN accepted — select your name...
-        </div>
-        <div style={{ color: '#555577', fontSize: '11px', marginTop: '4px' }}>
-          {session.seasonName} · Week {session.weekNumber}
-        </div>
+    <div style={{
+      minHeight: '100vh', background: BG, padding: '56px 16px 24px',
+      fontFamily: 'system-ui, sans-serif',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      overflowY: 'auto',
+    }}>
+      {/* Branding header matching mockup */}
+      <div style={{ fontSize: 10, fontWeight: 500, letterSpacing: 3, color: '#888888',
+        textTransform: 'uppercase', marginBottom: 3, alignSelf: 'center' }}>
+        Welcome to
+      </div>
+      <div style={{ fontSize: 20, fontWeight: 500, color: '#ffffff', letterSpacing: 1, marginBottom: 2 }}>
+        Bowling Poker
+      </div>
+      <div style={{ fontSize: 9, color: ACCENT, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 18 }}>
+        Digiplay
+      </div>
+      <div style={{ fontSize: 12, color: '#aaaaaa', marginBottom: 14, letterSpacing: '0.3px' }}>
+        Who are you?
       </div>
 
-      {/* Confirm bar — appears above grid when player selected */}
+      {/* Confirm bar — ABOVE grid, column layout */}
       {selected && (
         <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 10,
+          width: '100%',
           background: SURFACE,
           border: `1px solid ${BORDER}`,
-          borderRadius: '8px',
-          padding: '16px',
-          marginBottom: '16px',
+          borderRadius: 12,
+          padding: 16,
           textAlign: 'center',
+          marginBottom: 12,
         }}>
-          <div style={{ color: '#ffffff', fontSize: '18px', fontWeight: 700, marginBottom: '12px' }}>
+          <div style={{ fontSize: 18, fontWeight: 600, color: '#ffffff' }}>
             {selected.normalized_name}
           </div>
-          <div style={{ color: '#8888aa', fontSize: '13px', marginBottom: '16px' }}>Is that you?</div>
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+          <div style={{ fontSize: 11, color: '#aaaaaa' }}>Is that you?</div>
+          <div style={{ display: 'flex', gap: 8, width: '100%' }}>
             <button
               onClick={handleConfirm}
               disabled={checkingIn}
               style={{
-                background: ACCENT,
-                color: '#1a1a2e',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '10px 24px',
-                fontSize: '14px',
-                fontWeight: 700,
+                flex: 1, padding: 11,
+                background: ACCENT, color: '#1a1a2e',
+                border: 'none', borderRadius: 8,
+                fontSize: 13, fontWeight: 600, cursor: 'pointer',
               }}
             >
-              {checkingIn ? 'Checking in...' : "That's me! 🎳"}
+              {checkingIn ? 'Checking in...' : "That's me!"}
             </button>
             <button
               onClick={() => setSelected(null)}
               style={{
-                background: 'transparent',
-                color: '#8888aa',
-                border: `1px solid ${BORDER}`,
-                borderRadius: '6px',
-                padding: '10px 24px',
-                fontSize: '14px',
+                flex: 1, padding: 11,
+                background: SURFACE, color: '#ffffff',
+                border: `1px solid ${BORDER}`, borderRadius: 8,
+                fontSize: 13, fontWeight: 500, cursor: 'pointer',
               }}
             >
               Not me
@@ -117,7 +124,9 @@ export default function PlayerNameSelect({ session }) {
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '8px',
+        gap: 7,
+        width: '100%',
+        marginBottom: 16,
       }}>
         {players.map(player => (
           <button
@@ -126,25 +135,29 @@ export default function PlayerNameSelect({ session }) {
             style={{
               background: selected?.id === player.id ? '#ffffff' : SURFACE,
               color: selected?.id === player.id ? '#1a1a2e' : '#ffffff',
-              border: `1px solid ${BORDER}`,
-              borderRadius: '8px',
-              padding: '14px 8px',
-              fontSize: '13px',
-              fontWeight: selected?.id === player.id ? 700 : 400,
+              border: `1px solid ${selected?.id === player.id ? '#ffffff' : BORDER}`,
+              borderRadius: 8,
+              padding: '12px 4px',
+              fontSize: 11,
+              fontWeight: selected?.id === player.id ? 600 : 500,
               textAlign: 'center',
+              lineHeight: 1.2,
               opacity: player.checked_in ? 0.4 : 1,
-              transition: 'all 0.15s',
+              transition: 'background 0.15s, color 0.15s',
+              width: '100%',
+              cursor: 'pointer',
             }}
           >
             {player.normalized_name}
-            {player.checked_in && <div style={{ fontSize: '10px', color: '#3dffa0' }}>✓ In</div>}
+            {player.checked_in && <div style={{ fontSize: 10, color: '#3dffa0' }}>✓ In</div>}
           </button>
         ))}
       </div>
 
-      <p style={{ color: '#333355', fontSize: '11px', textAlign: 'center', marginTop: '24px' }}>
+      {/* Week info at bottom */}
+      <div style={{ fontSize: 10, color: '#444466', marginTop: 'auto', paddingTop: 12, letterSpacing: 1 }}>
         {session.seasonName} · Week {session.weekNumber}
-      </p>
+      </div>
     </div>
   );
 }

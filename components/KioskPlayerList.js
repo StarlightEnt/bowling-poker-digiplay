@@ -4,15 +4,14 @@ import KioskDrawScreen from './KioskDrawScreen.js';
 
 const BG = '#1a1a2e';
 const SURFACE = '#2a2a45';
-const BORDER = '#7777cc';
 const ACCENT = '#e8ff47';
 
 export default function KioskPlayerList({ session, onNewWeek }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
-  const [confirmed, setConfirmed] = useState(null);
   const [confirmMsg, setConfirmMsg] = useState('');
+  const [confirmed, setConfirmed] = useState(null);
 
   useEffect(() => {
     fetchPlayers();
@@ -42,10 +41,6 @@ export default function KioskPlayerList({ session, onNewWeek }) {
     }
   }
 
-  function handleDrawScreen(player) {
-    setConfirmed(player);
-  }
-
   if (confirmed) {
     return <KioskDrawScreen player={confirmed} session={session}
       onBack={() => { setConfirmed(null); setSelected(null); setConfirmMsg(''); }} />;
@@ -61,77 +56,128 @@ export default function KioskPlayerList({ session, onNewWeek }) {
       minHeight: '100vh',
       background: BG,
       fontFamily: 'system-ui, sans-serif',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
       padding: '24px',
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between',
-        alignItems: 'center', marginBottom: '16px' }}>
-        <div>
-          <span style={{ color: ACCENT, fontSize: '20px', fontWeight: 700,
-            letterSpacing: '2px' }}>BOWLING POKER DIGIPLAY</span>
+      {/* Header — title left, no session info here */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4, alignSelf: 'flex-start' }}>
+        <div style={{ fontSize: 22, fontWeight: 500, color: '#ffffff', letterSpacing: 1 }}>
+          Bowling Poker
         </div>
-        <div style={{ color: '#555577', fontSize: '13px' }}>
-          {session.seasonName} · Week {session.weekNumber}
+        <div style={{ fontSize: 10, color: ACCENT, letterSpacing: 3, textTransform: 'uppercase' }}>
+          Digiplay
         </div>
       </div>
 
-      {selected && (
-        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
-          borderRadius: '8px', padding: '16px 24px', marginBottom: '16px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
-          {confirmMsg ? (
-            <span style={{ color: '#3dffa0', fontSize: '18px', fontWeight: 700 }}>{confirmMsg}</span>
-          ) : (
-            <>
-              <span style={{ color: '#ffffff', fontSize: '20px', fontWeight: 700 }}>
-                {selected.normalized_name}
-              </span>
-              <span style={{ color: '#8888aa', fontSize: '16px' }}>Is that you?</span>
-              <button onClick={handleConfirm}
-                style={{ background: ACCENT, color: '#1a1a2e', border: 'none',
-                  borderRadius: '6px', padding: '10px 24px', fontSize: '15px', fontWeight: 700 }}>
-                That's me! 🎳
-              </button>
-              <button onClick={() => setSelected(null)}
-                style={{ background: 'transparent', color: '#8888aa',
-                  border: `1px solid ${BORDER}`, borderRadius: '6px',
-                  padding: '10px 20px', fontSize: '15px' }}>
-                Not me
-              </button>
-            </>
-          )}
-        </div>
-      )}
+      {/* Prompt */}
+      <div style={{ fontSize: 13, color: '#aaaaaa', marginBottom: 16, letterSpacing: '0.3px', alignSelf: 'flex-start' }}>
+        Tap your name to get started
+      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '10px' }}>
+      {/* Player grid — 6 columns */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(6, 1fr)',
+        gap: 8,
+        width: '100%',
+        maxWidth: 680,
+        marginBottom: 20,
+      }}>
         {players.map(player => (
           <button
             key={player.id}
-            onClick={() => setSelected(player)}
+            onClick={() => { setSelected(player); setConfirmMsg(''); }}
             style={{
               background: selected?.id === player.id ? '#ffffff' : SURFACE,
               color: selected?.id === player.id ? '#1a1a2e' : '#ffffff',
-              border: `1px solid ${BORDER}`,
-              borderRadius: '8px',
-              padding: '16px 8px',
-              fontSize: '14px',
-              fontWeight: selected?.id === player.id ? 700 : 400,
+              border: `1px solid ${selected?.id === player.id ? '#ffffff' : '#5555aa'}`,
+              borderRadius: 8,
+              padding: '11px 4px',
+              fontSize: 12,
+              fontWeight: selected?.id === player.id ? 600 : 500,
               textAlign: 'center',
+              lineHeight: 1.2,
               opacity: player.checked_in ? 0.45 : 1,
-              transition: 'all 0.15s',
+              cursor: 'pointer',
+              transition: 'background 0.15s, color 0.15s',
+              width: '100%',
             }}
           >
             {player.normalized_name}
             {player.checked_in && (
-              <div style={{ fontSize: '10px', color: '#3dffa0', marginTop: '2px' }}>✓</div>
+              <div style={{ fontSize: 10, color: '#3dffa0', marginTop: 2 }}>✓</div>
             )}
           </button>
         ))}
       </div>
 
-      <div style={{ position: 'fixed', bottom: '16px', right: '24px' }}>
-        <button onClick={onNewWeek}
-          style={{ background: 'transparent', color: '#333355', border: 'none',
-            fontSize: '11px', cursor: 'pointer' }}>
+      {/* Confirm bar — BELOW grid, column layout, semi-transparent */}
+      {selected && (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 10,
+          width: '100%',
+          maxWidth: 360,
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.2)',
+          borderRadius: 12,
+          padding: '18px 20px',
+          textAlign: 'center',
+        }}>
+          {confirmMsg ? (
+            <div style={{ fontSize: 18, fontWeight: 600, color: ACCENT, padding: '8px 0' }}>
+              {confirmMsg}
+            </div>
+          ) : (
+            <>
+              <div style={{ fontSize: 20, fontWeight: 600, color: '#ffffff' }}>
+                {selected.normalized_name}
+              </div>
+              <div style={{ fontSize: 12, color: '#888888' }}>Is that you?</div>
+              <div style={{ display: 'flex', gap: 10, width: '100%' }}>
+                <button
+                  onClick={handleConfirm}
+                  style={{
+                    flex: 1, padding: 11,
+                    background: ACCENT, color: '#1a1a2e',
+                    border: 'none', borderRadius: 8,
+                    fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                  }}
+                >
+                  That's me!
+                </button>
+                <button
+                  onClick={() => setSelected(null)}
+                  style={{
+                    flex: 1, padding: 11,
+                    background: 'transparent', color: '#aaaaaa',
+                    border: '1px solid #555555', borderRadius: 8,
+                    fontSize: 13, fontWeight: 500, cursor: 'pointer',
+                  }}
+                >
+                  Not me
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Week info + New Week link at bottom */}
+      <div style={{ fontSize: 11, color: '#444466', marginTop: 16, letterSpacing: 1, textAlign: 'center' }}>
+        {session.seasonName} · Week {session.weekNumber}
+        <button
+          onClick={onNewWeek}
+          style={{
+            marginLeft: 12,
+            background: 'transparent', color: '#333355',
+            border: 'none', fontSize: 11, cursor: 'pointer',
+          }}
+        >
           New Week
         </button>
       </div>

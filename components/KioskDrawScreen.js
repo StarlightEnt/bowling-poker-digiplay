@@ -129,6 +129,8 @@ export default function KioskDrawScreen({ player, session, onBack }) {
   const isSubmitted = playerState?.status === 'submitted';
   const isForfeited = playerState?.status === 'forfeited';
   const showSubmitButton = marks.frame === 10 && cardsAvailable === 0 && !isSubmitted && !isForfeited;
+  const drawBtnDisabled = drawing || isInvalid || cardsAvailable === 0 || isSubmitted || isForfeited;
+  const drawBtnBg = queueCount > 0 ? '#ffcc00' : ACCENT;
 
   function handleDrawTap() {
     resetInactivity();
@@ -158,8 +160,8 @@ export default function KioskDrawScreen({ player, session, onBack }) {
     if (data.dealtCards) {
       const dups = data.dealtCards.filter(c => c.is_duplicate);
       if (dups.length > 0) {
-        setDupMessage(`Oh no! Duplicate ${dups.map(c => c.card_code).join(', ')} 😱`);
-        setTimeout(() => setDupMessage(''), 2200);
+        setDupMessage(`Oh no! Duplicate ${dups.map(c => c.card_code).join(', ')} — moved to dead cards`);
+        setTimeout(() => setDupMessage(''), 2500);
       }
     }
     await fetchState(activeGame.id);
@@ -201,27 +203,24 @@ export default function KioskDrawScreen({ player, session, onBack }) {
         display: 'flex',
         flexDirection: 'column',
         fontFamily: 'system-ui, sans-serif',
+        position: 'relative',
       }}
     >
-      {/* Header */}
+      {/* Header — player name + session info left, game tabs right */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '12px 24px',
-        background: '#2a2a45', borderBottom: '1px solid #7777cc',
+        padding: '14px 20px 10px',
+        borderBottom: '1px solid #222244',
       }}>
         <div>
-          <span style={{ color: '#ffffff', fontSize: 18, fontWeight: 700 }}>
+          <div style={{ color: '#ffffff', fontSize: 18, fontWeight: 600 }}>
             {player.normalized_name}
-          </span>
-          <span style={{ color: '#8888aa', fontSize: 13, marginLeft: 12 }}>
-            Lane {player.lane} · {session.seasonName} · Week {session.weekNumber}
-          </span>
+          </div>
+          <div style={{ color: '#444466', fontSize: 11, letterSpacing: 1 }}>
+            {session.seasonName} · Week {session.weekNumber} · Lane {player.lane}
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-          <button onClick={onBack} style={{
-            background: 'transparent', border: '1px solid #7777cc', color: '#aaaacc',
-            fontSize: 12, padding: '5px 12px', borderRadius: 6, cursor: 'pointer',
-          }}>I'm done →</button>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           {games.map((g, i) => {
             const isOpen = g.status === 'open';
             const isActive = i === activeGameIndex;
@@ -230,10 +229,10 @@ export default function KioskDrawScreen({ player, session, onBack }) {
                 onClick={() => { if (isOpen) { setActiveGameIndex(i); fetchState(g.id); } }}
                 style={{
                   background: isActive ? ACCENT : SURFACE,
-                  color: isActive ? '#1a1a2e' : isOpen ? '#ffffff' : '#555577',
-                  border: `1px solid ${isOpen ? BORDER : '#333355'}`,
-                  borderRadius: 6, padding: '6px 14px', fontSize: 13,
-                  fontWeight: isActive ? 700 : 400,
+                  color: isActive ? '#1a1a2e' : '#aaaacc',
+                  border: `1px solid ${isActive ? ACCENT : '#5555aa'}`,
+                  borderRadius: 6, padding: '6px 14px', fontSize: 12,
+                  fontWeight: isActive ? 600 : 400,
                   opacity: isOpen ? 1 : 0.35,
                   cursor: isOpen ? 'pointer' : 'default',
                 }}
@@ -245,87 +244,117 @@ export default function KioskDrawScreen({ player, session, onBack }) {
         </div>
       </div>
 
-      {/* Landscape layout: left panel + right panel */}
+      {/* Landscape body: left panel + right panel */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+
         {/* Left panel — 320px fixed */}
         <div style={{
           width: 320, flexShrink: 0,
+          padding: '16px 20px',
+          borderRight: '1px solid #222244',
           display: 'flex', flexDirection: 'column', gap: 12,
-          padding: 16, borderRight: '1px solid #7777cc',
           overflowY: 'auto',
         }}>
-          <BowlingMarks
-            frame={marks.frame} strikes={marks.strikes} spares={marks.spares}
-            onChange={updateMarks}
-            disabled={isSubmitted || isForfeited}
-            validationError={validationError}
-          />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-          {/* Draw section */}
-          <div style={{ background: '#2a2a45', border: '1px solid #7777cc', borderRadius: 8, padding: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <div>
-                <div style={{ color: '#ffffff', fontSize: 32, fontWeight: 900 }}>
-                  {isInvalid ? '—' : cardsAvailable}
+            {/* Section card — ONE card: bowling marks title + steppers + divider + nudge + draw row */}
+            <div style={{
+              background: SURFACE,
+              border: '1px solid #5555aa',
+              borderRadius: 10,
+              padding: 14,
+            }}>
+              <div style={{ fontSize: 10, color: '#666688', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
+                Bowling marks
+              </div>
+              <BowlingMarks
+                frame={marks.frame} strikes={marks.strikes} spares={marks.spares}
+                onChange={updateMarks}
+                disabled={isSubmitted || isForfeited}
+                validationError={validationError}
+                size="lg"
+              />
+              {/* Draw row */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 32, fontWeight: 700, color: '#e8ff47', lineHeight: 1 }}>
+                    {isInvalid ? '—' : cardsAvailable}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#aaaacc', marginTop: 2 }}>Cards to draw</div>
+                  <div style={{ fontSize: 11, color: '#666688', marginTop: 1 }}>
+                    Already drawn: {playerState?.cards_drawn || 0}
+                  </div>
                 </div>
-                <div style={{ color: '#8888aa', fontSize: 11 }}>
-                  Available · Drawn: {playerState?.cards_drawn || 0}
+                <div>
+                  <button
+                    onClick={handleDrawTap}
+                    disabled={drawBtnDisabled}
+                    style={{
+                      padding: '16px 24px',
+                      background: drawBtnDisabled ? ACCENT : drawBtnBg,
+                      border: 'none', borderRadius: 10,
+                      fontSize: 18, fontWeight: 700,
+                      color: '#1a1a2e',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      whiteSpace: 'nowrap',
+                      cursor: drawBtnDisabled ? 'default' : 'pointer',
+                      opacity: drawBtnDisabled ? 0.25 : 1,
+                    }}
+                  >
+                    Draw
+                  </button>
+                  <div style={{ fontSize: 11, color: '#ffcc00', textAlign: 'center', minHeight: 14, marginTop: 3 }}>
+                    {queueCount > 1 ? `Queued: ${queueCount}...` : ''}
+                  </div>
                 </div>
               </div>
+              {dupMessage && (
+                <div style={{ fontSize: 12, color: '#ff6666', fontWeight: 600, textAlign: 'center', minHeight: 16, marginTop: 4 }}>
+                  {dupMessage}
+                </div>
+              )}
             </div>
-            <button
-              onClick={handleDrawTap}
-              disabled={drawing || isInvalid || cardsAvailable === 0 || isSubmitted || isForfeited}
-              style={{
-                width: '100%',
-                background: (drawing || isInvalid || cardsAvailable === 0 || isSubmitted || isForfeited)
-                  ? SURFACE : queueCount > 0 ? '#ffaa44' : ACCENT,
-                color: (drawing || isInvalid || cardsAvailable === 0 || isSubmitted || isForfeited)
-                  ? '#555577' : '#1a1a2e',
-                border: 'none', borderRadius: 8,
-                padding: '14px', fontSize: 18, fontWeight: 700, letterSpacing: 1,
-              }}
-            >
-              {queueCount > 0 ? `Queued: ${queueCount}...` : drawing ? 'Drawing...' : 'Draw 🃏'}
-            </button>
-            {dupMessage && (
-              <div style={{ color: '#ffaa44', fontSize: 13, textAlign: 'center', marginTop: 8 }}>
-                {dupMessage}
+
+            {/* Submit area — outside section card, conditional */}
+            {showSubmitButton && (
+              <div>
+                <button onClick={() => setShowSubmitConfirm(true)}
+                  style={{
+                    width: '100%', padding: 14,
+                    background: SURFACE, border: `2px solid ${BORDER}`,
+                    borderRadius: 10, color: '#ffffff',
+                    fontSize: 15, fontWeight: 600,
+                    letterSpacing: '0.5px',
+                    cursor: 'pointer',
+                  }}>
+                  Submit Hand for Game {activeGame?.game_number}
+                </button>
+                <div style={{ fontSize: 11, color: '#555577', textAlign: 'center', marginTop: 6 }}>
+                  Frame 10 complete · all cards drawn
+                </div>
               </div>
             )}
           </div>
 
-          {showSubmitButton && (
-            <div>
-              <button onClick={() => setShowSubmitConfirm(true)}
-                style={{
-                  width: '100%', background: 'rgba(61,255,160,0.1)',
-                  color: '#3dffa0', border: '1px solid #3dffa0',
-                  borderRadius: 6, padding: '10px', fontSize: 14,
-                }}>
-                Submit Hand ✓
-              </button>
-              <div style={{ color: '#555577', fontSize: 11, textAlign: 'center', marginTop: 4 }}>
-                Frame 10 complete · all cards drawn
-              </div>
-            </div>
-          )}
-
-          <div style={{ flex: 1 }} />
+          {/* Forfeit button — bottom of left panel */}
           {!isForfeited && !isSubmitted && (
             <button onClick={() => setShowForfeitOverlay(true)}
               style={{
-                background: 'transparent', color: '#ff6666',
-                border: '1px solid #661111', borderRadius: 6,
-                padding: '10px', fontSize: 13, width: '100%',
+                width: '100%', padding: 10,
+                background: 'transparent',
+                border: '1px solid #443333',
+                borderRadius: 8, color: '#664444',
+                fontSize: 12, fontWeight: 500,
+                cursor: 'pointer', marginTop: 'auto',
               }}>
               Forfeit this game
             </button>
           )}
         </div>
 
-        {/* Right panel — hand display */}
-        <div style={{ flex: 1, padding: 16, overflowY: 'auto' }}>
+        {/* Right panel — hand display, full height */}
+        <div style={{ flex: 1, padding: '16px 20px', overflowY: 'auto' }}>
           <HandDisplay
             hand={hand}
             gameNumber={activeGame?.game_number || 1}
@@ -336,48 +365,52 @@ export default function KioskDrawScreen({ player, session, onBack }) {
         </div>
       </div>
 
-      {/* Inactivity countdown bar */}
+      {/* Inactivity countdown bar — bottom of entire screen */}
       {inactivityCountdown !== null && (
-        <div style={{
-          position: 'fixed', bottom: 0, left: 0, right: 0,
-          background: '#2a2a45', borderTop: '1px solid #7777cc',
-          padding: '10px 24px',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        }}>
-          <span style={{ color: '#ffaa44', fontSize: 14 }}>
-            Returning to player list in {inactivityCountdown}... — tap anywhere to stay
-          </span>
-          <button onClick={resetInactivity}
-            style={{ background: ACCENT, color: '#1a1a2e', border: 'none',
-              borderRadius: 6, padding: '6px 16px', fontSize: 13, fontWeight: 700 }}>
-            Stay
-          </button>
+        <div
+          onClick={resetInactivity}
+          style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            background: 'rgba(0,0,0,0.75)',
+            borderTop: '1px solid #333355',
+            padding: '10px 20px',
+            textAlign: 'center',
+            fontSize: 13, color: '#aaaaaa',
+            letterSpacing: '0.5px',
+            cursor: 'pointer',
+            zIndex: 50,
+          }}
+        >
+          Returning to player list in{' '}
+          <span style={{ color: ACCENT, fontWeight: 700 }}>{inactivityCountdown}</span>
+          ... — tap anywhere to stay
         </div>
       )}
 
       {/* Submit confirm overlay */}
       {showSubmitConfirm && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200,
+          position: 'absolute', inset: 0, background: 'rgba(10,8,24,0.92)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 100, borderRadius: 12,
         }}>
           <div style={{
-            background: '#2a2a45', border: '1px solid #7777cc',
-            borderRadius: 12, padding: 32, maxWidth: 400,
+            background: '#1a2a1a', border: '1px solid #447744',
+            borderRadius: 16, padding: '28px 32px', textAlign: 'center', maxWidth: 420, width: '100%',
           }}>
-            <h3 style={{ color: '#ffffff', marginBottom: 8 }}>Ready to submit your hand?</h3>
-            <p style={{ color: '#8888aa', fontSize: 14, marginBottom: 24 }}>
+            <div style={{ color: '#88ff88', fontSize: 22, fontWeight: 700, marginBottom: 10 }}>Submit your hand?</div>
+            <p style={{ color: '#aaccaa', fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
               Make sure you've drawn all your cards — this locks your Game {activeGame?.game_number} hand.
             </p>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 12 }}>
               <button onClick={handleSubmit}
-                style={{ flex: 1, background: '#3dffa0', color: '#1a1a2e',
-                  border: 'none', borderRadius: 6, padding: '12px', fontWeight: 700, fontSize: 15 }}>
+                style={{ flex: 1, padding: 14, background: '#336633', border: 'none',
+                  borderRadius: 10, color: '#ffffff', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
                 Yes, submit my hand
               </button>
               <button onClick={() => setShowSubmitConfirm(false)}
-                style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                  border: '1px solid #7777cc', borderRadius: 6, padding: '12px' }}>
+                style={{ flex: 1, padding: 14, background: SURFACE, border: `1px solid ${BORDER}`,
+                  borderRadius: 10, color: '#ffffff', fontSize: 15, fontWeight: 500, cursor: 'pointer' }}>
                 Not yet
               </button>
             </div>
@@ -385,29 +418,32 @@ export default function KioskDrawScreen({ player, session, onBack }) {
         </div>
       )}
 
-      {/* Forfeit overlay */}
+      {/* Forfeit confirm overlay */}
       {showForfeitOverlay && !forfeitConfirmed && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300,
+          position: 'absolute', inset: 0, background: 'rgba(10,8,24,0.92)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 100, borderRadius: 12,
         }}>
           <div style={{
-            background: '#2a2a45', border: '1px solid #7777cc',
-            borderRadius: 12, padding: 32, maxWidth: 400,
+            background: '#2a1a1a', border: '1px solid #774444',
+            borderRadius: 16, padding: '28px 32px', textAlign: 'center', maxWidth: 420, width: '100%',
           }}>
-            <h3 style={{ color: '#ffffff', marginBottom: 8 }}>Forfeit Game {activeGame?.game_number}?</h3>
-            <p style={{ color: '#8888aa', fontSize: 14, marginBottom: 24 }}>
+            <div style={{ color: '#ff8888', fontSize: 22, fontWeight: 700, marginBottom: 10 }}>
+              Forfeit Game {activeGame?.game_number}?
+            </div>
+            <p style={{ color: '#ccaaaa', fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
               Your hand will be removed from the pool. This cannot be undone.
             </p>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 12 }}>
               <button onClick={handleForfeit}
-                style={{ flex: 1, background: '#ff4444', color: '#ffffff',
-                  border: 'none', borderRadius: 6, padding: '12px', fontWeight: 700 }}>
+                style={{ flex: 1, padding: 14, background: '#cc3333', border: 'none',
+                  borderRadius: 10, color: '#ffffff', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
                 Yes, forfeit
               </button>
               <button onClick={() => setShowForfeitOverlay(false)}
-                style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                  border: '1px solid #7777cc', borderRadius: 6, padding: '12px' }}>
+                style={{ flex: 1, padding: 14, background: SURFACE, border: `1px solid ${BORDER}`,
+                  borderRadius: 10, color: '#ffffff', fontSize: 15, fontWeight: 500, cursor: 'pointer' }}>
                 Never mind
               </button>
             </div>
@@ -415,27 +451,23 @@ export default function KioskDrawScreen({ player, session, onBack }) {
         </div>
       )}
 
+      {/* Forfeited confirmation overlay */}
       {forfeitConfirmed && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300,
+          position: 'absolute', inset: 0, background: 'rgba(10,8,24,0.92)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 100, borderRadius: 12,
         }}>
-          <div style={{ textAlign: 'center', padding: 48 }}>
-            <div style={{ color: '#ff6666', fontSize: 28, fontWeight: 700, marginBottom: 8 }}>
+          <div style={{
+            background: '#2a1a1a', border: '1px solid #774444',
+            borderRadius: 16, padding: '28px 32px', textAlign: 'center', maxWidth: 420, width: '100%',
+          }}>
+            <div style={{ color: '#ff8888', fontSize: 22, fontWeight: 700, marginBottom: 10 }}>
               Game {activeGame?.game_number} Forfeited
             </div>
-            <p style={{ color: '#8888aa', marginBottom: 8 }}>Your hand has been removed from the pool.</p>
-            <p style={{ color: ACCENT, fontSize: 20 }}>Good luck in the next game! 🎳</p>
-            <button
-              onClick={() => { setForfeitConfirmed(false); setShowForfeitOverlay(false); onBack(); }}
-              style={{
-                marginTop: 32, background: ACCENT, color: '#1a1a2e',
-                border: 'none', borderRadius: 6, padding: '14px 36px',
-                fontSize: 16, fontWeight: 700,
-              }}
-            >
-              Back to Player List
-            </button>
+            <p style={{ color: '#ccaaaa', fontSize: 14, lineHeight: 1.7, marginBottom: 0 }}>
+              Your hand has been removed from the pool.<br /><br />Good luck in Game 2!
+            </p>
           </div>
         </div>
       )}
@@ -443,41 +475,39 @@ export default function KioskDrawScreen({ player, session, onBack }) {
       {/* Winner announcement overlay — landscape, centered */}
       {announcement && !announcementDismissed && (
         <div style={{
-          position: 'fixed', inset: 0, zIndex: 500,
+          position: 'absolute', inset: 0, zIndex: 500,
           background: announcement.isRoyalFlush ? '#1a1000' : '#1a1a2e',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
           padding: '40px 80px', cursor: 'pointer',
         }} onClick={() => { setAnnouncementDismissed(true); resetInactivity(); }}>
-          {/* Game badge */}
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 3,
             textTransform: 'uppercase', color: announcement.isRoyalFlush ? '#c9860a' : '#888899',
             marginBottom: 16 }}>
             Game {announcement.gameNumber} Winner
           </div>
-          {/* Congratulations */}
           <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: 2,
             textTransform: 'uppercase', color: announcement.isRoyalFlush ? '#c9860a' : '#888899',
             marginBottom: 8 }}>Congratulations</div>
-          {/* Winner name — 56px */}
           <div style={{ fontSize: 56, fontWeight: 700,
             color: announcement.isRoyalFlush ? '#ffd700' : '#ffffff',
             marginBottom: 4, lineHeight: 1.1 }}>
             {announcement.winners.join(' & ')}
           </div>
-          {/* Hand name */}
-          <div style={{ fontSize: 24, fontWeight: 600,
+          <div style={{
             color: announcement.isRoyalFlush ? '#ffd700' : '#e8ff47',
-            marginBottom: announcement.isRoyalFlush ? 8 : 32, letterSpacing: 1 }}>
+            fontSize: announcement.isRoyalFlush ? 26 : 24,
+            fontWeight: announcement.isRoyalFlush ? 700 : 600,
+            letterSpacing: announcement.isRoyalFlush ? 2 : 1,
+            marginBottom: announcement.isRoyalFlush ? 8 : 32,
+          }}>
             {announcement.handName}
           </div>
-          {/* RF subtitle: suit name · ranks — D5 */}
           {announcement.isRoyalFlush && announcement.handCards?.length > 0 && (
-            <div style={{ fontSize: 13, color: '#c9860a', marginBottom: 24, letterSpacing: 1 }}>
+            <div style={{ fontSize: 12, color: '#c9860a', marginBottom: 24, letterSpacing: 1 }}>
               {SUIT_NAMES[cardParts(announcement.handCards[0]).suit]} · {announcement.handCards.map(c => cardParts(c).rank).join(' ')}
             </div>
           )}
-          {/* Cards — 64×90px */}
           {announcement.handCards?.length > 0 && (
             <div style={{ display: 'flex', gap: 14, marginBottom: 36 }}>
               {announcement.handCards.map((code, i) => {
@@ -506,33 +536,31 @@ export default function KioskDrawScreen({ player, session, onBack }) {
               })}
             </div>
           )}
-          {/* Payout — 44px */}
           {!announcement.isRoyalFlush && (
             <>
-              <div style={{ fontSize: 12, color: '#666688', letterSpacing: 2,
+              <div style={{ fontSize: 12, color: '#666688', letterSpacing: 1,
                 textTransform: 'uppercase', marginBottom: 6 }}>Game payout</div>
               <div style={{ fontSize: 44, fontWeight: 700, color: '#e8ff47' }}>
                 ${announcement.payoutAmount?.toFixed(2)}
               </div>
             </>
           )}
-          {/* RF: game payout + progressive pot (52px) */}
           {announcement.isRoyalFlush && (
             <>
+              <hr style={{ border: 'none', borderTop: '1px solid #3a2800', width: '100%', maxWidth: 400, margin: '12px 0' }} />
               <div style={{ fontSize: 12, color: '#c9860a', letterSpacing: 1,
                 textTransform: 'uppercase', marginBottom: 4 }}>Game payout</div>
-              <div style={{ fontSize: 20, color: '#c9860a', marginBottom: 8 }}>
+              <div style={{ fontSize: 13, color: '#c9860a', marginBottom: 4 }}>
                 ${announcement.payoutAmount?.toFixed(2)}
               </div>
-              <div style={{ borderTop: '1px solid #3a2800', width: 300, margin: '8px 0' }} />
-              <div style={{ fontSize: 12, color: '#c9860a', letterSpacing: 2,
-                textTransform: 'uppercase', marginBottom: 6 }}>Progressive pot won</div>
+              <div style={{ fontSize: 12, color: '#c9860a', letterSpacing: 1,
+                textTransform: 'uppercase', marginTop: 12, marginBottom: 4 }}>Progressive pot won</div>
               <div style={{ fontSize: 52, fontWeight: 700, color: '#ffd700' }}>
                 ${announcement.progressiveWon?.toFixed(2)}
               </div>
             </>
           )}
-          <div style={{ fontSize: 11, color: '#444466', marginTop: 24, letterSpacing: 1 }}>
+          <div style={{ fontSize: 11, color: announcement.isRoyalFlush ? '#7a4f00' : '#444466', marginTop: announcement.isRoyalFlush ? 20 : 24, letterSpacing: '0.5px' }}>
             Tap anywhere to dismiss
           </div>
         </div>
