@@ -8,6 +8,7 @@ const ACCENT = '#e8ff47';
 const SURFACE = '#2a2a45';
 const BORDER = '#7777cc';
 
+const SUIT_NAMES = { '♠': 'Spades', '♥': 'Hearts', '♦': 'Diamonds', '♣': 'Clubs' };
 const RANK_DISPLAY = {'2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','T':'10','J':'J','Q':'Q','K':'K','A':'A'};
 const SUIT_SYMBOL = {'s':'♠','h':'♥','c':'♣','d':'♦'};
 function cardParts(code) {
@@ -191,7 +192,7 @@ export default function PhoneDrawScreen({ player, session }) {
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 16px',
-        background: '#16213e', borderBottom: '1px solid #2a2a5a',
+        background: '#2a2a45', borderBottom: '1px solid #5555aa',
       }}>
         <div style={{ color: '#ffffff', fontSize: 15, fontWeight: 700 }}>
           {player.normalized_name}
@@ -235,18 +236,19 @@ export default function PhoneDrawScreen({ player, session }) {
 
         {/* Draw section */}
         <div style={{
-          background: '#16213e',
-          border: '1px solid #2a2a5a',
+          background: '#2a2a45',
+          border: '1px solid #5555aa',
           borderRadius: 8,
           padding: 16,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <div>
-              <div style={{ color: '#ffffff', fontSize: 28, fontWeight: 900 }}>
+              <div style={{ color: '#e8ff47', fontSize: 28, fontWeight: 900 }}>
                 {isInvalid ? '—' : cardsAvailable}
               </div>
-              <div style={{ color: '#8888aa', fontSize: 11 }}>
-                Cards available · Already drawn: {playerState?.cards_drawn || 0}
+              <div style={{ color: '#aaaacc', fontSize: 11 }}>Cards to draw now</div>
+              <div style={{ color: '#666688', fontSize: 11 }}>
+                Already drawn: {playerState?.cards_drawn || 0}
               </div>
             </div>
             <button
@@ -261,6 +263,8 @@ export default function PhoneDrawScreen({ player, session }) {
                 fontSize: 16,
                 fontWeight: 700,
                 letterSpacing: 1,
+                textTransform: 'uppercase',
+                cursor: drawBtnDisabled ? 'default' : 'pointer',
               }}
             >
               {queueCount > 0 ? `Queued: ${queueCount}...` : drawing ? 'Drawing...' : 'Draw 🃏'}
@@ -276,28 +280,9 @@ export default function PhoneDrawScreen({ player, session }) {
           gameNumber={activeGame?.game_number || 1}
           isSubmitted={isSubmitted}
           isForfeited={isForfeited}
+          showSubmitButton={showSubmitButton}
+          onSubmit={() => setShowSubmitConfirm(true)}
         />
-
-        {showSubmitButton && (
-          <div style={{ textAlign: 'center' }}>
-            <button
-              onClick={() => setShowSubmitConfirm(true)}
-              style={{
-                background: 'transparent',
-                color: '#3dffa0',
-                border: '1px solid #3dffa0',
-                borderRadius: 6,
-                padding: '8px 20px',
-                fontSize: 13,
-              }}
-            >
-              Submit Hand ✓
-            </button>
-            <div style={{ color: '#555577', fontSize: 11, marginTop: 4 }}>
-              Frame 10 complete · all cards drawn
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Submit confirmation popup */}
@@ -309,7 +294,7 @@ export default function PhoneDrawScreen({ player, session }) {
           zIndex: 200,
         }}>
           <div style={{
-            background: '#16213e', border: '1px solid #2a2a5a',
+            background: '#2a2a45', border: '1px solid #5555aa',
             borderRadius: 12, padding: 28, maxWidth: 320, width: '90%',
           }}>
             <h3 style={{ color: '#ffffff', marginBottom: 8 }}>Ready to submit your hand?</h3>
@@ -324,7 +309,7 @@ export default function PhoneDrawScreen({ player, session }) {
               </button>
               <button onClick={() => setShowSubmitConfirm(false)}
                 style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                  border: '1px solid #2a2a5a', borderRadius: 6, padding: '10px' }}>
+                  border: '1px solid #5555aa', borderRadius: 6, padding: '10px' }}>
                 Not yet
               </button>
             </div>
@@ -339,7 +324,7 @@ export default function PhoneDrawScreen({ player, session }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300,
         }}>
           <div style={{
-            background: '#16213e', border: '1px solid #2a2a5a',
+            background: '#2a2a45', border: '1px solid #5555aa',
             borderRadius: 12, padding: 28, maxWidth: 320, width: '90%',
           }}>
             <h3 style={{ color: '#ffffff', marginBottom: 8 }}>
@@ -356,7 +341,7 @@ export default function PhoneDrawScreen({ player, session }) {
               </button>
               <button onClick={() => setShowForfeitOverlay(false)}
                 style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                  border: '1px solid #2a2a5a', borderRadius: 6, padding: '10px' }}>
+                  border: '1px solid #5555aa', borderRadius: 6, padding: '10px' }}>
                 Never mind
               </button>
             </div>
@@ -397,7 +382,7 @@ export default function PhoneDrawScreen({ player, session }) {
         <div style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
           padding: '10px 16px',
-          background: '#16213e', borderTop: '1px solid #2a2a5a',
+          background: '#2a2a45', borderTop: '1px solid #5555aa',
         }}>
           <button
             onClick={() => setShowForfeitOverlay(true)}
@@ -422,19 +407,20 @@ export default function PhoneDrawScreen({ player, session }) {
           onClick={() => setAnnouncementDismissed(true)}
           style={{
             position: 'fixed', inset: 0,
-            background: announcement.isRoyalFlush ? '#1a1000' : '#0d0d1a',
+            background: announcement.isRoyalFlush ? '#1a1000' : '#1a1a2e',
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
             zIndex: 1000, padding: 24, textAlign: 'center',
           }}>
           {/* Game badge */}
-          <div style={{ color: announcement.isRoyalFlush ? '#c9860a' : '#8888aa',
+          <div style={{ color: announcement.isRoyalFlush ? '#c9860a' : '#888899',
             fontSize: 11, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 8 }}>
             Game {announcement.gameNumber} Winner
           </div>
-          {/* Congratulations */}
-          <div style={{ color: announcement.isRoyalFlush ? '#c9860a' : '#8888aa',
-            fontSize: 13, letterSpacing: 2, marginBottom: 8 }}>
+          {/* Congratulations — D3 */}
+          <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: 2,
+            textTransform: 'uppercase', color: announcement.isRoyalFlush ? '#c9860a' : '#888899',
+            marginBottom: 8 }}>
             Congratulations
           </div>
           {/* Winner name */}
@@ -450,10 +436,10 @@ export default function PhoneDrawScreen({ player, session }) {
             marginBottom: announcement.isRoyalFlush ? 6 : 16 }}>
             {announcement.handName}
           </div>
-          {/* RF subtitle: suit · ranks */}
-          {announcement.isRoyalFlush && (
-            <div style={{ fontSize: 12, color: '#c9860a', marginBottom: 16, letterSpacing: 1 }}>
-              {cardParts(announcement.handCards?.[0] || '').suit} · {(announcement.handCards || []).map(c => cardParts(c).rank).join(' ')}
+          {/* RF subtitle: suit name · ranks — D5 */}
+          {announcement.isRoyalFlush && announcement.handCards?.length > 0 && (
+            <div style={{ fontSize: 12, color: '#c9860a', marginBottom: 18, letterSpacing: 1 }}>
+              {SUIT_NAMES[cardParts(announcement.handCards[0]).suit]} · {announcement.handCards.map(c => cardParts(c).rank).join(' ')}
             </div>
           )}
           {/* Cards */}
@@ -464,7 +450,7 @@ export default function PhoneDrawScreen({ player, session }) {
                   const card = cardParts(code);
                   return (
                     <div key={i} style={{
-                      width: 44, height: 62, background: '#fff9e6',
+                      width: 48, height: 68, background: '#fff9e6',
                       borderRadius: 6, border: '2px solid #ffd700',
                       display: 'flex', flexDirection: 'column',
                       alignItems: 'center', justifyContent: 'center',
@@ -483,16 +469,16 @@ export default function PhoneDrawScreen({ player, session }) {
               </div>
             ) : (
               <div style={{ marginBottom: 16 }}>
-                <CardRow cards={announcement.handCards} status="best5" size="lg" />
+                <CardRow cards={announcement.handCards} status="best5" size="sm" />
               </div>
             )
           )}
-          {/* Non-RF: Game Payout label + yellow amount */}
+          {/* Non-RF: Game Payout label + yellow amount — D4 */}
           {!announcement.isRoyalFlush && (
             <>
               <div style={{ fontSize: 11, color: '#666688', letterSpacing: 2,
                 textTransform: 'uppercase', marginBottom: 4 }}>Game Payout</div>
-              <div style={{ color: '#e8ff47', fontSize: 28, fontWeight: 700, marginBottom: 6 }}>
+              <div style={{ color: '#e8ff47', fontSize: 32, fontWeight: 700, marginBottom: 6 }}>
                 ${announcement.payoutAmount?.toFixed(2)}
               </div>
               {announcement.isTie && (
@@ -500,7 +486,7 @@ export default function PhoneDrawScreen({ player, session }) {
               )}
             </>
           )}
-          {/* RF: game payout + progressive (36px) */}
+          {/* RF: game payout + progressive */}
           {announcement.isRoyalFlush && (
             <>
               <div style={{ fontSize: 11, color: '#c9860a', letterSpacing: 1,

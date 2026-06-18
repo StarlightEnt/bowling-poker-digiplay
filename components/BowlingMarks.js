@@ -39,8 +39,8 @@ export default function BowlingMarks({ frame, strikes, spares, onChange, disable
 
   return (
     <div style={{
-      background: '#16213e',
-      border: '1px solid #2a2a5a',
+      background: '#2a2a45',
+      border: '1px solid #5555aa',
       borderRadius: 8,
       padding: 16,
     }}>

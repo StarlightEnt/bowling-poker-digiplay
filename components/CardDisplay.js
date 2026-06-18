@@ -5,7 +5,8 @@ const SUIT_COLOR = { s: '#ffffff', h: '#ff4444', c: '#ffffff', d: '#ff4444' };
 
 export function Card({ code, status = 'legal', size = 'md', animateIn = false }) {
   const sizes = {
-    sm: { w: 36, h: 52, rankSize: 13, suitSize: 16 },
+    xs: { w: 36, h: 52, rankSize: 12, suitSize: 14 },
+    sm: { w: 48, h: 68, rankSize: 15, suitSize: 19 },
     md: { w: 44, h: 64, rankSize: 15, suitSize: 20 },
     lg: { w: 52, h: 74, rankSize: 17, suitSize: 24 },
     xl: { w: 64, h: 90, rankSize: 20, suitSize: 28 },

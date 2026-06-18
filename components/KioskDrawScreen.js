@@ -9,6 +9,7 @@ const SURFACE = '#2a2a45';
 const BORDER = '#7777cc';
 const INACTIVITY_SECONDS = 8;
 
+const SUIT_NAMES = { '♠': 'Spades', '♥': 'Hearts', '♦': 'Diamonds', '♣': 'Clubs' };
 const RANK_DISPLAY = {'2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','T':'10','J':'J','Q':'Q','K':'K','A':'A'};
 const SUIT_SYMBOL = {'s':'♠','h':'♥','c':'♣','d':'♦'};
 function cardParts(code) {
@@ -455,8 +456,9 @@ export default function KioskDrawScreen({ player, session, onBack }) {
             Game {announcement.gameNumber} Winner
           </div>
           {/* Congratulations */}
-          <div style={{ fontSize: 14, color: announcement.isRoyalFlush ? '#c9860a' : '#888899',
-            letterSpacing: 2, marginBottom: 8 }}>Congratulations</div>
+          <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: 2,
+            textTransform: 'uppercase', color: announcement.isRoyalFlush ? '#c9860a' : '#888899',
+            marginBottom: 8 }}>Congratulations</div>
           {/* Winner name — 56px */}
           <div style={{ fontSize: 56, fontWeight: 700,
             color: announcement.isRoyalFlush ? '#ffd700' : '#ffffff',
@@ -469,10 +471,10 @@ export default function KioskDrawScreen({ player, session, onBack }) {
             marginBottom: announcement.isRoyalFlush ? 8 : 32, letterSpacing: 1 }}>
             {announcement.handName}
           </div>
-          {/* RF subtitle: suit · ranks */}
-          {announcement.isRoyalFlush && (
+          {/* RF subtitle: suit name · ranks — D5 */}
+          {announcement.isRoyalFlush && announcement.handCards?.length > 0 && (
             <div style={{ fontSize: 13, color: '#c9860a', marginBottom: 24, letterSpacing: 1 }}>
-              {cardParts(announcement.handCards?.[0] || '').suit} · {(announcement.handCards || []).map(c => cardParts(c).rank).join(' ')}
+              {SUIT_NAMES[cardParts(announcement.handCards[0]).suit]} · {announcement.handCards.map(c => cardParts(c).rank).join(' ')}
             </div>
           )}
           {/* Cards — 64×90px */}

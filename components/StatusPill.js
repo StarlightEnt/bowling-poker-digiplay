@@ -4,7 +4,7 @@ export default function StatusPill({ status }) {
     drawing:   { label: 'Drawing',   bg: '#1a2a4a', color: '#4fa3ff', border: '#2a4a8a' },
     submitted: { label: 'Submitted', bg: '#0a2a1a', color: '#3dffa0', border: '#1a5a3a' },
     forfeited: { label: 'Forfeited', bg: '#2a1010', color: '#ff6666', border: '#661111' },
-    waiting:   { label: 'Waiting',   bg: '#1a1a2e', color: '#8888aa', border: '#2a2a5a' },
+    waiting:   { label: 'Waiting',   bg: '#1a1a2e', color: '#8888aa', border: '#5555aa' },
   };
   const c = config[status] || config.waiting;
   return (

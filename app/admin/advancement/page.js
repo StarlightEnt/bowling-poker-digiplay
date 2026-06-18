@@ -4,8 +4,8 @@ import { CardRow } from '../../../components/CardDisplay.js';
 import StatusPill from '../../../components/StatusPill.js';
 
 const ACCENT = '#e8ff47';
-const SURFACE = '#16213e';
-const BORDER = '#2a2a5a';
+const SURFACE = '#2a2a45';
+const BORDER = '#5555aa';
 
 export default function GameAdvancement() {
   const [dashData, setDashData] = useState(null);
@@ -221,7 +221,7 @@ export default function GameAdvancement() {
                       onChange={e => setChangeSearch(e.target.value)}
                       placeholder="Type player name..."
                       style={{
-                        flex: 1, background: '#0f1a2e', border: `1px solid ${BORDER}`,
+                        flex: 1, background: '#1a1a2e', border: `1px solid ${BORDER}`,
                         borderRadius: 6, padding: '8px 12px', color: '#ffffff',
                         fontSize: 14, outline: 'none',
                       }}
@@ -275,7 +275,7 @@ export default function GameAdvancement() {
             <div style={{
               display: 'grid',
               gridTemplateColumns: '40px 1fr 140px 180px 80px 100px',
-              background: '#0f1a2e', padding: '8px 16px', gap: 8,
+              background: '#1a1a2e', padding: '8px 16px', gap: 8,
             }}>
               {['#', 'Player', 'Hand', 'Cards', 'Lane', 'Status'].map(h => (
                 <div key={h} style={{ color: '#555577', fontSize: 10,
@@ -295,12 +295,12 @@ export default function GameAdvancement() {
                   padding: '10px 16px', gap: 8,
                   borderTop: `1px solid ${BORDER}`,
                   background: isRoyalFlush ? '#2a1f00'
-                    : isTieRow ? 'rgba(255,170,68,0.08)'
+                    : isTieRow ? 'rgba(255,170,68,0.15)'
                     : 'transparent',
                   opacity: (entry.isForfeited || entry.isInProgress) ? 0.5 : 1,
                   alignItems: 'center',
                 }}>
-                  <div style={{ color: isTop ? ACCENT : '#555577', fontWeight: 700 }}>
+                  <div style={{ color: isRoyalFlush ? '#ffd700' : isTop ? ACCENT : '#555577', fontWeight: 700 }}>
                     {entry.isSubmitted ? idx + 1 : '—'}
                     {isTieRow && <span style={{ color: '#ffaa44', fontSize: 10, marginLeft: 2 }}>TIE</span>}
                   </div>
@@ -311,16 +311,20 @@ export default function GameAdvancement() {
                   <div style={{ color: isRoyalFlush ? '#ffd700' : ACCENT, fontSize: 13,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {entry.isForfeited ? 'Forfeited' : entry.hand?.name || '—'}
-                    {entry.isInProgress && <span style={{ color: '#8888aa', fontSize: 10, marginLeft: 4 }}>in progress</span>}
                   </div>
                   <div>
                     {entry.hand?.best5?.length > 0 && !entry.isForfeited && (
                       <CardRow cards={entry.hand.best5.slice(0, 5)}
                         status={isRoyalFlush ? 'best5' : entry.isSubmitted ? 'best5' : 'legal'}
-                        size="sm" />
+                        size="xs" />
+                    )}
+                    {entry.isInProgress && (
+                      <span style={{ color: '#8888aa', fontSize: 10, display: 'block', marginTop: 2 }}>
+                        in progress
+                      </span>
                     )}
                   </div>
-                  <div style={{ color: '#8888aa', fontSize: 13 }}>{entry.lane}</div>
+                  <div style={{ color: isRoyalFlush ? '#ffd700' : '#8888aa', fontSize: 13 }}>{entry.lane}</div>
                   <StatusPill status={entry.status || 'waiting'} />
                 </div>
               );
