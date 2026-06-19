@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import StatusPill from '../../components/StatusPill.js';
 import { CardRow } from '../../components/CardDisplay.js';
 
@@ -235,6 +236,7 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
 }
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -282,6 +284,29 @@ export default function AdminDashboard() {
 
   const isFiltered = statusFilter !== 'all' || lanePairFilter !== 'all';
 
+  function exportCSV() {
+    const rows = [['Player', 'Lane', 'Frame', 'Drawn', 'Earned', 'Status', 'Best Hand']];
+    filtered.forEach(p => {
+      rows.push([
+        p.normalized_name,
+        p.lane,
+        p.current_frame || 0,
+        p.cards_drawn || 0,
+        p.cards_earned || 0,
+        p.game_status || 'waiting',
+        p.best_hand_name || '—',
+      ]);
+    });
+    const csv = rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `game-night-${session.week_number}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   function drawProgress(p) {
     if (!p.cards_earned) return 0;
     return Math.min(100, Math.round((p.cards_drawn / p.cards_earned) * 100));
@@ -304,13 +329,13 @@ export default function AdminDashboard() {
           <div style={{ color: '#555577', fontSize: 11, marginRight: 8 }}>
             Auto-refreshes every 10s
           </div>
-          <button style={{ padding: '5px 11px', fontSize: 12, borderRadius: 6,
+          <button onClick={exportCSV} style={{ padding: '5px 11px', fontSize: 12, borderRadius: 6,
             border: '0.5px solid #5555aa', background: '#2a2a45',
             color: '#ffffff', cursor: 'pointer' }}>
             Export
           </button>
           {activeGame && (
-            <button style={{ padding: '5px 11px', fontSize: 12, borderRadius: 6,
+            <button onClick={() => router.push('/admin/advancement')} style={{ padding: '5px 11px', fontSize: 12, borderRadius: 6,
               border: 'none', background: '#e8ff47',
               color: '#1a1a2e', fontWeight: 500, cursor: 'pointer' }}>
               End Game {activeGame.game_number} →
