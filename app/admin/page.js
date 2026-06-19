@@ -388,7 +388,7 @@ export default function AdminDashboard() {
             {activeGame ? `All players — Game ${activeGame.game_number}` : 'All players'}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 11, color: '#666688', whiteSpace: 'nowrap', fontWeight: 500 }}>Status:</span>
+            <span style={{ fontSize: 11, color: '#ffffff', whiteSpace: 'nowrap', fontWeight: 600 }}>Status:</span>
             {['all', 'drawing', 'submitted', 'forfeited', 'waiting'].map(s => (
               <button key={s} onClick={() => setStatusFilter(s)}
                 style={{
@@ -401,7 +401,7 @@ export default function AdminDashboard() {
                 {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
               </button>
             ))}
-            <span style={{ fontSize: 11, color: '#666688', whiteSpace: 'nowrap', marginLeft: 16, fontWeight: 500 }}>Lane:</span>
+            <span style={{ fontSize: 11, color: '#ffffff', whiteSpace: 'nowrap', marginLeft: 16, fontWeight: 600 }}>Lane:</span>
             <select
               value={lanePairFilter}
               onChange={e => setLanePairFilter(e.target.value)}
