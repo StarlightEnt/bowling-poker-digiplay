@@ -20,7 +20,7 @@ export function Card({ code, status = 'legal', size = 'md', animateIn = false })
   try { parsed = parseCard(code); } catch { return null; }
 
   const bg = isDead ? '#2a1010' : '#ffffff';
-  const border = isDead ? '#ff6666' : isBest5 ? '#e8ff47' : '#cccccc';
+  const border = isDead ? '#663333' : isBest5 ? '#e8ff47' : '#cccccc';
   const rankColor = isDead ? '#ff6666' : SUIT_COLOR[parsed.suit];
   const suitColor = isDead ? '#ff6666' : SUIT_COLOR[parsed.suit];
   const boxShadow = isBest5 ? `0 0 8px #e8ff4760` : 'none';
