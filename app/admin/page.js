@@ -432,14 +432,14 @@ export default function AdminDashboard() {
         {/* Column headers */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 60px 70px 100px 120px 100px 120px',
+          gridTemplateColumns: '2fr 80px 80px 120px 160px 120px 150px',
           background: BG,
           padding: '8px 16px',
           gap: 8,
         }}>
           {['Player', 'Lane', 'Frame', 'Drawn/Earned', 'Progress', 'Status', 'Best Hand'].map(h => (
-            <div key={h} style={{ color: '#666688', fontSize: 10,
-              textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
+            <div key={h} style={{ color: '#666688', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1,
+              textAlign: ['Lane', 'Frame', 'Drawn/Earned'].includes(h) ? 'center' : 'left' }}>{h}</div>
           ))}
         </div>
 
@@ -454,7 +454,7 @@ export default function AdminDashboard() {
             onClick={() => setSelectedPlayer(player.id === selectedPlayer ? null : player.id)}
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 60px 70px 100px 120px 100px 120px',
+              gridTemplateColumns: '2fr 80px 80px 120px 160px 120px 150px',
               padding: '10px 16px',
               gap: 8,
               borderTop: `0.5px solid ${BORDER}`,
@@ -467,9 +467,9 @@ export default function AdminDashboard() {
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {player.normalized_name}
             </div>
-            <div style={{ color: '#8888aa', fontSize: 13 }}>{player.lane}</div>
-            <div style={{ color: '#8888aa', fontSize: 13 }}>{player.current_frame || 0}</div>
-            <div style={{ color: '#8888aa', fontSize: 13 }}>
+            <div style={{ color: '#8888aa', fontSize: 13, textAlign: 'center' }}>{player.lane}</div>
+            <div style={{ color: '#8888aa', fontSize: 13, textAlign: 'center' }}>{player.current_frame || 0}</div>
+            <div style={{ color: '#8888aa', fontSize: 13, textAlign: 'center' }}>
               {player.cards_drawn || 0}/{player.cards_earned || 0}
             </div>
             <div style={{ background: BG, borderRadius: 4, height: 6, overflow: 'hidden' }}>
