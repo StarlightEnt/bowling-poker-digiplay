@@ -432,7 +432,7 @@ export default function AdminDashboard() {
         {/* Column headers */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '2fr 80px 80px 120px 160px 120px 150px',
+          gridTemplateColumns: '12% 10% 9% 14% 18% 18% 19%',
           background: BG,
           padding: '8px 16px',
           gap: 8,
@@ -454,7 +454,7 @@ export default function AdminDashboard() {
             onClick={() => setSelectedPlayer(player.id === selectedPlayer ? null : player.id)}
             style={{
               display: 'grid',
-              gridTemplateColumns: '2fr 80px 80px 120px 160px 120px 150px',
+              gridTemplateColumns: '12% 10% 9% 14% 18% 18% 19%',
               padding: '10px 16px',
               gap: 8,
               borderTop: `0.5px solid ${BORDER}`,
