@@ -50,9 +50,10 @@ export async function GET(request, { params }) {
   let handResult = { best5: best5.length > 0 ? best5 : [], alsoHeld: alsoHeld.length > 0 ? alsoHeld : [], score: 0, name: '' };
   if (best5.length === 0 && legalPool.length >= 5) {
     handResult = evaluateBestHand(legalPool);
-    handResult.best5 = sortForDisplay(handResult.best5);
-    handResult.alsoHeld = sortByRankDesc(handResult.alsoHeld);
   }
+  handResult.best5 = sortForDisplay(handResult.best5);
+  handResult.alsoHeld = sortByRankDesc(handResult.alsoHeld);
+  const sortedDeadCards = sortByRankDesc(deadCards);
 
   return Response.json({
     player,
@@ -60,7 +61,7 @@ export async function GET(request, { params }) {
     hand: {
       best5: handResult.best5,
       alsoHeld: handResult.alsoHeld,
-      deadCards: sortByRankDesc(deadCards),
+      deadCards: sortedDeadCards,
       score: handResult.score || state?.best_hand_score || 0,
       name: handResult.name || state?.best_hand_name || '',
     },
