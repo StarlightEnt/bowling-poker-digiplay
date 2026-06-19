@@ -1,7 +1,7 @@
 'use client';
 import { parseCard } from '../lib/cards.js';
 
-const SUIT_COLOR = { s: '#ffffff', h: '#ff4444', c: '#ffffff', d: '#ff4444' };
+const SUIT_COLOR = { s: '#1a1a2e', h: '#cc2222', c: '#1a1a2e', d: '#cc2222' };
 
 export function Card({ code, status = 'legal', size = 'md', animateIn = false }) {
   const sizes = {
@@ -19,8 +19,8 @@ export function Card({ code, status = 'legal', size = 'md', animateIn = false })
   let parsed = null;
   try { parsed = parseCard(code); } catch { return null; }
 
-  const bg = isDead ? '#2a1010' : '#2a2a45';
-  const border = isDead ? '#ff6666' : isBest5 ? '#e8ff47' : '#7777cc';
+  const bg = isDead ? '#2a1010' : '#ffffff';
+  const border = isDead ? '#ff6666' : isBest5 ? '#e8ff47' : '#cccccc';
   const rankColor = isDead ? '#ff6666' : SUIT_COLOR[parsed.suit];
   const suitColor = isDead ? '#ff6666' : SUIT_COLOR[parsed.suit];
   const boxShadow = isBest5 ? `0 0 8px #e8ff4760` : 'none';
