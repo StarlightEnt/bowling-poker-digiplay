@@ -300,7 +300,23 @@ export default function AdminDashboard() {
             {activeGame && ` · Game ${activeGame.game_number} in progress`}
           </div>
         </div>
-        <div style={{ color: '#555577', fontSize: 11, paddingTop: 4 }}>Auto-refreshes every 10s</div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <div style={{ color: '#555577', fontSize: 11, marginRight: 8 }}>
+            Auto-refreshes every 10s
+          </div>
+          <button style={{ padding: '5px 11px', fontSize: 12, borderRadius: 6,
+            border: '0.5px solid #5555aa', background: '#2a2a45',
+            color: '#ffffff', cursor: 'pointer' }}>
+            Export
+          </button>
+          {activeGame && (
+            <button style={{ padding: '5px 11px', fontSize: 12, borderRadius: 6,
+              border: 'none', background: '#e8ff47',
+              color: '#1a1a2e', fontWeight: 500, cursor: 'pointer' }}>
+              End Game {activeGame.game_number} →
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Stat cards — 4-column grid per mockup */}
