@@ -1,5 +1,5 @@
 import sql from '../../../../lib/db.js';
-import { evaluateBestHand, sortForDisplay } from '../../../../lib/cards.js';
+import { evaluateBestHand, sortForDisplay, sortByRankDesc } from '../../../../lib/cards.js';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -50,8 +50,8 @@ export async function GET(request) {
     hand: {
       legalPool,
       best5: sortForDisplay(handResult.best5),
-      alsoHeld: sortForDisplay(handResult.alsoHeld),
-      deadCards,
+      alsoHeld: sortByRankDesc(handResult.alsoHeld),
+      deadCards: sortByRankDesc(deadCards),
       score: handResult.score,
       name: handResult.name,
     },

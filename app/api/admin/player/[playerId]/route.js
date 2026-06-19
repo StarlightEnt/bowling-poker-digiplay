@@ -1,7 +1,7 @@
 // PATH: app/api/admin/player/[playerId]/route.js
 import { auth } from '../../../../../lib/auth.js';
 import sql from '../../../../../lib/db.js';
-import { evaluateBestHand, sortForDisplay } from '../../../../../lib/cards.js';
+import { evaluateBestHand, sortForDisplay, sortByRankDesc } from '../../../../../lib/cards.js';
 
 export async function GET(request, { params }) {
   const session = await auth();
@@ -51,7 +51,7 @@ export async function GET(request, { params }) {
   if (best5.length === 0 && legalPool.length >= 5) {
     handResult = evaluateBestHand(legalPool);
     handResult.best5 = sortForDisplay(handResult.best5);
-    handResult.alsoHeld = sortForDisplay(handResult.alsoHeld);
+    handResult.alsoHeld = sortByRankDesc(handResult.alsoHeld);
   }
 
   return Response.json({
@@ -60,7 +60,7 @@ export async function GET(request, { params }) {
     hand: {
       best5: handResult.best5,
       alsoHeld: handResult.alsoHeld,
-      deadCards,
+      deadCards: sortByRankDesc(deadCards),
       score: handResult.score || state?.best_hand_score || 0,
       name: handResult.name || state?.best_hand_name || '',
     },
