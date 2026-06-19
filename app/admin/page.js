@@ -68,7 +68,7 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
       }} />
       <div style={{
         position: 'fixed', top: 0, right: 0, bottom: 0,
-        width: 320, background: BG,
+        width: '33vw', minWidth: 340, background: BG,
         borderLeft: `1px solid ${BORDER}`,
         zIndex: 100, display: 'flex', flexDirection: 'column',
         overflowY: 'auto',
