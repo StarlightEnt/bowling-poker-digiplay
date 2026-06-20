@@ -33,22 +33,9 @@ export default function PhoneDrawScreen({ player, session }) {
   const [announcementDismissed, setAnnouncementDismissed] = useState(false);
   const queueRef = useRef(0);
   const queueTimerRef = useRef(null);
-  const headerRef = useRef(null);
-  const footerRef = useRef(null);
 
   useEffect(() => {
     fetchGames();
-  }, []);
-
-  const [debugHeights, setDebugHeights] = useState(null);
-  useEffect(() => {
-    if (headerRef.current && footerRef.current) {
-      setDebugHeights({
-        header: headerRef.current.offsetHeight,
-        footer: footerRef.current.offsetHeight,
-        viewport: window.innerHeight,
-      });
-    }
   }, []);
 
   const activeGame = games[activeGameIndex];
@@ -209,14 +196,14 @@ export default function PhoneDrawScreen({ player, session }) {
 
   return (
     <div style={{
-      height: '100vh',
+      height: '100dvh',
       background: '#1a1a2e',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: 'system-ui, sans-serif',
     }}>
       {/* Header — plain, sits on screen background */}
-      <div ref={headerRef} style={{
+      <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 14px',
         flexShrink: 0,
@@ -252,7 +239,7 @@ export default function PhoneDrawScreen({ player, session }) {
       </div>
 
       {/* Scroll area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {/* Inputs section — ONE card: steppers + divider + nudge + draw row */}
         <div style={{
@@ -412,7 +399,7 @@ export default function PhoneDrawScreen({ player, session }) {
 
       {/* Forfeit bar — pinned bottom, border-top only, no background */}
       {!isForfeited && !isSubmitted && (
-        <div ref={footerRef} style={{
+        <div style={{
           flexShrink: 0,
           padding: '10px 14px 16px',
           borderTop: '1px solid #222244',
@@ -535,17 +522,6 @@ export default function PhoneDrawScreen({ player, session }) {
             </>
           )}
           <div style={{ fontSize: 11, color: announcement.isRoyalFlush ? '#7a4f00' : '#444466', marginTop: announcement.isRoyalFlush ? 20 : 24, letterSpacing: '0.5px' }}>Tap anywhere to dismiss</div>
-        </div>
-      )}
-
-      {debugHeights && (
-        <div style={{
-          position: 'fixed', top: 4, right: 4, zIndex: 999,
-          background: '#000000', color: '#00ff00',
-          fontSize: 10, padding: '6px 8px', borderRadius: 4,
-          fontFamily: 'monospace',
-        }}>
-          H:{debugHeights.header} F:{debugHeights.footer} V:{debugHeights.viewport}
         </div>
       )}
 
