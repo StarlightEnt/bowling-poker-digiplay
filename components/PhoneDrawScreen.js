@@ -33,6 +33,7 @@ export default function PhoneDrawScreen({ player, session }) {
   const [announcementDismissed, setAnnouncementDismissed] = useState(false);
   const queueRef = useRef(0);
   const queueTimerRef = useRef(null);
+  const hasInitializedGameRef = useRef(false);
 
   useEffect(() => {
     fetchGames();
@@ -61,7 +62,10 @@ export default function PhoneDrawScreen({ player, session }) {
     if (data.games) {
       setGames(data.games);
       const openIdx = data.games.findIndex(g => g.status === 'open');
-      if (openIdx >= 0) setActiveGameIndex(openIdx);
+      if (!hasInitializedGameRef.current) {
+        if (openIdx >= 0) setActiveGameIndex(openIdx);
+        hasInitializedGameRef.current = true;
+      }
       const openGame = data.games[openIdx >= 0 ? openIdx : 0];
       if (openGame?.playerState) {
         setPlayerState(openGame.playerState);

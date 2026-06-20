@@ -38,6 +38,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
   const queueTimerRef = useRef(null);
   const inactivityRef = useRef(null);
   const countdownRef = useRef(null);
+  const hasInitializedGameRef = useRef(false);
 
   useEffect(() => { fetchGames(); }, []);
 
@@ -87,7 +88,10 @@ export default function KioskDrawScreen({ player, session, onBack }) {
     if (data.games) {
       setGames(data.games);
       const openIdx = data.games.findIndex(g => g.status === 'open');
-      if (openIdx >= 0) setActiveGameIndex(openIdx);
+      if (!hasInitializedGameRef.current) {
+        if (openIdx >= 0) setActiveGameIndex(openIdx);
+        hasInitializedGameRef.current = true;
+      }
       const openGame = data.games[openIdx >= 0 ? openIdx : 0];
       if (openGame?.playerState) {
         setPlayerState(openGame.playerState);
