@@ -228,13 +228,30 @@ export default function KioskDrawScreen({ player, session, onBack }) {
         padding: '14px 20px 10px',
         borderBottom: '1px solid #222244',
       }}>
-        <div>
-          <div style={{ color: '#ffffff', fontSize: 18, fontWeight: 600 }}>
-            {player.normalized_name}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div>
+            <div style={{ color: '#ffffff', fontSize: 18, fontWeight: 600 }}>
+              {player.normalized_name}
+            </div>
+            <div style={{ color: '#444466', fontSize: 11, letterSpacing: 1 }}>
+              {session.seasonName} · Week {session.weekNumber} · Lane {player.lane}
+            </div>
           </div>
-          <div style={{ color: '#444466', fontSize: 11, letterSpacing: 1 }}>
-            {session.seasonName} · Week {session.weekNumber} · Lane {player.lane}
-          </div>
+          <button
+            onClick={onBack}
+            style={{
+              background: '#e8ff47',
+              color: '#1a1a2e',
+              border: 'none',
+              borderRadius: 6,
+              padding: '6px 14px',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            Change Player
+          </button>
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           {games.map((g, i) => {
