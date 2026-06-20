@@ -142,14 +142,12 @@ export default function PlayerNameSelect({ session }) {
               fontWeight: selected?.id === player.id ? 600 : 500,
               textAlign: 'center',
               lineHeight: 1.2,
-              opacity: player.checked_in ? 0.4 : 1,
               transition: 'background 0.15s, color 0.15s',
               width: '100%',
               cursor: 'pointer',
             }}
           >
             {player.normalized_name}
-            {player.checked_in && <div style={{ fontSize: 10, color: '#3dffa0' }}>✓ In</div>}
           </button>
         ))}
       </div>
