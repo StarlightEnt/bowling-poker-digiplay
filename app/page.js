@@ -143,7 +143,7 @@ export default function PhonePinEntry() {
                 width: '36px',
                 height: '44px',
                 background: SURFACE,
-                border: `2px solid ${digit ? borderColor : BORDER}`,
+                border: `2px solid ${digit ? borderColor : ACCENT}`,
                 borderRadius: '6px',
                 color: '#ffffff',
                 fontSize: '20px',
