@@ -150,11 +150,14 @@ export default function GameAdvancement() {
             <div style={{
               background: SURFACE,
               border: `1px solid ${manualWinner ? ACCENT : leaderboard.isTie ? '#ffaa44' : '#3dffa0'}`,
-              borderRadius: 8, padding: 20, marginBottom: 20,
+              borderRadius: 8, overflow: 'hidden', marginBottom: 20,
             }}>
               {/* Header bar: dynamic eyebrow + Change winner / Cancel */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <div style={{ color: '#8888aa', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>
+              <div style={{
+                padding: '10px 16px', borderBottom: `1px solid ${BORDER}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
+                <div style={{ color: '#ffffff', fontSize: 13, fontWeight: 500 }}>
                   {manualWinner ? '✏️ Manual Override' : leaderboard.isTie ? '⚠️ Tie Detected — Split Payout' : '🏆 Suggested Winner'}
                 </div>
                 {!changingWinner && (
@@ -164,7 +167,7 @@ export default function GameAdvancement() {
                       style={{
                         background: 'transparent', color: '#8888aa',
                         border: `1px solid ${BORDER}`, borderRadius: 6,
-                        padding: '5px 11px', fontSize: 12, cursor: 'pointer',
+                        padding: '7px 14px', fontSize: 13, cursor: 'pointer',
                       }}>
                       Cancel
                     </button>
@@ -174,7 +177,7 @@ export default function GameAdvancement() {
                       style={{
                         background: 'transparent', color: '#8888aa',
                         border: `1px solid ${BORDER}`, borderRadius: 6,
-                        padding: '5px 11px', fontSize: 12, cursor: 'pointer',
+                        padding: '7px 14px', fontSize: 13, cursor: 'pointer',
                       }}>
                       Change winner
                     </button>
@@ -182,6 +185,7 @@ export default function GameAdvancement() {
                 )}
               </div>
 
+              <div style={{ padding: 20 }}>
               {/* Tie explanation note */}
               {!manualWinner && leaderboard.isTie && (
                 <div style={{
@@ -194,7 +198,7 @@ export default function GameAdvancement() {
 
               {/* Main row: left = winner block(s), right = big Confirm & Announce button */}
               {!changingWinner && (
-                <div style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
                   <div style={{ flex: 1, minWidth: 240 }}>
                     {(manualWinner ? [manualWinner] : leaderboard.tiedPlayers).map(p => (
                       <div key={p.id} style={{ marginBottom: 12 }}>
@@ -223,8 +227,8 @@ export default function GameAdvancement() {
                     style={{
                       background: ACCENT, color: '#1a1a2e',
                       border: 'none', borderRadius: 8,
-                      padding: '0 32px', fontSize: 18, fontWeight: 700,
-                      minWidth: 220,
+                      padding: '0 28px', fontSize: 16, fontWeight: 700,
+                      height: 68, minWidth: 190,
                       opacity: confirming ? 0.7 : 1,
                       cursor: confirming ? 'default' : 'pointer',
                     }}>
@@ -293,6 +297,7 @@ export default function GameAdvancement() {
               {/* Confirm helper text — always visible until confirmed */}
               <div style={{ marginTop: 12, fontSize: 11, color: '#666688' }}>
                 Confirming will push the winner announcement to all active player screens simultaneously.
+              </div>
               </div>
             </div>
           )}
