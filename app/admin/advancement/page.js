@@ -211,7 +211,7 @@ export default function GameAdvancement() {
                             <CardRow cards={p.hand.best5} status="best5" size="sm" />
                           </div>
                         )}
-                        <div style={{ marginTop: 6, color: '#8888aa', fontSize: 11 }}>
+                        <div style={{ marginTop: 6, color: '#8888aa', fontSize: 13, fontWeight: 500 }}>
                           Lane {p.lane} · {!manualWinner && leaderboard.isTie ? 'Split payout' : 'Payout'} ${leaderboard.splitAmount.toFixed(2)}
                           {p.score >= 9_000_000 && (
                             <span style={{ color: '#ffd700' }}> · + ${leaderboard.progressivePot.toFixed(2)} progressive pot</span>
@@ -295,7 +295,7 @@ export default function GameAdvancement() {
               )}
 
               {/* Confirm helper text — always visible until confirmed */}
-              <div style={{ marginTop: 12, fontSize: 11, color: '#666688' }}>
+              <div style={{ marginTop: 12, fontSize: 13, color: '#8888aa', fontWeight: 500 }}>
                 Confirming will push the winner announcement to all active player screens simultaneously.
               </div>
               </div>
@@ -319,7 +319,7 @@ export default function GameAdvancement() {
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '6% 17% 16% 37% 10% 14%',
+              gridTemplateColumns: '6fr 17fr 16fr 37fr 10fr minmax(100px, 14fr)',
               background: '#1a1a2e', padding: '8px 16px', gap: 8,
             }}>
               {['Rank', 'Player', 'Hand', 'Cards', 'Lane', 'Status'].map(h => (
@@ -337,7 +337,7 @@ export default function GameAdvancement() {
               return (
                 <div key={entry.id} style={{
                   display: 'grid',
-                  gridTemplateColumns: '6% 17% 16% 37% 10% 14%',
+                  gridTemplateColumns: '6fr 17fr 16fr 37fr 10fr minmax(100px, 14fr)',
                   padding: '10px 16px', gap: 8,
                   borderTop: `1px solid ${BORDER}`,
                   background: isRoyalFlush ? '#2a1f00'
