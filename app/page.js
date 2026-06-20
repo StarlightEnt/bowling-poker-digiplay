@@ -123,7 +123,7 @@ export default function PhonePinEntry() {
           flexDirection: 'column',
           gap: '8px',
           position: 'absolute',
-          top: '136px',
+          top: '115px',
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 1,
