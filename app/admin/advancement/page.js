@@ -169,7 +169,7 @@ export default function GameAdvancement() {
                   <div style={{ color: ACCENT, fontSize: 24, fontWeight: 700 }}>
                     ${leaderboard.splitAmount.toFixed(2)}
                   </div>
-                  {leaderboard.game?.royal_flush && (
+                  {(manualWinner || leaderboard.tiedPlayers[0])?.score >= 9_000_000 && (
                     <div style={{ color: '#ffd700', fontSize: 13 }}>
                       + ${leaderboard.progressivePot.toFixed(2)} progressive pot
                     </div>
