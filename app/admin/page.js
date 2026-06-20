@@ -261,9 +261,9 @@ export default function AdminDashboard() {
   if (!data?.session) {
     return (
       <div style={{ padding: 24 }}>
-        <div style={{ fontSize: 15, fontWeight: 500, color: '#ffffff', marginBottom: 4 }}>
+        <h1 style={{ color: ACCENT, fontSize: 26, marginBottom: 4 }}>
           Game Night Dashboard
-        </div>
+        </h1>
         <p style={{ color: '#8888aa', marginBottom: 32 }}>No active session.</p>
         <div style={{ background: SURFACE, border: `0.5px solid ${BORDER}`, borderRadius: 8,
           padding: 40, textAlign: 'center', color: '#666688' }}>
@@ -317,9 +317,9 @@ export default function AdminDashboard() {
       {/* Header — "Game Night Dashboard" text-primary 15px/500, matching mockup main-header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
         <div>
-          <div style={{ color: '#ffffff', fontSize: 15, fontWeight: 500, marginBottom: 2 }}>
+          <h1 style={{ color: ACCENT, fontSize: 26, marginBottom: 4 }}>
             Game Night Dashboard
-          </div>
+          </h1>
           <div style={{ color: '#666688', fontSize: 11 }}>
             {session.season_name} · Week {session.week_number}
             {activeGame && ` · Game ${activeGame.game_number} in progress`}
