@@ -99,16 +99,12 @@ export default function KioskPlayerList({ session, onNewWeek }) {
               fontWeight: selected?.id === player.id ? 600 : 500,
               textAlign: 'center',
               lineHeight: 1.2,
-              opacity: player.checked_in ? 0.45 : 1,
               cursor: 'pointer',
               transition: 'background 0.15s, color 0.15s',
               width: '100%',
             }}
           >
             {player.normalized_name}
-            {player.checked_in && (
-              <div style={{ fontSize: 10, color: '#3dffa0', marginTop: 2 }}>✓</div>
-            )}
           </button>
         ))}
       </div>
