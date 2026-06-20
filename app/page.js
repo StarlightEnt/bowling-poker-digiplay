@@ -103,9 +103,6 @@ export default function PhonePinEntry() {
         position: 'relative',
         width: '125px',
         height: '331px',
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
       }}>
         <img
           src="/bowling-pin.png"
