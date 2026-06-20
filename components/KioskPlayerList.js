@@ -62,7 +62,7 @@ export default function KioskPlayerList({ session, onNewWeek }) {
       padding: '24px',
     }}>
       {/* Header — title left, no session info here */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4, alignSelf: 'flex-start' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
         <div style={{ fontSize: 22, fontWeight: 500, color: '#ffffff', letterSpacing: 1 }}>
           Bowling Poker
         </div>
@@ -72,7 +72,7 @@ export default function KioskPlayerList({ session, onNewWeek }) {
       </div>
 
       {/* Prompt */}
-      <div style={{ fontSize: 13, color: '#aaaaaa', marginBottom: 16, letterSpacing: '0.3px', alignSelf: 'flex-start' }}>
+      <div style={{ fontSize: 13, color: '#aaaaaa', marginBottom: 16, letterSpacing: '0.3px' }}>
         Tap your name to get started
       </div>
 
