@@ -33,9 +33,16 @@ export default function PhoneDrawScreen({ player, session }) {
   const [announcementDismissed, setAnnouncementDismissed] = useState(false);
   const queueRef = useRef(0);
   const queueTimerRef = useRef(null);
+  const headerRef = useRef(null);
+  const footerRef = useRef(null);
 
   useEffect(() => {
     fetchGames();
+  }, []);
+
+  useEffect(() => {
+    if (headerRef.current) console.log('HEADER HEIGHT:', headerRef.current.offsetHeight);
+    if (footerRef.current) console.log('FOOTER HEIGHT:', footerRef.current.offsetHeight);
   }, []);
 
   const activeGame = games[activeGameIndex];
@@ -203,7 +210,7 @@ export default function PhoneDrawScreen({ player, session }) {
       fontFamily: 'system-ui, sans-serif',
     }}>
       {/* Header — plain, sits on screen background */}
-      <div style={{
+      <div ref={headerRef} style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 14px',
         flexShrink: 0,
@@ -399,7 +406,7 @@ export default function PhoneDrawScreen({ player, session }) {
 
       {/* Forfeit bar — pinned bottom, border-top only, no background */}
       {!isForfeited && !isSubmitted && (
-        <div style={{
+        <div ref={footerRef} style={{
           flexShrink: 0,
           padding: '10px 14px 16px',
           borderTop: '1px solid #222244',
