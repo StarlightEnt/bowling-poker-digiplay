@@ -78,17 +78,18 @@ export default function PhonePinEntry() {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      height: '100dvh',
+      overflow: 'hidden',
       background: BG,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'space-evenly',
       fontFamily: 'system-ui, sans-serif',
-      padding: '24px',
+      padding: '16px 24px',
     }}>
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+      <div style={{ textAlign: 'center' }}>
         <div style={{ color: '#8888aa', fontSize: '14px', letterSpacing: '2px',
           textTransform: 'uppercase', marginBottom: '4px' }}>Welcome to</div>
         <div style={{ color: '#ffffff', fontSize: '32px', fontWeight: 900,
@@ -98,17 +99,24 @@ export default function PhonePinEntry() {
       </div>
 
       {/* PIN input area with bowling pin behind */}
-      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', marginBottom: '24px' }}>
+      <div style={{
+        position: 'relative',
+        width: '125px',
+        height: '331px',
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+      }}>
         <img
           src="/bowling-pin.png"
           alt=""
           style={{
             position: 'absolute',
-            width: '80px',
-            opacity: 0.15,
-            top: '50%',
-            transform: 'translateY(-50%)',
+            width: '125px',
+            opacity: 1,
+            top: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
             pointerEvents: 'none',
             zIndex: 0,
           }}
@@ -117,7 +125,10 @@ export default function PhonePinEntry() {
           display: 'flex',
           flexDirection: 'column',
           gap: '8px',
-          position: 'relative',
+          position: 'absolute',
+          top: '136px',
+          left: '50%',
+          transform: 'translateX(-50%)',
           zIndex: 1,
           animation: shake ? 'shake 0.5s ease' : 'none',
         }}>
@@ -150,13 +161,14 @@ export default function PhonePinEntry() {
       </div>
 
       {/* Instructions */}
-      <p style={{ color: '#8888aa', fontSize: '14px', textAlign: 'center', marginBottom: '8px' }}>
-        Enter the PIN to get started.
-      </p>
-      <p style={{ color: '#555577', fontSize: '12px', fontStyle: 'italic',
-        textAlign: 'center', marginBottom: '32px' }}>
-        One PIN only, please. Get it? <span style={{ fontStyle: 'normal' }}>😉</span>
-      </p>
+      <div style={{ textAlign: 'center' }}>
+        <p style={{ color: '#8888aa', fontSize: '14px', marginBottom: '8px' }}>
+          Enter the PIN to get started.
+        </p>
+        <p style={{ color: '#555577', fontSize: '12px', fontStyle: 'italic' }}>
+          One PIN only, please. Get it? <span style={{ fontStyle: 'normal' }}>😉</span>
+        </p>
+      </div>
 
       {/* Enter button */}
       <button
@@ -172,7 +184,6 @@ export default function PhonePinEntry() {
           fontWeight: 700,
           letterSpacing: '1px',
           transition: 'all 0.15s',
-          marginBottom: '24px',
         }}
       >
         {status === 'checking' ? 'Checking...' : 'Enter the Lane 🎳'}
