@@ -196,17 +196,17 @@ export default function PhoneDrawScreen({ player, session }) {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      height: '100vh',
       background: '#1a1a2e',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: 'system-ui, sans-serif',
-      paddingBottom: 60,
     }}>
       {/* Header — plain, sits on screen background */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 14px',
+        flexShrink: 0,
       }}>
         <div style={{ color: '#ffffff', fontSize: 15, fontWeight: 600 }}>
           {player.normalized_name}
@@ -239,7 +239,7 @@ export default function PhoneDrawScreen({ player, session }) {
       </div>
 
       {/* Scroll area */}
-      <div style={{ flex: 1, padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 10, paddingBottom: 10 }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {/* Inputs section — ONE card: steppers + divider + nudge + draw row */}
         <div style={{
@@ -400,7 +400,7 @@ export default function PhoneDrawScreen({ player, session }) {
       {/* Forfeit bar — pinned bottom, border-top only, no background */}
       {!isForfeited && !isSubmitted && (
         <div style={{
-          position: 'fixed', bottom: 0, left: 0, right: 0,
+          flexShrink: 0,
           padding: '10px 14px 16px',
           borderTop: '1px solid #222244',
         }}>
