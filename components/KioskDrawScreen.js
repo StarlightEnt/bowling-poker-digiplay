@@ -87,12 +87,13 @@ export default function KioskDrawScreen({ player, session, onBack }) {
     const data = await res.json();
     if (data.games) {
       setGames(data.games);
-      const openIdx = data.games.findIndex(g => g.status === 'open');
+      let targetIdx = activeGameIndex;
       if (!hasInitializedGameRef.current) {
-        if (openIdx >= 0) setActiveGameIndex(openIdx);
+        const openIdx = data.games.findIndex(g => g.status === 'open');
+        if (openIdx >= 0) { targetIdx = openIdx; setActiveGameIndex(openIdx); }
         hasInitializedGameRef.current = true;
       }
-      const openGame = data.games[openIdx >= 0 ? openIdx : 0];
+      const openGame = data.games[targetIdx] || data.games[0];
       if (openGame?.playerState) {
         setPlayerState(openGame.playerState);
         setMarks({
