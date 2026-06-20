@@ -15,6 +15,7 @@ export async function GET(request) {
   `;
 
   let playerStates = [];
+  let playerRow = null;
   if (playerId) {
     playerStates = await sql`
       SELECT game_id, status, cards_earned, cards_drawn, cards_dead,
@@ -22,12 +23,14 @@ export async function GET(request) {
       FROM player_game_state
       WHERE player_id = ${playerId} AND game_id = ANY(${games.map(g => g.id)})
     `;
+    [playerRow] = await sql`SELECT active_game_id FROM players WHERE id = ${playerId} LIMIT 1`;
   }
 
   const stateByGame = {};
   for (const s of playerStates) stateByGame[s.game_id] = s;
 
   return Response.json({
+    activeGameId: playerRow?.active_game_id || null,
     games: games.map(g => ({
       ...g,
       playerState: stateByGame[g.id] || null,

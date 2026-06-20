@@ -53,6 +53,19 @@ export async function POST(request) {
     WHERE player_id = ${playerId} AND game_id = ${gameId}
   `;
 
+  const [submittedGame] = await sql`SELECT game_session_id FROM games WHERE id = ${gameId} LIMIT 1`;
+  if (submittedGame?.game_session_id) {
+    const [nextGame] = await sql`
+      SELECT id FROM games
+      WHERE game_session_id = ${submittedGame.game_session_id}
+        AND status = 'open' AND id != ${gameId}
+      ORDER BY game_number ASC LIMIT 1
+    `;
+    if (nextGame) {
+      await sql`UPDATE players SET active_game_id = ${nextGame.id} WHERE id = ${playerId}`;
+    }
+  }
+
   return Response.json({
     submitted: true,
     hand: {

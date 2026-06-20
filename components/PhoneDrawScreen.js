@@ -33,7 +33,6 @@ export default function PhoneDrawScreen({ player, session }) {
   const [announcementDismissed, setAnnouncementDismissed] = useState(false);
   const queueRef = useRef(0);
   const queueTimerRef = useRef(null);
-  const hasInitializedGameRef = useRef(false);
 
   useEffect(() => {
     fetchGames();
@@ -61,23 +60,35 @@ export default function PhoneDrawScreen({ player, session }) {
     const data = await res.json();
     if (data.games) {
       setGames(data.games);
-      let targetIdx = activeGameIndex;
-      if (!hasInitializedGameRef.current) {
+      let targetIdx = 0;
+      if (data.activeGameId) {
+        const idx = data.games.findIndex(g => g.id === data.activeGameId);
+        if (idx >= 0) { targetIdx = idx; setActiveGameIndex(idx); }
+      } else {
         const openIdx = data.games.findIndex(g => g.status === 'open');
         if (openIdx >= 0) { targetIdx = openIdx; setActiveGameIndex(openIdx); }
-        hasInitializedGameRef.current = true;
       }
-      const openGame = data.games[targetIdx] || data.games[0];
-      if (openGame?.playerState) {
-        setPlayerState(openGame.playerState);
+      const activeGame = data.games[targetIdx] || data.games[0];
+      if (activeGame?.playerState) {
+        setPlayerState(activeGame.playerState);
         setMarks({
-          frame: openGame.playerState.current_frame || 0,
-          strikes: openGame.playerState.strikes || 0,
-          spares: openGame.playerState.spares || 0,
+          frame: activeGame.playerState.current_frame || 0,
+          strikes: activeGame.playerState.strikes || 0,
+          spares: activeGame.playerState.spares || 0,
         });
       }
-      if (openGame) await fetchState(openGame.id);
+      if (activeGame) await fetchState(activeGame.id);
     }
+  }
+
+  async function selectGame(gameId, index) {
+    setActiveGameIndex(index);
+    await fetchState(gameId);
+    await fetch('/api/play/select-game', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerId: player.id, gameId }),
+    });
   }
 
   async function fetchState(gameId) {
@@ -207,7 +218,7 @@ export default function PhoneDrawScreen({ player, session }) {
             return (
               <button
                 key={g.id}
-                onClick={() => { if (isOpen) { setActiveGameIndex(i); fetchState(g.id); } }}
+                onClick={() => { if (isOpen) selectGame(g.id, i); }}
                 style={{
                   background: isActive ? ACCENT : SURFACE,
                   color: isActive ? '#1a1a2e' : '#aaaacc',

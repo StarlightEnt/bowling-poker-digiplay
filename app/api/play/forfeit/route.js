@@ -60,5 +60,17 @@ export async function POST(request) {
     }
   }
 
+  if (sessionId) {
+    const [nextGame] = await sql`
+      SELECT id FROM games
+      WHERE game_session_id = ${sessionId}
+        AND status = 'open' AND id != ${gameId}
+      ORDER BY game_number ASC LIMIT 1
+    `;
+    if (nextGame) {
+      await sql`UPDATE players SET active_game_id = ${nextGame.id} WHERE id = ${playerId}`;
+    }
+  }
+
   return Response.json({ forfeited: true, game2Unlocked });
 }
