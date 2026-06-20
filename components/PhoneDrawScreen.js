@@ -40,9 +40,15 @@ export default function PhoneDrawScreen({ player, session }) {
     fetchGames();
   }, []);
 
+  const [debugHeights, setDebugHeights] = useState(null);
   useEffect(() => {
-    if (headerRef.current) console.log('HEADER HEIGHT:', headerRef.current.offsetHeight);
-    if (footerRef.current) console.log('FOOTER HEIGHT:', footerRef.current.offsetHeight);
+    if (headerRef.current && footerRef.current) {
+      setDebugHeights({
+        header: headerRef.current.offsetHeight,
+        footer: footerRef.current.offsetHeight,
+        viewport: window.innerHeight,
+      });
+    }
   }, []);
 
   const activeGame = games[activeGameIndex];
@@ -529,6 +535,17 @@ export default function PhoneDrawScreen({ player, session }) {
             </>
           )}
           <div style={{ fontSize: 11, color: announcement.isRoyalFlush ? '#7a4f00' : '#444466', marginTop: announcement.isRoyalFlush ? 20 : 24, letterSpacing: '0.5px' }}>Tap anywhere to dismiss</div>
+        </div>
+      )}
+
+      {debugHeights && (
+        <div style={{
+          position: 'fixed', top: 4, right: 4, zIndex: 999,
+          background: '#000000', color: '#00ff00',
+          fontSize: 10, padding: '6px 8px', borderRadius: 4,
+          fontFamily: 'monospace',
+        }}>
+          H:{debugHeights.header} F:{debugHeights.footer} V:{debugHeights.viewport}
         </div>
       )}
 
