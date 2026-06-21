@@ -7,7 +7,7 @@ const ACCENT = '#e8ff47';
 const SURFACE = '#2a2a45';
 const BORDER = '#5555aa';
 
-function ConfirmModal({ title, message, confirmLabel, dangerous, onConfirm, onCancel, children }) {
+function ConfirmModal({ title, message, confirmLabel, dangerous, onConfirm, onCancel, disabled, children }) {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}>
@@ -17,10 +17,11 @@ function ConfirmModal({ title, message, confirmLabel, dangerous, onConfirm, onCa
         <p style={{ color: '#8888aa', fontSize: 13, marginBottom: 16 }}>{message}</p>
         {children}
         <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-          <button onClick={onConfirm} style={{
+          <button onClick={onConfirm} disabled={disabled} style={{
             flex: 1, background: dangerous ? '#ff4444' : ACCENT,
             color: dangerous ? '#ffffff' : '#1a1a2e',
             border: 'none', borderRadius: 6, padding: '10px', fontWeight: 700, fontSize: 14,
+            opacity: disabled ? 0.5 : 1, cursor: disabled ? 'default' : 'pointer',
           }}>{confirmLabel}</button>
           <button onClick={onCancel} style={{
             flex: 1, background: 'transparent', color: '#8888aa',
@@ -32,22 +33,52 @@ function ConfirmModal({ title, message, confirmLabel, dangerous, onConfirm, onCa
   );
 }
 
+function validateScore(frame, strikes, spares) {
+  if (strikes + spares > 12) return `${strikes} strikes + ${spares} spares doesn't look right. Please check your numbers again.`;
+  if (spares > 10) return `${strikes} strikes + ${spares} spares doesn't look right. Please check your numbers again.`;
+  if (frame >= 1 && frame <= 9 && strikes + spares > frame) return `${strikes} strikes + ${spares} spares doesn't look right for only ${frame} frames. Please check your numbers again.`;
+  return null;
+}
+
+const actionBtn = {
+  background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
+  borderRadius: 4, padding: '4px 10px', fontSize: 11, cursor: 'pointer',
+};
+const dangerBtn = {
+  background: 'transparent', color: '#ff6666', border: '1px solid #661111',
+  borderRadius: 4, padding: '4px 10px', fontSize: 11, cursor: 'pointer',
+};
+
 export default function OverridesPage() {
   const [dashData, setDashData] = useState(null);
+  const [gameBoards, setGameBoards] = useState({});
   const [overrides, setOverrides] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null);
-  const [adjustValue, setAdjustValue] = useState(0);
+  const [scoreStrikes, setScoreStrikes] = useState(0);
+  const [scoreSpares, setScoreSpares] = useState(0);
 
   const fetchData = useCallback(async () => {
     const res = await fetch('/api/admin/dashboard');
     const data = await res.json();
     setDashData(data);
+
     if (data.session) {
       const ovRes = await fetch(`/api/admin/overrides?sessionId=${data.session.id}`);
       const ovData = await ovRes.json();
       setOverrides(ovData.overrides || []);
     }
+
+    if (data.games?.length) {
+      const activeGames = data.games.filter(g => g.status === 'open' || g.status === 'closed');
+      const boards = {};
+      await Promise.all(activeGames.map(async g => {
+        const r = await fetch(`/api/admin/leaderboard?gameId=${g.id}`);
+        boards[g.id] = await r.json();
+      }));
+      setGameBoards(boards);
+    }
+
     setLoading(false);
   }, []);
 
@@ -93,15 +124,12 @@ export default function OverridesPage() {
   if (loading) return <div style={{ padding: 32, color: '#8888aa' }}>Loading...</div>;
   if (!dashData?.session) return (
     <div style={{ padding: 32 }}>
-      <h1 style={{ color: ACCENT, fontSize: 28, marginBottom: 8 }}>Overrides</h1>
+      <h1 style={{ color: ACCENT, fontSize: 26, marginBottom: 8 }}>Overrides</h1>
       <p style={{ color: '#8888aa' }}>No active session.</p>
     </div>
   );
 
-  const { players, activeGame, games, session } = dashData;
-  const game2 = games?.find(g => g.game_number === 2);
-  const game3 = games?.find(g => g.game_number === 3);
-  const lanePairs = [...new Set(players.filter(p => p.lane_pair).map(p => p.lane_pair))].sort();
+  const { games, session } = dashData;
 
   function formatTime(ts) {
     if (!ts) return '';
@@ -115,20 +143,16 @@ export default function OverridesPage() {
       case 'undo_submit': return `Undo submit — ${details.playerName}`;
       case 'force_forfeit': return `Force forfeited — ${details.playerName}`;
       case 'undo_forfeit': return `Undo forfeit — ${details.playerName}`;
+      case 'correct_score': return `Corrected score — ${details.playerName} · ${details.strikes} strikes/${details.spares} spares${details.cardsReturned ? ` · ${details.cardsReturned} card(s) returned` : ''}`;
       case 'adjust_draw_count': return `Adjusted draw count to ${details.newCount} — ${details.playerName}`;
       case 'force_unlock_game': return `Force unlocked Game ${details.gameNumber} — All Lanes`;
-      case 'force_unlock_lane_pair': return `Force unlocked Game ${details.gameNumber} — Lane ${details.lanePair}`;
       case 'confirm_winner': return `Confirmed winner — ${details.winners?.join(', ')} · ${details.handName}`;
       default: return ov.action;
     }
   }
 
-  const btnStyle = {
-    background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
-    borderRadius: 6, padding: '8px 14px', fontSize: 12, cursor: 'pointer',
-  };
-
-  const hasUnlockActions = game2?.status === 'pending' || game3?.status === 'pending';
+  const colsOpen = '2fr 1fr 1.3fr minmax(260px, 4fr)';
+  const colsClosed = '1.5fr 0.8fr 1.5fr 1fr';
 
   return (
     <div style={{ padding: 24 }}>
@@ -137,106 +161,114 @@ export default function OverridesPage() {
         {session.season_name} · Week {session.week_number} · Every action requires confirmation.
       </p>
 
-      {/* Player overrides table */}
-      <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
-        borderRadius: 8, overflow: 'hidden', marginBottom: 16 }}>
-        <div style={{ padding: '12px 16px', borderBottom: `1px solid ${BORDER}` }}>
-          <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700 }}>Player Overrides</div>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 100px 1fr',
-          background: '#1a1a2e', padding: '8px 16px', gap: 8 }}>
-          {['Player', 'Lane', 'Status', 'Actions'].map(h => (
-            <div key={h} style={{ color: '#555577', fontSize: 10,
-              textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
-          ))}
-        </div>
-        {players.filter(p => p.checked_in).map(player => (
-          <div key={player.id} style={{
-            display: 'grid', gridTemplateColumns: '1fr 80px 100px 1fr',
-            padding: '10px 16px', gap: 8,
-            borderTop: `1px solid ${BORDER}`, alignItems: 'center',
-          }}>
-            <div style={{ color: '#ffffff', fontSize: 13, fontWeight: 600 }}>
-              {player.normalized_name}
-            </div>
-            <div style={{ color: '#8888aa', fontSize: 13 }}>{player.lane}</div>
-            <StatusPill status={player.game_status || 'waiting'} />
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {(player.game_status === 'drawing' || player.game_status === 'waiting') && (
-                <>
-                  <button onClick={() => setModal({ action: 'force_submit', player, gameId: activeGame?.id })}
-                    style={{ background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
-                      borderRadius: 4, padding: '4px 10px', fontSize: 11, cursor: 'pointer' }}>
-                    Force Submit
-                  </button>
-                  <button onClick={() => setModal({ action: 'force_forfeit', player, gameId: activeGame?.id })}
-                    style={{ background: 'transparent', color: '#ff6666', border: '1px solid #661111',
-                      borderRadius: 4, padding: '4px 10px', fontSize: 11, cursor: 'pointer' }}>
-                    Force Forfeit
-                  </button>
-                </>
-              )}
-              {player.game_status === 'submitted' && (
-                <button onClick={() => setModal({ action: 'undo_submit', player, gameId: activeGame?.id })}
-                  style={{ background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
-                    borderRadius: 4, padding: '4px 10px', fontSize: 11, cursor: 'pointer' }}>
-                  Undo Submit
-                </button>
-              )}
-              {player.game_status === 'forfeited' && (
-                <>
-                  <button onClick={() => setModal({ action: 'undo_forfeit', player, gameId: activeGame?.id })}
-                    style={{ background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
-                      borderRadius: 4, padding: '4px 10px', fontSize: 11, cursor: 'pointer' }}>
-                    Undo Forfeit
-                  </button>
-                  <button onClick={() => setModal({ action: 'force_submit', player, gameId: activeGame?.id })}
-                    style={{ background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
-                      borderRadius: 4, padding: '4px 10px', fontSize: 11, cursor: 'pointer' }}>
-                    Force Submit
-                  </button>
-                </>
-              )}
-              <button onClick={() => { setAdjustValue(player.cards_drawn || 0); setModal({ action: 'adjust_draw_count', player, gameId: activeGame?.id }); }}
-                style={{ background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
-                  borderRadius: 4, padding: '4px 10px', fontSize: 11, cursor: 'pointer' }}>
-                Adjust Draw
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* One card per game */}
+      {games?.slice().sort((a, b) => a.game_number - b.game_number).map(game => {
+        const board = gameBoards[game.id];
+        const statusLabel = game.status === 'open' ? '● OPEN' : game.status === 'closed' ? '✓ CLOSED' : 'PENDING';
+        const statusColor = game.status === 'open' ? ACCENT : game.status === 'closed' ? '#8888aa' : '#555577';
 
-      {/* Game controls */}
-      <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
-        borderRadius: 8, padding: 16, marginBottom: 16 }}>
-        <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Game Controls</div>
-        {!hasUnlockActions ? (
-          <div style={{ color: '#555577', fontSize: 13 }}>No game unlock actions available.</div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {[game2, game3].filter(g => g?.status === 'pending').map(game => (
-              <div key={game.id}>
-                <div style={{ color: '#8888aa', fontSize: 11, textTransform: 'uppercase',
-                  letterSpacing: 1, marginBottom: 8 }}>Game {game.game_number}</div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <button onClick={() => setModal({ action: 'force_unlock_game', value: game.game_number })}
-                    style={btnStyle}>
-                    All Lanes
-                  </button>
-                  {lanePairs.map(lp => (
-                    <button key={lp}
-                      onClick={() => setModal({ action: 'force_unlock_lane_pair', gameNumber: game.game_number, lanePair: lp })}
-                      style={btnStyle}>
-                      Lane {lp}
-                    </button>
+        return (
+          <div key={game.id} style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+            borderRadius: 8, overflow: 'hidden', marginBottom: 16 }}>
+            <div style={{ padding: '12px 16px', borderBottom: `1px solid ${BORDER}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700 }}>
+                Player overrides — Game {game.game_number}
+              </div>
+              <div style={{ color: statusColor, fontSize: 11, fontWeight: 700 }}>{statusLabel}</div>
+            </div>
+
+            {game.status === 'pending' && (
+              <div style={{ padding: 16 }}>
+                <button onClick={() => setModal({ action: 'force_unlock_game', value: game.game_number })}
+                  style={{ ...actionBtn, padding: '8px 14px', fontSize: 12 }}>
+                  Force unlock — All Lanes
+                </button>
+              </div>
+            )}
+
+            {game.status === 'open' && board && (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: colsOpen,
+                  background: '#1a1a2e', padding: '8px 16px', gap: 8 }}>
+                  {['Player', 'Lane', 'Status', 'Actions'].map(h => (
+                    <div key={h} style={{ color: '#555577', fontSize: 10,
+                      textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
                   ))}
                 </div>
-              </div>
-            ))}
+                {board.entries.map(entry => (
+                  <div key={entry.id} style={{
+                    display: 'grid', gridTemplateColumns: colsOpen,
+                    padding: '10px 16px', gap: 8,
+                    borderTop: `1px solid ${BORDER}`, alignItems: 'center',
+                  }}>
+                    <div style={{ color: '#ffffff', fontSize: 13, fontWeight: 600 }}>
+                      {entry.normalized_name}
+                    </div>
+                    <div style={{ color: '#8888aa', fontSize: 13 }}>{entry.lane}</div>
+                    <StatusPill status={entry.status || 'waiting'} />
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      {(entry.status === 'drawing' || entry.status === 'waiting') && (
+                        <>
+                          <button onClick={() => setModal({ action: 'force_submit', player: entry, gameId: game.id })}
+                            style={actionBtn}>Force Submit</button>
+                          <button onClick={() => setModal({ action: 'force_forfeit', player: entry, gameId: game.id })}
+                            style={dangerBtn}>Force Forfeit</button>
+                        </>
+                      )}
+                      {entry.status === 'submitted' && (
+                        <button onClick={() => setModal({ action: 'undo_submit', player: entry, gameId: game.id })}
+                          style={actionBtn}>Undo Submit</button>
+                      )}
+                      {entry.status === 'forfeited' && (
+                        <>
+                          <button onClick={() => setModal({ action: 'undo_forfeit', player: entry, gameId: game.id })}
+                            style={actionBtn}>Undo Forfeit</button>
+                          <button onClick={() => setModal({ action: 'force_submit', player: entry, gameId: game.id })}
+                            style={actionBtn}>Force Submit</button>
+                        </>
+                      )}
+                      <button onClick={() => {
+                        setScoreStrikes(entry.strikes || 0);
+                        setScoreSpares(entry.spares || 0);
+                        setModal({ action: 'correct_score', player: entry, gameId: game.id, frame: entry.current_frame || 0 });
+                      }} style={actionBtn}>Correct Score</button>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {game.status === 'closed' && board && (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: colsClosed,
+                  background: '#1a1a2e', padding: '8px 16px', gap: 8 }}>
+                  {['Player', 'Lane', 'Hand', 'Status'].map(h => (
+                    <div key={h} style={{ color: '#555577', fontSize: 10,
+                      textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
+                  ))}
+                </div>
+                {board.entries.map(entry => (
+                  <div key={entry.id} style={{
+                    display: 'grid', gridTemplateColumns: colsClosed,
+                    padding: '10px 16px', gap: 8,
+                    borderTop: `1px solid ${BORDER}`, alignItems: 'center', opacity: 0.85,
+                  }}>
+                    <div style={{ color: '#ffffff', fontSize: 13, fontWeight: 600 }}>
+                      {entry.normalized_name}
+                    </div>
+                    <div style={{ color: '#8888aa', fontSize: 13 }}>{entry.lane}</div>
+                    <div style={{ color: ACCENT, fontSize: 13 }}>
+                      {entry.isForfeited ? 'Forfeited' : entry.hand?.name || '—'}
+                    </div>
+                    <StatusPill status={entry.status || 'waiting'} />
+                  </div>
+                ))}
+              </>
+            )}
           </div>
-        )}
-      </div>
+        );
+      })}
 
       {/* Audit trail */}
       <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 8, padding: 16 }}>
@@ -302,42 +334,59 @@ export default function OverridesPage() {
           onCancel={() => setModal(null)}
         />
       )}
-      {modal?.action === 'adjust_draw_count' && (
-        <ConfirmModal
-          title={`Adjust draw count for ${modal.player.normalized_name}?`}
-          message="Set the number of cards drawn."
-          confirmLabel="Apply"
-          onConfirm={() => executeAction('adjust_draw_count', modal.player.id, modal.gameId, adjustValue)}
-          onCancel={() => setModal(null)}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '12px 0' }}>
-            <button onClick={() => setAdjustValue(v => Math.max(0, v - 1))}
-              style={{ width: 32, height: 32, background: '#2a2a45', border: `1px solid ${BORDER}`,
-                borderRadius: 6, color: '#ffffff', fontSize: 18 }}>−</button>
-            <span style={{ color: '#ffffff', fontSize: 20, fontWeight: 700, minWidth: 32, textAlign: 'center' }}>
-              {adjustValue}
-            </span>
-            <button onClick={() => setAdjustValue(v => v + 1)}
-              style={{ width: 32, height: 32, background: '#2a2a45', border: `1px solid ${BORDER}`,
-                borderRadius: 6, color: '#ffffff', fontSize: 18 }}>+</button>
-          </div>
-        </ConfirmModal>
-      )}
+      {modal?.action === 'correct_score' && (() => {
+        const error = validateScore(modal.frame, scoreStrikes, scoreSpares);
+        const cardsEarned = scoreStrikes * 2 + scoreSpares;
+        return (
+          <ConfirmModal
+            title={`Correct score — ${modal.player.normalized_name}`}
+            message={`Frame ${modal.frame} (read-only). Adjust strikes/spares to correct their card allowance.`}
+            confirmLabel="Apply"
+            disabled={!!error}
+            onConfirm={() => executeAction('correct_score', modal.player.id, modal.gameId, { strikes: scoreStrikes, spares: scoreSpares })}
+            onCancel={() => setModal(null)}
+          >
+            <div style={{ display: 'flex', gap: 20, margin: '12px 0', justifyContent: 'center' }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ color: '#666688', fontSize: 11, marginBottom: 4 }}>Strikes</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <button onClick={() => setScoreStrikes(v => Math.max(0, v - 1))}
+                    style={{ width: 28, height: 28, background: '#1a1a2e', border: `1px solid ${BORDER}`,
+                      borderRadius: 6, color: '#ffffff', fontSize: 16 }}>−</button>
+                  <span style={{ color: '#ffffff', fontSize: 18, fontWeight: 700, minWidth: 24, textAlign: 'center' }}>{scoreStrikes}</span>
+                  <button onClick={() => setScoreStrikes(v => v + 1)}
+                    style={{ width: 28, height: 28, background: '#1a1a2e', border: `1px solid ${BORDER}`,
+                      borderRadius: 6, color: '#ffffff', fontSize: 16 }}>+</button>
+                </div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ color: '#666688', fontSize: 11, marginBottom: 4 }}>Spares</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <button onClick={() => setScoreSpares(v => Math.max(0, v - 1))}
+                    style={{ width: 28, height: 28, background: '#1a1a2e', border: `1px solid ${BORDER}`,
+                      borderRadius: 6, color: '#ffffff', fontSize: 16 }}>−</button>
+                  <span style={{ color: '#ffffff', fontSize: 18, fontWeight: 700, minWidth: 24, textAlign: 'center' }}>{scoreSpares}</span>
+                  <button onClick={() => setScoreSpares(v => v + 1)}
+                    style={{ width: 28, height: 28, background: '#1a1a2e', border: `1px solid ${BORDER}`,
+                      borderRadius: 6, color: '#ffffff', fontSize: 16 }}>+</button>
+                </div>
+              </div>
+            </div>
+            <div style={{ textAlign: 'center', color: ACCENT, fontSize: 13, fontWeight: 600, marginBottom: error ? 8 : 0 }}>
+              Cards earned: {cardsEarned}
+            </div>
+            {error && (
+              <div style={{ color: '#ff6666', fontSize: 12, textAlign: 'center' }}>{error}</div>
+            )}
+          </ConfirmModal>
+        );
+      })()}
       {modal?.action === 'force_unlock_game' && (
         <ConfirmModal
           title={`Force unlock Game ${modal.value} — All Lanes?`}
           message={`This will open Game ${modal.value} for all lane pairs immediately.`}
           confirmLabel={`Unlock Game ${modal.value}`}
           onConfirm={() => executeAction('force_unlock_game', null, null, modal.value)}
-          onCancel={() => setModal(null)}
-        />
-      )}
-      {modal?.action === 'force_unlock_lane_pair' && (
-        <ConfirmModal
-          title={`Force unlock Game ${modal.gameNumber} — Lane ${modal.lanePair}?`}
-          message={`This will open Game ${modal.gameNumber} for Lane Pair ${modal.lanePair} only.`}
-          confirmLabel={`Unlock Lane ${modal.lanePair}`}
-          onConfirm={() => executeAction('force_unlock_lane_pair', null, null, null, { gameNumber: modal.gameNumber, lanePair: modal.lanePair })}
           onCancel={() => setModal(null)}
         />
       )}
