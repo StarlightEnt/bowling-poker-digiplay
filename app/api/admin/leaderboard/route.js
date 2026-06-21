@@ -27,7 +27,8 @@ export async function GET(request) {
   const players = await sql`
     SELECT
       p.id, p.normalized_name, p.lane, p.lane_pair, p.checked_in,
-      pgs.status, pgs.cards_earned, pgs.cards_drawn,
+      pgs.status, pgs.current_frame, pgs.strikes, pgs.spares,
+      pgs.cards_earned, pgs.cards_drawn,
       pgs.best_hand_name, pgs.best_hand_score,
       pgs.submitted_at, pgs.forfeited_at
     FROM players p
