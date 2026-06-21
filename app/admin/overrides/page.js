@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import StatusPill from '../../../components/StatusPill.js';
 
 const ACCENT = '#e8ff47';
-const SURFACE = '#16213e';
-const BORDER = '#2a2a5a';
+const SURFACE = '#2a2a45';
+const BORDER = '#5555aa';
 
 function ConfirmModal({ title, message, confirmLabel, dangerous, onConfirm, onCancel, children }) {
   return (
@@ -144,7 +144,7 @@ export default function OverridesPage() {
           <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700 }}>Player Overrides</div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 100px 1fr',
-          background: '#0f1a2e', padding: '8px 16px', gap: 8 }}>
+          background: '#1a1a2e', padding: '8px 16px', gap: 8 }}>
           {['Player', 'Lane', 'Status', 'Actions'].map(h => (
             <div key={h} style={{ color: '#555577', fontSize: 10,
               textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
