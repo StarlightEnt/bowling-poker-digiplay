@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 
 const ACCENT = '#e8ff47';
-const SURFACE = '#16213e';
-const BORDER = '#2a2a5a';
+const SURFACE = '#2a2a45';
+const BORDER = '#5555aa';
 
 export default function CardShoePage() {
   const [dashData, setDashData] = useState(null);
@@ -35,7 +35,7 @@ export default function CardShoePage() {
 
   function shoeColor(remaining, total) {
     const pct = remaining / total;
-    if (pct > 0.4) return '#3dffa0';
+    if (pct > 0.4) return '#e8ff47';
     if (pct > 0.15) return '#ffaa44';
     return '#ff6666';
   }
@@ -136,7 +136,7 @@ export default function CardShoePage() {
           </div>
 
           {/* Progress bar */}
-          <div style={{ background: '#0f1a2e', borderRadius: 6, height: 8,
+          <div style={{ background: '#1a1a2e', borderRadius: 6, height: 8,
             overflow: 'hidden', marginBottom: 20 }}>
             <div style={{
               width: `${(activeShoe.cards_remaining / activeShoe.total_cards) * 100}%`,
@@ -158,7 +158,7 @@ export default function CardShoePage() {
 
             {/* Header row */}
             <div style={{ display: 'grid', gridTemplateColumns: '36px 1fr 80px 60px',
-              background: '#0f1a2e', padding: '8px 16px', gap: 8 }}>
+              background: '#1a1a2e', padding: '8px 16px', gap: 8 }}>
               {['#', 'Source', 'Available', 'Include'].map(h => (
                 <div key={h} style={{ color: '#555577', fontSize: 10,
                   textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
