@@ -247,6 +247,13 @@ async function migrate() {
   await sql`CREATE INDEX IF NOT EXISTS idx_overrides_session ON overrides(game_session_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_admins_league ON admins(league_id)`;
 
+  // Add early_access to player_game_state (lane-pair early unlock feature)
+  await sql`
+    ALTER TABLE player_game_state
+    ADD COLUMN IF NOT EXISTS early_access BOOLEAN NOT NULL DEFAULT false
+  `;
+  console.log('  early_access column added to player_game_state');
+
   console.log('✅ Schema migration complete.');
   console.log('Tables created:');
   console.log('  nextauth_users, nextauth_accounts, nextauth_sessions, nextauth_verification_tokens');

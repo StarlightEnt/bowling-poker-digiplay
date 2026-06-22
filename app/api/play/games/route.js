@@ -19,7 +19,8 @@ export async function GET(request) {
   if (playerId) {
     playerStates = await sql`
       SELECT game_id, status, cards_earned, cards_drawn, cards_dead,
-             current_frame, strikes, spares, best_hand_name, best_hand_score
+             current_frame, strikes, spares, best_hand_name, best_hand_score,
+             early_access
       FROM player_game_state
       WHERE player_id = ${playerId} AND game_id = ANY(${games.map(g => g.id)})
     `;

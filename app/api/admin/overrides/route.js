@@ -223,14 +223,25 @@ export async function POST(request) {
 
   // force_unlock_lane_pair
   else if (action === 'force_unlock_lane_pair') {
+    if (!lanePair) return Response.json({ error: 'lanePair required' }, { status: 400 });
     const [targetGame] = await sql`
       SELECT id FROM games WHERE game_session_id = ${sessionId}
       AND game_number = ${bodyGameNumber} AND league_id = ${leagueId} LIMIT 1
     `;
     if (!targetGame) return Response.json({ error: 'Game not found' }, { status: 404 });
-    await sql`UPDATE games SET status = 'open', opened_at = NOW() WHERE id = ${targetGame.id}`;
-    details = { gameNumber: bodyGameNumber, lanePair };
-    result = { success: true };
+    const updated = await sql`
+      UPDATE player_game_state SET early_access = true
+      WHERE game_id = ${targetGame.id}
+        AND player_id IN (
+          SELECT id FROM players
+          WHERE game_session_id = ${sessionId}
+            AND lane_pair = ${lanePair}
+            AND league_id = ${leagueId}
+        )
+      RETURNING player_id
+    `;
+    details = { gameNumber: bodyGameNumber, lanePair, playersUnlocked: updated.length };
+    result = { success: true, playersUnlocked: updated.length };
   }
 
   else {

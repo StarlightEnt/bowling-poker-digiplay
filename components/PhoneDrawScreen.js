@@ -65,7 +65,7 @@ export default function PhoneDrawScreen({ player, session }) {
         const idx = data.games.findIndex(g => g.id === data.activeGameId);
         if (idx >= 0) { targetIdx = idx; setActiveGameIndex(idx); }
       } else {
-        const openIdx = data.games.findIndex(g => g.status === 'open');
+        const openIdx = data.games.findIndex(g => g.status === 'open' || g.playerState?.early_access === true);
         if (openIdx >= 0) { targetIdx = openIdx; setActiveGameIndex(openIdx); }
       }
       const activeGame = data.games[targetIdx] || data.games[0];
@@ -213,7 +213,7 @@ export default function PhoneDrawScreen({ player, session }) {
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           {games.map((g, i) => {
-            const isOpen = g.status === 'open';
+            const isOpen = g.status === 'open' || g.playerState?.early_access === true;
             const isActive = i === activeGameIndex;
             return (
               <button

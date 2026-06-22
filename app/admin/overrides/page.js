@@ -131,6 +131,10 @@ export default function OverridesPage() {
 
   const { games, session } = dashData;
 
+  const lanePairs = [...new Set(
+    (dashData?.players || []).map(p => p.lane_pair).filter(Boolean)
+  )].sort();
+
   function formatTime(ts) {
     if (!ts) return '';
     return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
@@ -179,11 +183,18 @@ export default function OverridesPage() {
             </div>
 
             {game.status === 'pending' && (
-              <div style={{ padding: 16 }}>
+              <div style={{ padding: 16, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <button onClick={() => setModal({ action: 'force_unlock_game', value: game.game_number })}
                   style={{ ...actionBtn, padding: '8px 14px', fontSize: 12 }}>
                   Force unlock — All Lanes
                 </button>
+                {lanePairs.map(lp => (
+                  <button key={lp}
+                    onClick={() => setModal({ action: 'force_unlock_lane_pair', gameNumber: game.game_number, lanePair: lp })}
+                    style={{ ...actionBtn, padding: '8px 14px', fontSize: 12 }}>
+                    Lane {lp}
+                  </button>
+                ))}
               </div>
             )}
 
@@ -387,6 +398,18 @@ export default function OverridesPage() {
           message={`This will open Game ${modal.value} for all lane pairs immediately.`}
           confirmLabel={`Unlock Game ${modal.value}`}
           onConfirm={() => executeAction('force_unlock_game', null, null, modal.value)}
+          onCancel={() => setModal(null)}
+        />
+      )}
+      {modal?.action === 'force_unlock_lane_pair' && (
+        <ConfirmModal
+          title={`Force unlock Lane ${modal.lanePair} — Game ${modal.gameNumber}?`}
+          message={`Players on lanes ${modal.lanePair} will get early access to Game ${modal.gameNumber} immediately. Other players stay locked until the game opens normally.`}
+          confirmLabel={`Unlock Lane ${modal.lanePair}`}
+          onConfirm={() => executeAction('force_unlock_lane_pair', null, null, null, {
+            gameNumber: modal.gameNumber,
+            lanePair: modal.lanePair,
+          })}
           onCancel={() => setModal(null)}
         />
       )}
