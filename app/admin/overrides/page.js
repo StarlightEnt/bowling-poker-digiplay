@@ -151,6 +151,7 @@ export default function OverridesPage() {
       case 'adjust_draw_count': return `Adjusted draw count to ${details.newCount} — ${details.playerName}`;
       case 'force_unlock_game': return `Force unlocked Game ${details.gameNumber} — All Lanes`;
       case 'confirm_winner': return `Confirmed winner — ${details.winners?.join(', ')} · ${details.handName}`;
+      case 'undo_confirm_winner': return `Undo confirmed winner — Game ${details.gameNumber} · was: ${details.undoneWinners?.join(', ')}${details.wasRoyalFlush ? ' (Royal Flush)' : ''}`;
       default: return ov.action;
     }
   }
@@ -179,7 +180,18 @@ export default function OverridesPage() {
               <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700 }}>
                 Player overrides — Game {game.game_number}
               </div>
-              <div style={{ color: statusColor, fontSize: 11, fontWeight: 700 }}>{statusLabel}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                {game.status === 'closed' && (
+                  <button
+                    onClick={() => setModal({ action: 'undo_confirm_winner', game })}
+                    style={{ background: 'transparent', color: '#ffaa44',
+                      border: '1px solid #ffaa44', borderRadius: 4,
+                      padding: '3px 10px', fontSize: 11, cursor: 'pointer' }}>
+                    Undo Confirmation
+                  </button>
+                )}
+                <div style={{ color: statusColor, fontSize: 11, fontWeight: 700 }}>{statusLabel}</div>
+              </div>
             </div>
 
             {game.status === 'pending' && (
@@ -410,6 +422,16 @@ export default function OverridesPage() {
             gameNumber: modal.gameNumber,
             lanePair: modal.lanePair,
           })}
+          onCancel={() => setModal(null)}
+        />
+      )}
+      {modal?.action === 'undo_confirm_winner' && (
+        <ConfirmModal
+          title={`Undo confirmed winner — Game ${modal.game?.game_number}?`}
+          message={`This will reopen Game ${modal.game?.game_number} so a new winner can be selected in Game Advancement. Important: the winner announcement already pushed to player screens cannot be recalled — players may have already seen it.`}
+          confirmLabel="Undo & Reopen Game"
+          dangerous
+          onConfirm={() => executeAction('undo_confirm_winner', null, modal.game?.id, null)}
           onCancel={() => setModal(null)}
         />
       )}

@@ -244,6 +244,70 @@ export async function POST(request) {
     result = { success: true, playersUnlocked: updated.length };
   }
 
+  // undo_confirm_winner
+  else if (action === 'undo_confirm_winner') {
+    const targetGameId = parseInt(gameId);
+    if (!targetGameId) return Response.json({ error: 'gameId required' }, { status: 400 });
+
+    const [targetGame] = await sql`
+      SELECT id, game_number, game_session_id, status, progressive_add
+      FROM games
+      WHERE id = ${targetGameId} AND league_id = ${leagueId} LIMIT 1
+    `;
+    if (!targetGame) return Response.json({ error: 'Game not found' }, { status: 404 });
+    if (targetGame.status !== 'closed') {
+      return Response.json({ error: 'Game is not closed — nothing to undo' }, { status: 400 });
+    }
+
+    const results = await sql`
+      SELECT winner_name, royal_flush, progressive_won
+      FROM game_results
+      WHERE game_id = ${targetGameId}
+    `;
+    if (results.length === 0) {
+      return Response.json({ error: 'No confirmed winner found for this game' }, { status: 404 });
+    }
+
+    const isRoyalFlush = results.some(r => r.royal_flush);
+    const progressiveWon = isRoyalFlush
+      ? parseFloat(results.find(r => r.progressive_won != null)?.progressive_won || 0)
+      : null;
+    const progressiveAdd = parseFloat(targetGame.progressive_add || 0);
+
+    await sql`DELETE FROM game_results WHERE game_id = ${targetGameId}`;
+
+    await sql`
+      UPDATE games SET
+        status = 'open',
+        closed_at = NULL,
+        payout_amount = NULL,
+        charity_amount = NULL,
+        progressive_add = NULL
+      WHERE id = ${targetGameId}
+    `;
+
+    if (isRoyalFlush && progressiveWon != null) {
+      await sql`
+        UPDATE game_sessions SET progressive_pot = ${progressiveWon}
+        WHERE id = ${targetGame.game_session_id}
+      `;
+    } else if (progressiveAdd > 0) {
+      await sql`
+        UPDATE game_sessions SET progressive_pot = GREATEST(0, progressive_pot - ${progressiveAdd})
+        WHERE id = ${targetGame.game_session_id}
+      `;
+    }
+
+    const winnerNames = results.map(r => r.winner_name);
+    details = {
+      gameNumber: targetGame.game_number,
+      undoneWinners: winnerNames,
+      wasRoyalFlush: isRoyalFlush,
+      progressiveRestored: isRoyalFlush ? progressiveWon : null,
+    };
+    result = { success: true, gameNumber: targetGame.game_number };
+  }
+
   else {
     return Response.json({ error: 'Unknown action' }, { status: 400 });
   }
