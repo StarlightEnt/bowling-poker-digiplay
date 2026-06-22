@@ -14,6 +14,7 @@ export default function GameAdvancement() {
   const [confirming, setConfirming] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [confirmResult, setConfirmResult] = useState(null);
+  const [confirmError, setConfirmError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [changingWinner, setChangingWinner] = useState(false);
   const [changeSearch, setChangeSearch] = useState('');
@@ -52,6 +53,7 @@ export default function GameAdvancement() {
       : leaderboard.tiedPlayers.map(p => p.id);
 
     try {
+      setConfirmError(null);
       const res = await fetch('/api/admin/confirm-winner', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -68,7 +70,20 @@ export default function GameAdvancement() {
         setConfirmed(true);
         setConfirmResult(data);
         await fetchDash();
+      } else {
+        const msg = data.error || '';
+        if (msg === 'Winner already confirmed' || msg === 'Game already closed') {
+          setConfirmError('This game was already confirmed. Refresh the page to see the current state.');
+        } else if (msg === 'gameId and winnerPlayerIds required') {
+          setConfirmError('No valid winner found — player scores may be missing. Go to Overrides → Correct Score to fix the affected player, then try again.');
+        } else if (msg === 'Game not found') {
+          setConfirmError('Game not found. Try refreshing the page.');
+        } else {
+          setConfirmError(`Something went wrong: ${msg || 'unknown error'}. Try again, or refresh the page if the problem persists.`);
+        }
       }
+    } catch (err) {
+      setConfirmError('Network error — check your connection and try again.');
     } finally {
       setConfirming(false);
     }
@@ -103,7 +118,7 @@ export default function GameAdvancement() {
       <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
         {games.map(g => (
           <button key={g.id}
-            onClick={() => { setSelectedGameId(g.id); setConfirmed(false); setConfirmResult(null); }}
+            onClick={() => { setSelectedGameId(g.id); setConfirmed(false); setConfirmResult(null); setConfirmError(null); }}
             style={{
               background: selectedGameId === g.id ? ACCENT : SURFACE,
               color: selectedGameId === g.id ? '#1a1a2e' : g.status === 'open' ? '#ffffff' : '#555577',
@@ -294,6 +309,18 @@ export default function GameAdvancement() {
                 </div>
               )}
 
+              {/* Confirm error — shown when API call fails */}
+              {confirmError && (
+                <div style={{
+                  marginTop: 10, padding: '10px 14px',
+                  background: 'rgba(255,68,68,0.12)',
+                  border: '1px solid #ff4444',
+                  borderRadius: 6, color: '#ff6666',
+                  fontSize: 13, lineHeight: 1.5,
+                }}>
+                  ⚠️ {confirmError}
+                </div>
+              )}
               {/* Confirm helper text — always visible until confirmed */}
               <div style={{ marginTop: 12, fontSize: 13, color: '#8888aa', fontWeight: 500 }}>
                 Confirming will push the winner announcement to all active player screens simultaneously.
