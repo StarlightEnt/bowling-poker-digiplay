@@ -3,8 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import { calculatePayouts, generatePin } from '../../../lib/finance.js';
 
 const card = {
-  background: '#16213e',
-  border: '1px solid #2a2a5a',
+  background: '#2a2a45',
+  border: '1px solid #5555aa',
   borderRadius: '8px',
   padding: '24px',
   marginBottom: '16px',
@@ -20,8 +20,8 @@ const label = {
 };
 
 const input = {
-  background: '#0f3460',
-  border: '1px solid #2a2a5a',
+  background: '#2a2a45',
+  border: '1px solid #5555aa',
   borderRadius: '6px',
   color: '#ffffff',
   padding: '9px 12px',
@@ -44,7 +44,7 @@ const btnPrimary = {
 const btnSecondary = {
   background: 'transparent',
   color: '#8888aa',
-  border: '1px solid #2a2a5a',
+  border: '1px solid #5555aa',
   borderRadius: '6px',
   padding: '9px 16px',
   fontSize: '13px',
@@ -87,6 +87,7 @@ export default function SessionSetupPage() {
       setProgressiveNightly(String(data.session.progressive_nightly || '3.00'));
       setCheckedInCount(data.checkedInCount || 0);
       setProgressivePot(data.session.progressive_pot || 0);
+      if (data.deckCount) setDeckCount(data.deckCount);
       if (data.session.id) fetchPlayers(data.session.id);
     }
     setLoading(false);
@@ -202,7 +203,7 @@ export default function SessionSetupPage() {
     <div style={{ padding: '32px', maxWidth: '800px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
         <div>
-          <h1 style={{ color: '#e8ff47', fontSize: '28px' }}>Session Setup</h1>
+          <h1 style={{ color: '#e8ff47', fontSize: 26 }}>Session Setup</h1>
           {isLocked && (
             <span style={{ background: '#e8ff47', color: '#1a1a2e', fontSize: '11px',
               fontWeight: 700, padding: '2px 8px', borderRadius: '4px', marginTop: '4px', display: 'inline-block' }}>
@@ -282,18 +283,18 @@ export default function SessionSetupPage() {
           </div>
           <div>
             <label style={label}>Current Progressive Pot</label>
-            <div style={{ ...input, background: '#0a1a30', color: '#8888aa', cursor: 'default' }}>
+            <div style={{ ...input, background: '#1a1a2e', color: '#8888aa', cursor: 'default' }}>
               ${parseFloat(progressivePot || 0).toFixed(2)}
             </div>
           </div>
           <div>
             <label style={label}>Players Checked In</label>
-            <div style={{ ...input, background: '#0a1a30', color: '#8888aa', cursor: 'default' }}>
+            <div style={{ ...input, background: '#1a1a2e', color: '#8888aa', cursor: 'default' }}>
               {checkedInCount}
             </div>
           </div>
         </div>
-        <div style={{ background: '#0f3460', borderRadius: '6px', padding: '16px',
+        <div style={{ background: '#2a2a45', borderRadius: '6px', padding: '16px',
           display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
           {[
             { label: 'Total Pool', value: `$${payouts.pool.toFixed(2)}` },
@@ -331,14 +332,14 @@ export default function SessionSetupPage() {
               onChange={handleCsvUpload} />
           </div>
           {importStatus && (
-            <p style={{ color: '#3dffa0', fontSize: '13px', marginBottom: '12px' }}>{importStatus}</p>
+            <p style={{ color: '#e8ff47', fontSize: '13px', marginBottom: '12px' }}>{importStatus}</p>
           )}
           {players.length > 0 && (
             <div style={{ maxHeight: '240px', overflowY: 'auto',
-              border: '1px solid #2a2a5a', borderRadius: '6px' }}>
+              border: '1px solid #5555aa', borderRadius: '6px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                 <thead>
-                  <tr style={{ background: '#0f3460' }}>
+                  <tr style={{ background: '#2a2a45' }}>
                     <th style={{ padding: '8px 12px', textAlign: 'left', color: '#8888aa',
                       fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Player</th>
                     <th style={{ padding: '8px 12px', textAlign: 'left', color: '#8888aa',
@@ -349,7 +350,7 @@ export default function SessionSetupPage() {
                 </thead>
                 <tbody>
                   {players.map((p, i) => (
-                    <tr key={p.id} style={{ borderTop: '1px solid #2a2a5a',
+                    <tr key={p.id} style={{ borderTop: '1px solid #5555aa',
                       background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)' }}>
                       <td style={{ padding: '8px 12px', color: '#ffffff' }}>{p.normalized_name}</td>
                       <td style={{ padding: '8px 12px', color: '#8888aa' }}>{p.lane}</td>
@@ -368,7 +369,7 @@ export default function SessionSetupPage() {
         </div>
       )}
 
-      {currentSession && !isLocked && (() => {
+      {currentSession && (() => {
         const recommended = players.length >= 29 ? 10 : players.length >= 21 ? 8 : 6;
         return (
           <div style={card}>
@@ -382,13 +383,16 @@ export default function SessionSetupPage() {
                 { decks: 8, cards: 416, range: '21–28 players' },
                 { decks: 10, cards: 520, range: '29+ players' },
               ].map(({ decks, cards, range }) => (
-                <button key={decks} onClick={() => setDeckCount(decks)}
+                <button key={decks}
+                  onClick={isLocked ? undefined : () => setDeckCount(decks)}
                   style={{
-                    flex: 1, padding: '12px', borderRadius: '8px', cursor: 'pointer',
-                    background: deckCount === decks ? '#e8ff47' : '#0f1a2e',
+                    flex: 1, padding: '12px', borderRadius: '8px',
+                    cursor: isLocked ? 'default' : 'pointer',
+                    background: deckCount === decks ? '#e8ff47' : '#1a1a2e',
                     color: deckCount === decks ? '#1a1a2e' : '#ffffff',
-                    border: `1px solid ${decks === recommended ? '#e8ff47' : '#2a2a5a'}`,
+                    border: `1px solid ${decks === recommended ? '#e8ff47' : '#5555aa'}`,
                     textAlign: 'center',
+                    opacity: isLocked && deckCount !== decks ? 0.4 : 1,
                   }}>
                   <div style={{ fontSize: '18px', fontWeight: 700 }}>{decks} Deck</div>
                   <div style={{ fontSize: '11px', marginTop: '4px' }}>{cards} cards</div>
@@ -413,7 +417,7 @@ export default function SessionSetupPage() {
             Locking the session activates the PIN, initializes card shoes, and opens the player list on the kiosk.
             No changes can be made after locking.
           </p>
-          <p style={{ color: players.length === 0 ? '#ffaa44' : '#3dffa0', fontSize: '13px' }}>
+          <p style={{ color: players.length === 0 ? '#ffaa44' : '#e8ff47', fontSize: '13px' }}>
             {players.length === 0
               ? '⚠️ Import players before locking.'
               : `✅ ${players.length} players ready to lock.`}
@@ -428,8 +432,8 @@ export default function SessionSetupPage() {
       )}
 
       {isLocked && (
-        <div style={{ ...card, border: '1px solid #3dffa0' }}>
-          <h2 style={{ color: '#3dffa0', fontSize: '16px', marginBottom: '8px' }}>✅ Session Locked</h2>
+        <div style={{ ...card, border: '1px solid #e8ff47' }}>
+          <h2 style={{ color: '#e8ff47', fontSize: '16px', marginBottom: '8px' }}>✅ Session Locked</h2>
           <p style={{ color: '#8888aa', fontSize: '13px' }}>
             PIN is active. Card shoes initialized. Players can now enter on their phones or the kiosk.
           </p>

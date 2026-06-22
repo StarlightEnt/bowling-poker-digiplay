@@ -38,9 +38,21 @@ export async function GET() {
     WHERE game_session_id = ${sessions[0].id} AND checked_in = true
   ` : [{ count: 0 }];
 
+  let deckCount = 6;
+  if (sessions[0]?.id) {
+    const shoeRows = await sql`
+      SELECT s.deck_count FROM shoes s
+      JOIN games g ON g.id = s.game_id
+      WHERE g.game_session_id = ${sessions[0].id}
+      LIMIT 1
+    `;
+    if (shoeRows.length > 0) deckCount = shoeRows[0].deck_count;
+  }
+
   return Response.json({
     session: sessions[0] || null,
     checkedInCount: parseInt(playerCount[0].count),
+    deckCount,
   });
 }
 
