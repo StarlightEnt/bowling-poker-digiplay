@@ -62,6 +62,10 @@ export default function SessionSetupPage() {
 
   const [deckCount, setDeckCount] = useState(6);
   const [progressivePot, setProgressivePot] = useState(0);
+  const [managerConnected, setManagerConnected] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState(null);
+  const [syncMessage, setSyncMessage] = useState('');
   const [pin, setPin] = useState('');
   const [seasonName, setSeasonName] = useState('Summer 2026');
   const [weekNumber, setWeekNumber] = useState('');
@@ -88,6 +92,7 @@ export default function SessionSetupPage() {
       setCheckedInCount(data.checkedInCount || 0);
       setProgressivePot(data.session.progressive_pot || 0);
       if (data.deckCount) setDeckCount(data.deckCount);
+      setManagerConnected(data.managerConnected || false);
       if (data.session.id) fetchPlayers(data.session.id);
     }
     setLoading(false);
@@ -189,6 +194,26 @@ export default function SessionSetupPage() {
     a.click();
   }
 
+  async function syncFromManager() {
+    setSyncing(true);
+    setSyncStatus(null);
+    try {
+      const res = await fetch('/api/admin/manager-sync');
+      const data = await res.json();
+      if (data.error) {
+        setSyncStatus('error');
+        setSyncMessage(data.message || 'Sync failed.');
+      } else {
+        setSyncStatus('success');
+        setSyncMessage(`Synced: ${data.playerCount} players · Week ${data.weekNumber}`);
+      }
+    } catch {
+      setSyncStatus('error');
+      setSyncMessage('Network error — check connection and try again.');
+    }
+    setSyncing(false);
+  }
+
   const payouts = calculatePayouts(
     checkedInCount || players.length || 0,
     parseFloat(buyinAmount) || 5,
@@ -221,6 +246,62 @@ export default function SessionSetupPage() {
           <button onClick={unlockSession} disabled={saving} style={btnSecondary}>
             Unlock (Destructive)
           </button>
+        )}
+      </div>
+
+      {/* Manager Sync card — always visible, state-dependent content */}
+      <div style={{
+        background: '#2a2a45',
+        border: `1px solid ${managerConnected ? '#7777cc' : '#5555aa'}`,
+        borderRadius: 8, padding: '16px 20px', marginBottom: 16,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <div>
+            <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 600 }}>
+              Bowling Poker Manager
+            </div>
+            <div style={{ color: managerConnected ? '#aaaacc' : '#666688', fontSize: 12, marginTop: 2 }}>
+              {managerConnected
+                ? "Connected — sync players and session details from this week's check-in"
+                : 'Not connected — configure in Settings → Manager Integration'}
+            </div>
+          </div>
+          <div style={{
+            fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 10,
+            background: managerConnected ? 'rgba(119,119,204,0.15)' : 'rgba(102,102,136,0.15)',
+            color: managerConnected ? '#7777cc' : '#666688',
+            border: `1px solid ${managerConnected ? '#7777cc' : '#5555aa'}`,
+          }}>
+            {managerConnected ? '● Connected' : '○ Not connected'}
+          </div>
+        </div>
+
+        {managerConnected && !isLocked && (
+          <>
+            <button
+              onClick={syncFromManager}
+              disabled={syncing}
+              style={{
+                background: syncing ? '#2a2a45' : '#e8ff47',
+                color: syncing ? '#aaaacc' : '#1a1a2e',
+                border: `1px solid ${syncing ? '#5555aa' : '#e8ff47'}`,
+                borderRadius: 6, padding: '8px 18px',
+                fontSize: 13, fontWeight: 700, cursor: syncing ? 'not-allowed' : 'pointer',
+                marginTop: 4,
+              }}>
+              {syncing ? 'Syncing...' : '⟳ Sync this week from Manager'}
+            </button>
+            {syncStatus && (
+              <div style={{
+                marginTop: 10, fontSize: 12, padding: '8px 12px', borderRadius: 6,
+                background: syncStatus === 'success' ? 'rgba(232,255,71,0.08)' : 'rgba(255,68,68,0.08)',
+                border: `1px solid ${syncStatus === 'success' ? '#e8ff47' : '#ff4444'}`,
+                color: syncStatus === 'success' ? '#e8ff47' : '#ff6666',
+              }}>
+                {syncMessage}
+              </div>
+            )}
+          </>
         )}
       </div>
 

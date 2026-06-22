@@ -49,10 +49,16 @@ export async function GET() {
     if (shoeRows.length > 0) deckCount = shoeRows[0].deck_count;
   }
 
+  const [leagueRow] = await sql`
+    SELECT manager_enabled, manager_api_key FROM leagues WHERE id = ${leagueId}
+  `;
+
   return Response.json({
     session: sessions[0] || null,
     checkedInCount: parseInt(playerCount[0].count),
     deckCount,
+    managerEnabled: leagueRow?.manager_enabled || false,
+    managerConnected: !!(leagueRow?.manager_enabled && leagueRow?.manager_api_key),
   });
 }
 
