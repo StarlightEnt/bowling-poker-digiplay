@@ -7,14 +7,15 @@ export default async function AdminLayout({ children }) {
   if (!session) redirect('/login');
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#1a1a2e' }}>
+    <div style={{ display: 'flex', height: '100vh', background: '#1a1a2e' }}>
       <AdminSidebar session={session} />
       <div style={{
         marginLeft: '190px',
         flex: 1,
+        height: '100vh',
+        overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100vh',
       }}>
         {children}
       </div>
