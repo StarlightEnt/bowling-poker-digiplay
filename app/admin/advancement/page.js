@@ -102,6 +102,7 @@ export default function GameAdvancement() {
 
   const { games, activeGame } = dashData;
   const selectedGame = games.find(g => g.id === selectedGameId) || activeGame;
+  const isClosed = selectedGame?.status === 'closed';
 
   const totalCount = leaderboard?.entries.length || 0;
   const submittedCount = leaderboard?.entries.filter(e => e.isSubmitted).length || 0;
@@ -237,17 +238,19 @@ export default function GameAdvancement() {
                   </div>
 
                   <button
-                    onClick={() => handleConfirmWinner()}
-                    disabled={confirming}
+                    onClick={() => { if (!isClosed) handleConfirmWinner(); }}
+                    disabled={confirming || isClosed}
                     style={{
-                      background: ACCENT, color: '#1a1a2e',
-                      border: 'none', borderRadius: 8,
+                      background: isClosed ? SURFACE : ACCENT,
+                      color: isClosed ? '#555577' : '#1a1a2e',
+                      border: isClosed ? `1px solid ${BORDER}` : 'none',
+                      borderRadius: 8,
                       padding: '0 28px', fontSize: 16, fontWeight: 700,
                       height: 68, minWidth: 190,
-                      opacity: confirming ? 0.7 : 1,
-                      cursor: confirming ? 'default' : 'pointer',
+                      opacity: (confirming && !isClosed) ? 0.7 : 1,
+                      cursor: (confirming || isClosed) ? 'default' : 'pointer',
                     }}>
-                    {confirming ? 'Confirming...' : 'Confirm & Announce →'}
+                    {isClosed ? '✓ Winner Announced' : confirming ? 'Confirming...' : 'Confirm & Announce →'}
                   </button>
                 </div>
               )}
