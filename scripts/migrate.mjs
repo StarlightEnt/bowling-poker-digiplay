@@ -254,6 +254,12 @@ async function migrate() {
   `;
   console.log('  early_access column added to player_game_state');
 
+  // Rename legacy 'superadmin' role to 'owner'
+  const updated = await sql`
+    UPDATE admins SET role = 'owner' WHERE role = 'superadmin'
+  `;
+  console.log(`  superadmin → owner migration: ${updated.count} row(s) updated`);
+
   console.log('✅ Schema migration complete.');
   console.log('Tables created:');
   console.log('  nextauth_users, nextauth_accounts, nextauth_sessions, nextauth_verification_tokens');

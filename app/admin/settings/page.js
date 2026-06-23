@@ -485,9 +485,31 @@ export default function SettingsPage() {
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {admin.email}
                     </div>
-                    <div style={{ color: admin.role === 'owner' ? ACCENT : '#8888aa',
-                      fontSize: 12, fontWeight: admin.role === 'owner' ? 700 : 400 }}>
-                      {admin.role}
+                    <div style={{
+                      display: 'inline-block',
+                      padding: '2px 8px',
+                      borderRadius: 10,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      background: admin.role === 'owner'
+                        ? 'rgba(232,255,71,0.12)'
+                        : admin.role === 'manager_admin'
+                        ? 'rgba(119,119,204,0.15)'
+                        : 'rgba(136,136,170,0.12)',
+                      color: admin.role === 'owner'
+                        ? '#e8ff47'
+                        : admin.role === 'manager_admin'
+                        ? '#7777cc'
+                        : '#8888aa',
+                      border: `1px solid ${
+                        admin.role === 'owner'
+                          ? 'rgba(232,255,71,0.3)'
+                          : admin.role === 'manager_admin'
+                          ? 'rgba(119,119,204,0.3)'
+                          : 'rgba(136,136,170,0.2)'
+                      }`,
+                    }}>
+                      {admin.role === 'manager_admin' ? 'manager' : admin.role}
                     </div>
                     <div>
                       {admin.role !== 'owner' && (
