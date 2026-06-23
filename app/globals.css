@@ -1,16 +1,41 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #1a1a2e;
-  --surface2:  #0f3460;
-  --accent:    #e8ff47;
-  --accent2:   #7777cc;
-  --text:      #ffffff;
-  --muted:     #8888aa;
-  --danger:    #ff6666;
-  --warning:   #ffaa44;
-  --success:   #3dffa0;
-  --sidebar-w: 240px;
+  /* ── Backgrounds ─────────────────────────────────────── */
+  --bg:              #1a1a2e;   /* page background */
+  --surface:         #2a2a45;   /* card / panel surface */
+  --surface-deep:    #1a1a2e;   /* read-only fields, inset areas */
+
+  /* ── Borders ─────────────────────────────────────────── */
+  --border:          #5555aa;   /* standard border */
+  --border-light:    #7777cc;   /* lighter border, hover states */
+  --border-dim:      #333355;   /* subtle dividers, sidebar */
+
+  /* ── Text ────────────────────────────────────────────── */
+  --text:            #ffffff;   /* primary text */
+  --text-muted:      #8888aa;   /* secondary / muted text */
+  --text-dim:        #666688;   /* tertiary / disabled text */
+
+  /* ── Accent ──────────────────────────────────────────── */
+  --accent:          #e8ff47;   /* primary accent yellow */
+  --accent-bg:       rgba(232,255,71,0.10);  /* accent tint background */
+  --accent2:         #7777cc;   /* purple accent (manager, tags) */
+  --accent2-bg:      rgba(119,119,204,0.15); /* purple tint background */
+
+  /* ── Semantic ────────────────────────────────────────── */
+  --success:         #e8ff47;   /* success = accent (not green) */
+  --warning:         #ffaa44;   /* warning amber */
+  --warning-bg:      #2a1a00;   /* warning tint background */
+  --danger:          #ff6666;   /* error / destructive */
+  --danger-bg:       rgba(255,68,68,0.10);   /* danger tint background */
+
+  /* ── Royal Flush special ─────────────────────────────── */
+  --rf-bg:           #1a1000;   /* RF overlay background */
+  --rf-gold:         #ffd700;   /* RF gold accent */
+  --rf-gold-muted:   #c9860a;   /* RF muted gold labels */
+
+  /* ── Layout ──────────────────────────────────────────── */
+  --sidebar-w:       240px;     /* admin sidebar width */
 }
 
 html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; }
