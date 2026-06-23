@@ -297,6 +297,47 @@ export default function SessionSetupPage() {
             )}
           </div>
 
+          {currentSession && (() => {
+            const recommended = players.length >= 29 ? 10 : players.length >= 21 ? 8 : 6;
+            return (
+              <div style={card}>
+                <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '8px' }}>Card Shoe Sizing</h2>
+                <p style={{ color: '#8888aa', fontSize: '12px', marginBottom: '16px' }}>
+                  Recommended based on {players.length} players imported.
+                </p>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {[
+                    { decks: 6, cards: 312, range: 'Up to 20 players' },
+                    { decks: 8, cards: 416, range: '21–28 players' },
+                    { decks: 10, cards: 520, range: '29+ players' },
+                  ].map(({ decks, cards, range }) => (
+                    <button key={decks}
+                      onClick={isLocked ? undefined : () => setDeckCount(decks)}
+                      style={{
+                        flex: 1, padding: '12px', borderRadius: '8px',
+                        cursor: isLocked ? 'default' : 'pointer',
+                        background: deckCount === decks ? '#e8ff47' : '#1a1a2e',
+                        color: deckCount === decks ? '#1a1a2e' : '#ffffff',
+                        border: `1px solid ${decks === recommended ? '#e8ff47' : '#5555aa'}`,
+                        textAlign: 'center',
+                        opacity: isLocked && deckCount !== decks ? 0.4 : 1,
+                      }}>
+                      <div style={{ fontSize: '18px', fontWeight: 700 }}>{decks} Deck</div>
+                      <div style={{ fontSize: '11px', marginTop: '4px' }}>{cards} cards</div>
+                      <div style={{ fontSize: '10px', marginTop: '2px', color: deckCount === decks ? '#555' : '#8888aa' }}>{range}</div>
+                      {decks === recommended && (
+                        <div style={{ fontSize: '9px', marginTop: '4px', fontWeight: 700,
+                          color: deckCount === decks ? '#555' : '#e8ff47', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                          Recommended
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
           {currentSession && (
             <div style={card}>
               <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '4px' }}>Player Import</h2>
@@ -348,36 +389,6 @@ export default function SessionSetupPage() {
                   No players imported yet.
                 </p>
               )}
-            </div>
-          )}
-
-          {currentSession && !isLocked && (
-            <div style={{ ...card, border: '1px solid #7777cc' }}>
-              <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '8px' }}>Ready to Lock?</h2>
-              <p style={{ color: '#8888aa', fontSize: '13px', marginBottom: '16px' }}>
-                Locking the session activates the PIN, initializes card shoes, and opens the player list on the kiosk.
-                No changes can be made after locking.
-              </p>
-              <p style={{ color: players.length === 0 ? '#ffaa44' : '#e8ff47', fontSize: '13px' }}>
-                {players.length === 0
-                  ? '⚠️ Import players before locking.'
-                  : `✅ ${players.length} players ready to lock.`}
-              </p>
-              <button
-                onClick={lockSession}
-                disabled={saving || players.length === 0}
-                style={{ ...btnPrimary, marginTop: '16px', opacity: players.length === 0 ? 0.5 : 1 }}>
-                🔒 Lock Session
-              </button>
-            </div>
-          )}
-
-          {isLocked && (
-            <div style={{ ...card, border: '1px solid #e8ff47' }}>
-              <h2 style={{ color: '#e8ff47', fontSize: '16px', marginBottom: '8px' }}>✅ Session Locked</h2>
-              <p style={{ color: '#8888aa', fontSize: '13px' }}>
-                PIN is active. Card shoes initialized. Players can now enter on their phones or the kiosk.
-              </p>
             </div>
           )}
 
@@ -472,9 +483,9 @@ export default function SessionSetupPage() {
               display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
               {[
                 { label: 'Total Pool', value: `$${payouts.pool.toFixed(2)}` },
-                { label: 'Per Game Payout', value: `$${payouts.perGame.toFixed(2)}`, highlight: true },
+                { label: 'Per Game', value: `$${payouts.perGame.toFixed(2)}`, highlight: true },
                 { label: 'Charity', value: `$${payouts.charity.toFixed(2)}` },
-                { label: 'Progressive Add', value: `$${payouts.progressiveAdd.toFixed(2)}` },
+                { label: 'Prog. Add', value: `$${payouts.progressiveAdd.toFixed(2)}` },
               ].map(({ label: l, value, highlight }) => (
                 <div key={l}>
                   <div style={{ color: '#8888aa', fontSize: '10px', textTransform: 'uppercase',
@@ -489,46 +500,35 @@ export default function SessionSetupPage() {
             </p>
           </div>
 
-          {currentSession && (() => {
-            const recommended = players.length >= 29 ? 10 : players.length >= 21 ? 8 : 6;
-            return (
-              <div style={card}>
-                <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '8px' }}>Shoe Sizing</h2>
-                <p style={{ color: '#8888aa', fontSize: '12px', marginBottom: '16px' }}>
-                  Recommended based on {players.length} players imported.
-                </p>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  {[
-                    { decks: 6, cards: 312, range: 'Up to 20 players' },
-                    { decks: 8, cards: 416, range: '21–28 players' },
-                    { decks: 10, cards: 520, range: '29+ players' },
-                  ].map(({ decks, cards, range }) => (
-                    <button key={decks}
-                      onClick={isLocked ? undefined : () => setDeckCount(decks)}
-                      style={{
-                        flex: 1, padding: '12px', borderRadius: '8px',
-                        cursor: isLocked ? 'default' : 'pointer',
-                        background: deckCount === decks ? '#e8ff47' : '#1a1a2e',
-                        color: deckCount === decks ? '#1a1a2e' : '#ffffff',
-                        border: `1px solid ${decks === recommended ? '#e8ff47' : '#5555aa'}`,
-                        textAlign: 'center',
-                        opacity: isLocked && deckCount !== decks ? 0.4 : 1,
-                      }}>
-                      <div style={{ fontSize: '18px', fontWeight: 700 }}>{decks} Deck</div>
-                      <div style={{ fontSize: '11px', marginTop: '4px' }}>{cards} cards</div>
-                      <div style={{ fontSize: '10px', marginTop: '2px', color: deckCount === decks ? '#555' : '#8888aa' }}>{range}</div>
-                      {decks === recommended && (
-                        <div style={{ fontSize: '9px', marginTop: '4px', fontWeight: 700,
-                          color: deckCount === decks ? '#555' : '#e8ff47', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                          Recommended
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })()}
+          {currentSession && !isLocked && (
+            <div style={{ ...card, border: '1px solid #7777cc' }}>
+              <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '8px' }}>Ready to Lock?</h2>
+              <p style={{ color: '#8888aa', fontSize: '13px', marginBottom: '16px' }}>
+                Locking the session activates the PIN, initializes card shoes, and opens the player list on the kiosk.
+                No changes can be made after locking.
+              </p>
+              <p style={{ color: players.length === 0 ? '#ffaa44' : '#e8ff47', fontSize: '13px' }}>
+                {players.length === 0
+                  ? '⚠️ Import players before locking.'
+                  : `✅ ${players.length} players ready to lock.`}
+              </p>
+              <button
+                onClick={lockSession}
+                disabled={saving || players.length === 0}
+                style={{ ...btnPrimary, marginTop: '16px', opacity: players.length === 0 ? 0.5 : 1 }}>
+                🔒 Lock Session
+              </button>
+            </div>
+          )}
+
+          {isLocked && (
+            <div style={{ ...card, border: '1px solid #e8ff47' }}>
+              <h2 style={{ color: '#e8ff47', fontSize: '16px', marginBottom: '8px' }}>✅ Session Locked</h2>
+              <p style={{ color: '#8888aa', fontSize: '13px' }}>
+                PIN is active. Card shoes initialized. Players can now enter on their phones or the kiosk.
+              </p>
+            </div>
+          )}
 
         </div>
 
