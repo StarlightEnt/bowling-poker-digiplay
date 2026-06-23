@@ -47,18 +47,7 @@ export default function AdminSidebar({ session }) {
       zIndex: 100,
     }}>
       <div style={{ padding: '16px 20px', borderBottom: '0.5px solid #333355' }}>
-        {/* Logo placeholder — paid tier branding, not yet functional */}
-        <div style={{
-          width: 36, height: 36,
-          border: '1px dashed #5555aa',
-          borderRadius: 6,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          marginBottom: 10,
-          cursor: 'default',
-        }} title="League logo (paid tier — coming soon)">
-          <span style={{ fontSize: 16, opacity: 0.4 }}>🏆</span>
-        </div>
-        <div style={{ fontSize: 16, fontWeight: 600, color: '#ffffff' }}>
+        <div style={{ fontSize: 22, fontWeight: 700, color: '#e8ff47', letterSpacing: 0.5 }}>
           Bowling Poker
         </div>
         <div style={{ fontSize: 14, color: '#666688', marginTop: 2 }}>
@@ -71,8 +60,9 @@ export default function AdminSidebar({ session }) {
         {NAV.map(({ section, items }) => (
           <div key={section}>
             <div style={{
-              color: '#666688',
+              color: '#ffffff',
               fontSize: 12,
+              fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
               padding: '10px 20px 5px',
@@ -105,7 +95,7 @@ export default function AdminSidebar({ session }) {
         ))}
       </nav>
 
-      <div style={{ padding: '12px 20px', borderTop: '0.5px solid #333355', fontSize: 14, color: '#666688' }}>
+      <div style={{ padding: '12px 20px', paddingBottom: 48, borderTop: '0.5px solid #333355', fontSize: 14, color: '#666688' }}>
         <div style={{ display: 'block', color: '#8888aa', fontWeight: 500, fontSize: 15, marginBottom: 2 }}>
           {session?.user?.leagueName || 'League'}
         </div>
