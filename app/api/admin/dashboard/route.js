@@ -32,8 +32,11 @@ export async function GET() {
     ORDER BY game_number ASC
   `;
 
-  // Get active game (first open game)
-  const activeGame = games.find(g => g.status === 'open') || games[0];
+  // Get active game: first open → most recently closed → first game (all pending)
+  const closedGames = games.filter(g => g.status === 'closed');
+  const activeGame = games.find(g => g.status === 'open')
+    || closedGames[closedGames.length - 1]
+    || games[0];
 
   // Get shoe stats for active game
   let shoeStats = null;
