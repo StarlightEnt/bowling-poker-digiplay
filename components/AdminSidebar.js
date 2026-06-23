@@ -37,7 +37,7 @@ export default function AdminSidebar({ session }) {
 
   return (
     <aside style={{
-      width: '190px',
+      width: '240px',
       background: '#1a1a2e',
       borderRight: '0.5px solid #333355',
       position: 'fixed',
@@ -46,12 +46,22 @@ export default function AdminSidebar({ session }) {
       flexDirection: 'column',
       zIndex: 100,
     }}>
-      {/* Sidebar header — "Bowling Poker" (text-primary) + "Digiplay Admin" (text-tertiary) */}
-      <div style={{ padding: '14px 16px', borderBottom: '0.5px solid #333355' }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: '#ffffff' }}>
+      <div style={{ padding: '16px 20px', borderBottom: '0.5px solid #333355' }}>
+        {/* Logo placeholder — paid tier branding, not yet functional */}
+        <div style={{
+          width: 36, height: 36,
+          border: '1px dashed #5555aa',
+          borderRadius: 6,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          marginBottom: 10,
+          cursor: 'default',
+        }} title="League logo (paid tier — coming soon)">
+          <span style={{ fontSize: 16, opacity: 0.4 }}>🏆</span>
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 600, color: '#ffffff' }}>
           Bowling Poker
         </div>
-        <div style={{ fontSize: 11, color: '#666688', marginTop: 2 }}>
+        <div style={{ fontSize: 14, color: '#666688', marginTop: 2 }}>
           Digiplay Admin
         </div>
       </div>
@@ -62,10 +72,10 @@ export default function AdminSidebar({ session }) {
           <div key={section}>
             <div style={{
               color: '#666688',
-              fontSize: 10,
+              fontSize: 12,
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
-              padding: '8px 16px 4px',
+              padding: '10px 20px 5px',
             }}>
               {section}
             </div>
@@ -76,9 +86,9 @@ export default function AdminSidebar({ session }) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 9,
-                  padding: '7px 16px',
-                  fontSize: 13,
+                  gap: 11,
+                  padding: '9px 20px',
+                  fontSize: 16,
                   color: isActive(href) ? '#ffffff' : '#8888aa',
                   background: isActive(href) ? '#2a2a45' : 'transparent',
                   borderLeft: isActive(href) ? '2px solid #e8ff47' : '2px solid transparent',
@@ -87,7 +97,7 @@ export default function AdminSidebar({ session }) {
                   textDecoration: 'none',
                 }}
               >
-                <span style={{ fontSize: 14, flexShrink: 0 }}>{icon}</span>
+                <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
                 {label}
               </Link>
             ))}
@@ -95,9 +105,8 @@ export default function AdminSidebar({ session }) {
         ))}
       </nav>
 
-      {/* Footer — league name prominent, week info, sign out */}
-      <div style={{ padding: '10px 16px', borderTop: '0.5px solid #333355', fontSize: 11, color: '#666688' }}>
-        <div style={{ display: 'block', color: '#8888aa', fontWeight: 500, fontSize: 12, marginBottom: 2 }}>
+      <div style={{ padding: '12px 20px', borderTop: '0.5px solid #333355', fontSize: 14, color: '#666688' }}>
+        <div style={{ display: 'block', color: '#8888aa', fontWeight: 500, fontSize: 15, marginBottom: 2 }}>
           {session?.user?.leagueName || 'League'}
         </div>
         Week {session?.user?.weekNumber || '—'}
@@ -106,7 +115,7 @@ export default function AdminSidebar({ session }) {
           style={{
             display: 'block', marginTop: 8,
             background: 'transparent', border: '0.5px solid #333355',
-            borderRadius: 4, color: '#666688', fontSize: 10,
+            borderRadius: 4, color: '#666688', fontSize: 12,
             padding: '4px 8px', cursor: 'pointer', width: '100%',
           }}
         >

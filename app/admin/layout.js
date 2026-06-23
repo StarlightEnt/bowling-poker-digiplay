@@ -10,7 +10,7 @@ export default async function AdminLayout({ children }) {
     <div style={{ display: 'flex', height: '100vh', background: '#1a1a2e' }}>
       <AdminSidebar session={session} />
       <div style={{
-        marginLeft: '190px',
+        marginLeft: '240px',
         flex: 1,
         height: '100vh',
         overflowY: 'auto',
