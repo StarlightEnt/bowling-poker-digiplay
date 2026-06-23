@@ -95,7 +95,7 @@ export default function AdminSidebar({ session }) {
         ))}
       </nav>
 
-      <div style={{ padding: '12px 20px', paddingBottom: 48, borderTop: '0.5px solid #333355', fontSize: 14, color: '#666688' }}>
+      <div style={{ padding: '12px 20px', paddingBottom: 72, borderTop: '0.5px solid #333355', fontSize: 14, color: '#666688' }}>
         <div style={{ display: 'block', color: '#8888aa', fontWeight: 500, fontSize: 15, marginBottom: 2 }}>
           {session?.user?.leagueName || 'League'}
         </div>
