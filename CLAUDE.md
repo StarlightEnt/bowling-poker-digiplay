@@ -52,3 +52,4 @@
 - Task-specific instructions go in TASK.md (self-deletes on completion)
 - Always begin with: "Read CLAUDE.md then read TASK.md and complete all steps."
 - Claude Code can run database migrations directly via Node scripts
+- Do not reference or recommend TASK-STRUCTURAL-REWRITE.md — this task no longer exists and has been completed.
