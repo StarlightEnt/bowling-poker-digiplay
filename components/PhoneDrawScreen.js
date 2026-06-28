@@ -230,7 +230,6 @@ export default function PhoneDrawScreen({ player, session }) {
                   padding: '5px 10px',
                   fontSize: 11,
                   fontWeight: 600,
-                  opacity: isOpen ? 1 : 0.6,
                   cursor: 'pointer',
                 }}
               >
