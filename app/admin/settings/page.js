@@ -1,10 +1,12 @@
 // PATH: app/admin/settings/page.js
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { THEMES, getThemeTokens } from '../../../lib/themes.js';
 
 const BG_SWATCHES = ['#1a1a2e', '#0a0a0f', '#0a1a0f', '#1a0a0f', '#0a0f1a', '#1a1000'];
 const ACCENT_SWATCHES = ['#e8ff47', '#4fa3ff', '#3dffa0', '#ff6b35', '#cc88ff', '#ff5577'];
+
+const isValidHex = v => /^#[0-9a-fA-F]{6}$/.test(v);
 
 function getContrast(hex1, hex2) {
   const lum = h => {
@@ -42,6 +44,14 @@ export default function SettingsPage() {
   const [savingAppearance, setSavingAppearance] = useState(false);
   const [savedAppearance, setSavedAppearance] = useState(false);
 
+  // Custom color pickers
+  const [bgPickerOpen, setBgPickerOpen]         = useState(false);
+  const [accentPickerOpen, setAccentPickerOpen] = useState(false);
+  const [bgHexInput, setBgHexInput]             = useState('');
+  const [accentHexInput, setAccentHexInput]     = useState('');
+  const [bgHexError, setBgHexError]             = useState('');
+  const [accentHexError, setAccentHexError]     = useState('');
+
   // Manager integration
   const [managerEnabled, setManagerEnabled] = useState(false);
   const [apiKey, setApiKey] = useState('');
@@ -56,6 +66,9 @@ export default function SettingsPage() {
   const [addAdminError, setAddAdminError] = useState('');
   const [removeConfirm, setRemoveConfirm] = useState(null);
   const [removing, setRemoving] = useState(false);
+
+  const bgPickerRef     = useRef(null);
+  const accentPickerRef = useRef(null);
 
   useEffect(() => {
     fetch('/api/admin/settings').then(r => r.json()).then(data => {
@@ -77,6 +90,19 @@ export default function SettingsPage() {
       });
     });
   }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (bgPickerOpen && bgPickerRef.current && !bgPickerRef.current.contains(e.target)) {
+        setBgPickerOpen(false);
+      }
+      if (accentPickerOpen && accentPickerRef.current && !accentPickerRef.current.contains(e.target)) {
+        setAccentPickerOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [bgPickerOpen, accentPickerOpen]);
 
   async function handleSave() {
     setSaving(true);
@@ -177,10 +203,58 @@ export default function SettingsPage() {
     });
   }
 
+  function openBgPicker() {
+    setBgHexInput(themeBackground);
+    setBgHexError('');
+    setBgPickerOpen(true);
+    setAccentPickerOpen(false);
+  }
+
+  function openAccentPicker() {
+    setAccentHexInput(themeAccent);
+    setAccentHexError('');
+    setAccentPickerOpen(true);
+    setBgPickerOpen(false);
+  }
+
+  function handleBgHexChange(val) {
+    setBgHexInput(val);
+    if (isValidHex(val)) {
+      setBgHexError('');
+      setThemeBackground(val);
+    } else {
+      setBgHexError('Enter a valid hex color (e.g. #1a1a2e)');
+    }
+  }
+
+  function handleAccentHexChange(val) {
+    setAccentHexInput(val);
+    if (isValidHex(val)) {
+      setAccentHexError('');
+      setThemeAccent(val);
+    } else {
+      setAccentHexError('Enter a valid hex color (e.g. #e8ff47)');
+    }
+  }
+
+  function handleBgWheelChange(val) {
+    setBgHexInput(val);
+    setBgHexError('');
+    setThemeBackground(val);
+  }
+
+  function handleAccentWheelChange(val) {
+    setAccentHexInput(val);
+    setAccentHexError('');
+    setThemeAccent(val);
+  }
+
   const isPaid = league?.plan === 'paid';
   const maskedKey = apiKey ? `sk_digiplay_••••••••••••••••${apiKey.slice(-4)}` : '';
   const contrastRatio = themeBackground ? getContrast(themeBackground, '#ffffff') : 21;
   const lowContrast = contrastRatio < 4.5;
+  const bgIsCustom     = !BG_SWATCHES.includes(themeBackground);
+  const accentIsCustom = !ACCENT_SWATCHES.includes(themeAccent);
 
   if (loading) return <div style={{ padding: 32, color: 'var(--text-muted)' }}>Loading...</div>;
 
@@ -290,28 +364,132 @@ export default function SettingsPage() {
             {/* Background swatches */}
             <div style={{ marginBottom: 16 }}>
               <div style={labelStyle}>Background</div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {BG_SWATCHES.map(c => (
-                  <button key={c} onClick={() => setThemeBackground(c)} style={{
-                    width: 28, height: 28, borderRadius: '50%', background: c,
-                    border: `2px solid ${themeBackground === c ? '#e8ff47' : 'var(--text-dim)'}`,
-                    cursor: 'pointer',
-                  }} title={c} />
-                ))}
+              <div style={{ position: 'relative' }}>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {BG_SWATCHES.map(c => (
+                    <button key={c} onClick={() => setThemeBackground(c)} style={{
+                      width: 28, height: 28, borderRadius: '50%', background: c,
+                      border: `2px solid ${themeBackground === c ? '#e8ff47' : 'var(--text-dim)'}`,
+                      cursor: 'pointer',
+                    }} title={c} />
+                  ))}
+                  <button
+                    onClick={openBgPicker}
+                    title="Custom color"
+                    style={{
+                      width: 28, height: 28, borderRadius: '50%',
+                      background: bgIsCustom
+                        ? themeBackground
+                        : 'conic-gradient(red, yellow, lime, cyan, blue, magenta, red)',
+                      border: `2px solid ${bgPickerOpen ? 'var(--text)' : 'var(--text-dim)'}`,
+                      cursor: 'pointer', fontSize: 12,
+                      color: bgIsCustom ? '#ffffff' : '#000000',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    ✎
+                  </button>
+                </div>
+
+                {bgPickerOpen && (
+                  <div ref={bgPickerRef} style={{
+                    position: 'absolute', top: 36, left: 0, zIndex: 100,
+                    background: 'var(--surface)', border: '1px solid var(--border)',
+                    borderRadius: 8, padding: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                    display: 'flex', flexDirection: 'column', gap: 8, minWidth: 220,
+                  }}>
+                    <input
+                      type="color"
+                      value={isValidHex(bgHexInput) ? bgHexInput : themeBackground}
+                      onChange={e => handleBgWheelChange(e.target.value)}
+                      style={{ width: '100%', height: 40, border: 'none',
+                        borderRadius: 4, cursor: 'pointer', background: 'none' }}
+                    />
+                    <input
+                      type="text"
+                      value={bgHexInput}
+                      onChange={e => handleBgHexChange(e.target.value)}
+                      placeholder="#1a1a2e"
+                      maxLength={7}
+                      style={{
+                        background: 'var(--surface-deep)',
+                        border: `1px solid ${bgHexError ? 'var(--danger)' : 'var(--border)'}`,
+                        borderRadius: 6, color: 'var(--text)', padding: '7px 10px',
+                        fontSize: 13, fontFamily: 'monospace', outline: 'none', width: '100%',
+                      }}
+                    />
+                    {bgHexError && (
+                      <div style={{ color: 'var(--danger)', fontSize: 11 }}>{bgHexError}</div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Accent swatches */}
             <div style={{ marginBottom: 16 }}>
               <div style={labelStyle}>Accent Color</div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {ACCENT_SWATCHES.map(c => (
-                  <button key={c} onClick={() => setThemeAccent(c)} style={{
-                    width: 28, height: 28, borderRadius: '50%', background: c,
-                    border: `2px solid ${themeAccent === c ? 'var(--text)' : 'var(--text-dim)'}`,
-                    cursor: 'pointer',
-                  }} title={c} />
-                ))}
+              <div style={{ position: 'relative' }}>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {ACCENT_SWATCHES.map(c => (
+                    <button key={c} onClick={() => setThemeAccent(c)} style={{
+                      width: 28, height: 28, borderRadius: '50%', background: c,
+                      border: `2px solid ${themeAccent === c ? 'var(--text)' : 'var(--text-dim)'}`,
+                      cursor: 'pointer',
+                    }} title={c} />
+                  ))}
+                  <button
+                    onClick={openAccentPicker}
+                    title="Custom color"
+                    style={{
+                      width: 28, height: 28, borderRadius: '50%',
+                      background: accentIsCustom
+                        ? themeAccent
+                        : 'conic-gradient(red, yellow, lime, cyan, blue, magenta, red)',
+                      border: `2px solid ${accentPickerOpen ? 'var(--text)' : 'var(--text-dim)'}`,
+                      cursor: 'pointer', fontSize: 12,
+                      color: accentIsCustom ? '#ffffff' : '#000000',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    ✎
+                  </button>
+                </div>
+
+                {accentPickerOpen && (
+                  <div ref={accentPickerRef} style={{
+                    position: 'absolute', top: 36, left: 0, zIndex: 100,
+                    background: 'var(--surface)', border: '1px solid var(--border)',
+                    borderRadius: 8, padding: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                    display: 'flex', flexDirection: 'column', gap: 8, minWidth: 220,
+                  }}>
+                    <input
+                      type="color"
+                      value={isValidHex(accentHexInput) ? accentHexInput : themeAccent}
+                      onChange={e => handleAccentWheelChange(e.target.value)}
+                      style={{ width: '100%', height: 40, border: 'none',
+                        borderRadius: 4, cursor: 'pointer', background: 'none' }}
+                    />
+                    <input
+                      type="text"
+                      value={accentHexInput}
+                      onChange={e => handleAccentHexChange(e.target.value)}
+                      placeholder="#e8ff47"
+                      maxLength={7}
+                      style={{
+                        background: 'var(--surface-deep)',
+                        border: `1px solid ${accentHexError ? 'var(--danger)' : 'var(--border)'}`,
+                        borderRadius: 6, color: 'var(--text)', padding: '7px 10px',
+                        fontSize: 13, fontFamily: 'monospace', outline: 'none', width: '100%',
+                      }}
+                    />
+                    {accentHexError && (
+                      <div style={{ color: 'var(--danger)', fontSize: 11 }}>{accentHexError}</div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -540,7 +718,7 @@ export default function SettingsPage() {
                 disabled={!isPaid}
                 style={{
                   background: 'transparent', color: isPaid ? 'var(--text-muted)' : 'var(--text-dim)',
-                  border: `1px solid ${isPaid ? 'var(--border)' : 'var(--border)'}`,
+                  border: '1px solid var(--border)',
                   borderRadius: 6, padding: '8px 14px', fontSize: 13,
                   cursor: isPaid ? 'pointer' : 'not-allowed', opacity: isPaid ? 1 : 0.6,
                 }}>
