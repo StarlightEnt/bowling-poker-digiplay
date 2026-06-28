@@ -1,18 +1,8 @@
 // PATH: app/admin/settings/page.js
 'use client';
 import { useState, useEffect } from 'react';
+import { THEMES, getThemeTokens } from '../../../lib/themes.js';
 
-const ACCENT = '#e8ff47';
-const SURFACE = '#2a2a45';
-const BORDER = '#5555aa';
-
-const THEMES = [
-  { name: 'Classic',  bg: '#1a1a2e', accent: '#e8ff47', mode: 'dark' },
-  { name: 'Midnight', bg: '#0a0a0f', accent: '#4fa3ff', mode: 'dark' },
-  { name: 'Forest',   bg: '#0a1a0f', accent: '#3dffa0', mode: 'dark' },
-  { name: 'Burgundy', bg: '#1a0a0f', accent: '#ff6b6b', mode: 'dark' },
-  { name: 'Light',    bg: '#f5f5f5', accent: '#1a1a2e', mode: 'light' },
-];
 const BG_SWATCHES = ['#1a1a2e', '#0a0a0f', '#0a1a0f', '#1a0a0f', '#0a0f1a', '#1a1000'];
 const ACCENT_SWATCHES = ['#e8ff47', '#4fa3ff', '#3dffa0', '#ff6b35', '#cc88ff', '#ff5577'];
 
@@ -27,13 +17,13 @@ function getContrast(hex1, hex2) {
 }
 
 const inputStyle = {
-  background: '#2a2a45', border: `1px solid ${BORDER}`,
-  borderRadius: 6, color: '#ffffff',
+  background: 'var(--surface)', border: '1px solid var(--border)',
+  borderRadius: 6, color: 'var(--text)',
   padding: '9px 12px', fontSize: 14, outline: 'none', width: '100%',
 };
 
 const labelStyle = {
-  display: 'block', color: '#8888aa', fontSize: 11,
+  display: 'block', color: 'var(--text-muted)', fontSize: 11,
   textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6,
 };
 
@@ -78,6 +68,13 @@ export default function SettingsPage() {
       setManagerEnabled(data.league?.manager_enabled || false);
       setApiKey(data.league?.manager_api_key || '');
       setLoading(false);
+      const tokens = getThemeTokens(
+        data.settings?.theme_background || '#1a1a2e',
+        data.settings?.theme_accent || '#e8ff47'
+      );
+      Object.entries(tokens).forEach(([key, val]) => {
+        document.documentElement.style.setProperty(key, val);
+      });
     });
   }, []);
 
@@ -103,6 +100,10 @@ export default function SettingsPage() {
     setSavingAppearance(false);
     setSavedAppearance(true);
     setTimeout(() => setSavedAppearance(false), 3000);
+    const tokens = getThemeTokens(themeBackground, themeAccent);
+    Object.entries(tokens).forEach(([key, val]) => {
+      document.documentElement.style.setProperty(key, val);
+    });
   }
 
   async function handleManagerToggle(on) {
@@ -170,6 +171,10 @@ export default function SettingsPage() {
     setThemeBackground(theme.bg);
     setThemeAccent(theme.accent);
     setThemeMode(theme.mode);
+    const tokens = getThemeTokens(theme.bg, theme.accent);
+    Object.entries(tokens).forEach(([key, val]) => {
+      document.documentElement.style.setProperty(key, val);
+    });
   }
 
   const isPaid = league?.plan === 'paid';
@@ -177,16 +182,16 @@ export default function SettingsPage() {
   const contrastRatio = themeBackground ? getContrast(themeBackground, '#ffffff') : 21;
   const lowContrast = contrastRatio < 4.5;
 
-  if (loading) return <div style={{ padding: 32, color: '#8888aa' }}>Loading...</div>;
+  if (loading) return <div style={{ padding: 32, color: 'var(--text-muted)' }}>Loading...</div>;
 
   return (
     <div style={{ padding: 24, maxWidth: 1100 }}>
-      <h1 style={{ color: ACCENT, fontSize: 26, marginBottom: 20 }}>Settings</h1>
+      <h1 style={{ color: 'var(--accent)', fontSize: 26, marginBottom: 20 }}>Settings</h1>
 
       {saved && (
-        <div style={{ background: '#2a2a45', border: '1px solid #e8ff47',
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--accent)',
           borderRadius: 8, padding: '10px 16px', marginBottom: 16,
-          color: '#e8ff47', fontSize: 13 }}>
+          color: 'var(--accent)', fontSize: 13 }}>
           ✅ Settings saved
         </div>
       )}
@@ -197,9 +202,9 @@ export default function SettingsPage() {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           {/* League Profile */}
-          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 8, padding: 20 }}>
-            <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700, marginBottom: 16 }}>
+            <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 700, marginBottom: 16 }}>
               League Profile
             </div>
             <div style={{ display: 'grid', gap: 12 }}>
@@ -222,9 +227,9 @@ export default function SettingsPage() {
           </div>
 
           {/* Financial Defaults */}
-          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 8, padding: 20 }}>
-            <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700, marginBottom: 16 }}>
+            <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 700, marginBottom: 16 }}>
               Financial Defaults
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -256,9 +261,9 @@ export default function SettingsPage() {
           </div>
 
           {/* Appearance */}
-          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 8, padding: 20 }}>
-            <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700, marginBottom: 16 }}>
+            <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 700, marginBottom: 16 }}>
               Appearance
             </div>
 
@@ -271,7 +276,7 @@ export default function SettingsPage() {
                   return (
                     <button key={t.name} onClick={() => applyTheme(t)} style={{
                       background: t.bg, color: t.accent,
-                      border: `2px solid ${isSelected ? '#e8ff47' : BORDER}`,
+                      border: `2px solid ${isSelected ? '#e8ff47' : 'var(--border)'}`,
                       borderRadius: 6, padding: '6px 14px', fontSize: 12, fontWeight: 700,
                       cursor: 'pointer',
                     }}>
@@ -289,7 +294,7 @@ export default function SettingsPage() {
                 {BG_SWATCHES.map(c => (
                   <button key={c} onClick={() => setThemeBackground(c)} style={{
                     width: 28, height: 28, borderRadius: '50%', background: c,
-                    border: `2px solid ${themeBackground === c ? '#e8ff47' : '#666688'}`,
+                    border: `2px solid ${themeBackground === c ? '#e8ff47' : 'var(--text-dim)'}`,
                     cursor: 'pointer',
                   }} title={c} />
                 ))}
@@ -303,7 +308,7 @@ export default function SettingsPage() {
                 {ACCENT_SWATCHES.map(c => (
                   <button key={c} onClick={() => setThemeAccent(c)} style={{
                     width: 28, height: 28, borderRadius: '50%', background: c,
-                    border: `2px solid ${themeAccent === c ? '#ffffff' : '#666688'}`,
+                    border: `2px solid ${themeAccent === c ? 'var(--text)' : 'var(--text-dim)'}`,
                     cursor: 'pointer',
                   }} title={c} />
                 ))}
@@ -312,9 +317,9 @@ export default function SettingsPage() {
 
             {/* WCAG warning */}
             {lowContrast && (
-              <div style={{ background: '#2a1a00', border: '1px solid #ffaa44',
+              <div style={{ background: 'var(--warning-bg)', border: '1px solid var(--warning)',
                 borderRadius: 6, padding: '8px 12px', marginBottom: 12,
-                color: '#ffaa44', fontSize: 12 }}>
+                color: 'var(--warning)', fontSize: 12 }}>
                 ⚠️ This background may reduce readability (contrast ratio: {contrastRatio.toFixed(1)})
               </div>
             )}
@@ -328,10 +333,10 @@ export default function SettingsPage() {
             </div>
 
             {savedAppearance && (
-              <div style={{ color: '#e8ff47', fontSize: 12, marginBottom: 8 }}>✅ Appearance saved</div>
+              <div style={{ color: 'var(--accent)', fontSize: 12, marginBottom: 8 }}>✅ Appearance saved</div>
             )}
             <button onClick={handleSaveAppearance} disabled={savingAppearance} style={{
-              background: ACCENT, color: '#1a1a2e', border: 'none',
+              background: 'var(--accent)', color: 'var(--bg)', border: 'none',
               borderRadius: 6, padding: '9px 20px', fontSize: 13, fontWeight: 700,
               opacity: savingAppearance ? 0.7 : 1, cursor: 'pointer',
             }}>
@@ -342,14 +347,14 @@ export default function SettingsPage() {
           {/* Save League Profile + Financial Defaults */}
           <button onClick={handleSave} disabled={saving}
             style={{
-              background: ACCENT, color: '#1a1a2e', border: 'none',
+              background: 'var(--accent)', color: 'var(--bg)', border: 'none',
               borderRadius: 6, padding: '12px 28px', fontSize: 14,
               fontWeight: 700, opacity: saving ? 0.7 : 1, cursor: 'pointer',
             }}>
             {saving ? 'Saving...' : 'Save Settings'}
           </button>
 
-          <p style={{ color: '#666688', fontSize: 11, fontStyle: 'italic' }}>
+          <p style={{ color: 'var(--text-dim)', fontSize: 11, fontStyle: 'italic' }}>
             Powered by Bowling Poker Digiplay
           </p>
 
@@ -359,18 +364,19 @@ export default function SettingsPage() {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           {/* Plan & Billing */}
-          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 8, padding: 20 }}>
-            <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700, marginBottom: 8 }}>
+            <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 700, marginBottom: 8 }}>
               Plan & Billing
             </div>
-            <div style={{ display: 'inline-block', background: isPaid ? '#2a2a45' : '#1a1a2e',
-              border: `1px solid ${isPaid ? '#e8ff47' : BORDER}`,
+            <div style={{ display: 'inline-block',
+              background: isPaid ? 'var(--surface)' : 'var(--surface-deep)',
+              border: `1px solid ${isPaid ? 'var(--accent)' : 'var(--border)'}`,
               borderRadius: 4, padding: '4px 10px', fontSize: 12, fontWeight: 700,
-              color: isPaid ? '#e8ff47' : '#8888aa', marginBottom: 8 }}>
+              color: isPaid ? 'var(--accent)' : 'var(--text-muted)', marginBottom: 8 }}>
               {isPaid ? 'PAID' : 'FREE'}
             </div>
-            <p style={{ color: '#666688', fontSize: 12 }}>
+            <p style={{ color: 'var(--text-dim)', fontSize: 12 }}>
               {isPaid
                 ? 'Full access — multiple admins, unlimited players, Manager integration, history, white label.'
                 : 'Free tier — 1 admin, 20 player cap, CSV only, current session only.'}
@@ -378,16 +384,16 @@ export default function SettingsPage() {
           </div>
 
           {/* Manager Integration */}
-          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 8, padding: 20 }}>
-            <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700, marginBottom: 12 }}>
+            <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 700, marginBottom: 12 }}>
               Manager Integration
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <div>
-                <div style={{ color: '#ffffff', fontSize: 13 }}>Enable Bowling Poker Manager integration</div>
-                <div style={{ color: '#666688', fontSize: 11, marginTop: 2 }}>
+                <div style={{ color: 'var(--text)', fontSize: 13 }}>Enable Bowling Poker Manager integration</div>
+                <div style={{ color: 'var(--text-dim)', fontSize: 11, marginTop: 2 }}>
                   Connect with the bowling center management system
                 </div>
               </div>
@@ -396,8 +402,8 @@ export default function SettingsPage() {
                 onClick={() => isPaid && handleManagerToggle(!managerEnabled)}
                 style={{
                   width: 44, height: 24, borderRadius: 12, flexShrink: 0,
-                  background: managerEnabled && isPaid ? ACCENT : '#2a2a45',
-                  border: `1px solid ${managerEnabled && isPaid ? ACCENT : BORDER}`,
+                  background: managerEnabled && isPaid ? 'var(--accent)' : 'var(--surface)',
+                  border: `1px solid ${managerEnabled && isPaid ? 'var(--accent)' : 'var(--border)'}`,
                   position: 'relative', cursor: isPaid ? 'pointer' : 'not-allowed',
                   opacity: isPaid ? 1 : 0.5, marginLeft: 16,
                 }}>
@@ -405,26 +411,26 @@ export default function SettingsPage() {
                   position: 'absolute', top: 4,
                   left: managerEnabled && isPaid ? 22 : 4,
                   width: 16, height: 16, borderRadius: '50%',
-                  background: managerEnabled && isPaid ? '#1a1a2e' : '#666688',
+                  background: managerEnabled && isPaid ? 'var(--bg)' : 'var(--text-muted)',
                   transition: 'left 0.2s',
                 }} />
               </div>
             </div>
 
             {!isPaid && (
-              <div style={{ background: '#1a1200', border: '1px solid #ffaa44',
-                borderRadius: 6, padding: '8px 12px', color: '#ffaa44', fontSize: 12 }}>
+              <div style={{ background: '#1a1200', border: '1px solid var(--warning)',
+                borderRadius: 6, padding: '8px 12px', color: 'var(--warning)', fontSize: 12 }}>
                 Upgrade to paid plan to enable Manager integration
               </div>
             )}
 
             {isPaid && managerEnabled && (
-              <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 12, marginTop: 4 }}>
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 4 }}>
                 {/* Connection status */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%',
-                    background: apiKey ? '#e8ff47' : '#666688' }} />
-                  <span style={{ color: apiKey ? '#e8ff47' : '#8888aa', fontSize: 12 }}>
+                    background: apiKey ? 'var(--accent)' : 'var(--text-dim)' }} />
+                  <span style={{ color: apiKey ? 'var(--accent)' : 'var(--text-muted)', fontSize: 12 }}>
                     {apiKey ? 'Connected' : 'Not connected'}
                   </span>
                 </div>
@@ -432,8 +438,8 @@ export default function SettingsPage() {
                 <div style={labelStyle}>API Key</div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <code style={{
-                    flex: 1, background: '#1a1a2e', border: `1px solid ${BORDER}`,
-                    borderRadius: 6, padding: '8px 12px', color: '#8888aa',
+                    flex: 1, background: 'var(--surface-deep)', border: '1px solid var(--border)',
+                    borderRadius: 6, padding: '8px 12px', color: 'var(--text-muted)',
                     fontSize: 12, fontFamily: 'monospace',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
@@ -441,16 +447,16 @@ export default function SettingsPage() {
                   </code>
                   {apiKey && (
                     <button onClick={handleCopyKey} style={{
-                      background: 'transparent', color: copied ? '#e8ff47' : '#8888aa',
-                      border: `1px solid ${BORDER}`, borderRadius: 6,
+                      background: 'transparent', color: copied ? 'var(--accent)' : 'var(--text-muted)',
+                      border: '1px solid var(--border)', borderRadius: 6,
                       padding: '7px 12px', fontSize: 12, cursor: 'pointer', flexShrink: 0,
                     }}>
                       {copied ? 'Copied!' : 'Copy'}
                     </button>
                   )}
                   <button onClick={() => setShowRegenConfirm(true)} style={{
-                    background: 'transparent', color: '#ffaa44',
-                    border: '1px solid #ffaa44', borderRadius: 6,
+                    background: 'transparent', color: 'var(--warning)',
+                    border: '1px solid var(--warning)', borderRadius: 6,
                     padding: '7px 12px', fontSize: 12, cursor: 'pointer', flexShrink: 0,
                   }}>
                     Regenerate
@@ -461,9 +467,9 @@ export default function SettingsPage() {
           </div>
 
           {/* Admin Accounts */}
-          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 8, padding: 20 }}>
-            <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700, marginBottom: 16 }}>
+            <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 700, marginBottom: 16 }}>
               Admin Accounts
             </div>
 
@@ -471,17 +477,17 @@ export default function SettingsPage() {
               <div style={{ marginBottom: 16 }}>
                 {/* Header */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 80px 80px',
-                  padding: '6px 0', borderBottom: `1px solid ${BORDER}`, marginBottom: 4 }}>
+                  padding: '6px 0', borderBottom: '1px solid var(--border)', marginBottom: 4 }}>
                   {['Name', 'Email', 'Role', ''].map(h => (
-                    <div key={h} style={{ color: '#666688', fontSize: 10,
+                    <div key={h} style={{ color: 'var(--text-dim)', fontSize: 10,
                       textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
                   ))}
                 </div>
                 {admins.map(admin => (
                   <div key={admin.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 80px 80px',
-                    padding: '10px 0', borderBottom: `1px solid ${BORDER}`, alignItems: 'center' }}>
-                    <div style={{ color: '#ffffff', fontSize: 13 }}>{admin.name}</div>
-                    <div style={{ color: '#8888aa', fontSize: 12,
+                    padding: '10px 0', borderBottom: '1px solid var(--border)', alignItems: 'center' }}>
+                    <div style={{ color: 'var(--text)', fontSize: 13 }}>{admin.name}</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 12,
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {admin.email}
                     </div>
@@ -514,7 +520,7 @@ export default function SettingsPage() {
                     <div>
                       {admin.role !== 'owner' && (
                         <button onClick={() => setRemoveConfirm(admin.id)} style={{
-                          background: 'transparent', color: '#ff6666',
+                          background: 'transparent', color: 'var(--danger)',
                           border: '1px solid #661111', borderRadius: 4,
                           padding: '4px 8px', fontSize: 11, cursor: 'pointer',
                         }}>
@@ -533,15 +539,15 @@ export default function SettingsPage() {
                 onClick={() => { if (isPaid) setShowAddAdmin(true); }}
                 disabled={!isPaid}
                 style={{
-                  background: 'transparent', color: isPaid ? '#8888aa' : '#666688',
-                  border: `1px solid ${isPaid ? BORDER : '#5555aa'}`,
+                  background: 'transparent', color: isPaid ? 'var(--text-muted)' : 'var(--text-dim)',
+                  border: `1px solid ${isPaid ? 'var(--border)' : 'var(--border)'}`,
                   borderRadius: 6, padding: '8px 14px', fontSize: 13,
                   cursor: isPaid ? 'pointer' : 'not-allowed', opacity: isPaid ? 1 : 0.6,
                 }}>
                 {isPaid ? '+ Add admin' : '+ Add admin (paid feature)'}
               </button>
             ) : (
-              <div style={{ background: '#1a1a2e', border: `1px solid ${BORDER}`,
+              <div style={{ background: 'var(--surface-deep)', border: '1px solid var(--border)',
                 borderRadius: 6, padding: 16 }}>
                 <label style={labelStyle}>Email address</label>
                 <input
@@ -553,12 +559,12 @@ export default function SettingsPage() {
                   onKeyDown={e => e.key === 'Enter' && addAdminEmail && handleAddAdmin()}
                 />
                 {addAdminError && (
-                  <div style={{ color: '#ff6666', fontSize: 12, marginBottom: 8 }}>{addAdminError}</div>
+                  <div style={{ color: 'var(--danger)', fontSize: 12, marginBottom: 8 }}>{addAdminError}</div>
                 )}
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button onClick={handleAddAdmin} disabled={addingAdmin || !addAdminEmail}
                     style={{
-                      background: ACCENT, color: '#1a1a2e', border: 'none',
+                      background: 'var(--accent)', color: 'var(--bg)', border: 'none',
                       borderRadius: 6, padding: '8px 16px', fontSize: 13, fontWeight: 700,
                       opacity: (addingAdmin || !addAdminEmail) ? 0.6 : 1,
                       cursor: (addingAdmin || !addAdminEmail) ? 'not-allowed' : 'pointer',
@@ -568,8 +574,8 @@ export default function SettingsPage() {
                   <button
                     onClick={() => { setShowAddAdmin(false); setAddAdminEmail(''); setAddAdminError(''); }}
                     style={{
-                      background: 'transparent', color: '#8888aa',
-                      border: `1px solid ${BORDER}`, borderRadius: 6,
+                      background: 'transparent', color: 'var(--text-muted)',
+                      border: '1px solid var(--border)', borderRadius: 6,
                       padding: '8px 14px', fontSize: 13, cursor: 'pointer',
                     }}>
                     Cancel
@@ -579,7 +585,7 @@ export default function SettingsPage() {
             )}
 
             {!isPaid && (
-              <p style={{ color: '#666688', fontSize: 11, marginTop: 8 }}>
+              <p style={{ color: 'var(--text-dim)', fontSize: 11, marginTop: 8 }}>
                 Free tier allows 1 admin. Upgrade to add more.
               </p>
             )}
@@ -592,22 +598,22 @@ export default function SettingsPage() {
       {showRegenConfirm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}>
-          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 12, padding: 28, maxWidth: 380, width: '90%' }}>
-            <h3 style={{ color: '#ffffff', marginBottom: 8 }}>Regenerate API Key?</h3>
-            <p style={{ color: '#8888aa', fontSize: 13, marginBottom: 16 }}>
+            <h3 style={{ color: 'var(--text)', marginBottom: 8 }}>Regenerate API Key?</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 16 }}>
               The current key will stop working immediately. Any connected integrations will need to be updated.
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={handleRegenKey} disabled={regenerating}
-                style={{ flex: 1, background: '#ffaa44', color: '#1a1a2e',
+                style={{ flex: 1, background: 'var(--warning)', color: 'var(--bg)',
                   border: 'none', borderRadius: 6, padding: '10px', fontWeight: 700,
                   opacity: regenerating ? 0.7 : 1, cursor: 'pointer' }}>
                 {regenerating ? 'Regenerating...' : 'Regenerate'}
               </button>
               <button onClick={() => setShowRegenConfirm(false)} disabled={regenerating}
-                style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                  border: `1px solid ${BORDER}`, borderRadius: 6, padding: '10px', cursor: 'pointer' }}>
+                style={{ flex: 1, background: 'transparent', color: 'var(--text-muted)',
+                  border: '1px solid var(--border)', borderRadius: 6, padding: '10px', cursor: 'pointer' }}>
                 Cancel
               </button>
             </div>
@@ -619,22 +625,22 @@ export default function SettingsPage() {
       {removeConfirm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}>
-          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 12, padding: 28, maxWidth: 360, width: '90%' }}>
-            <h3 style={{ color: '#ffffff', marginBottom: 8 }}>Remove admin?</h3>
-            <p style={{ color: '#8888aa', fontSize: 13, marginBottom: 16 }}>
+            <h3 style={{ color: 'var(--text)', marginBottom: 8 }}>Remove admin?</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 16 }}>
               {admins.find(a => a.id === removeConfirm)?.name} will lose access immediately.
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={handleRemoveAdmin} disabled={removing}
-                style={{ flex: 1, background: '#ff4444', color: '#ffffff',
+                style={{ flex: 1, background: 'var(--danger)', color: 'var(--text)',
                   border: 'none', borderRadius: 6, padding: '10px', fontWeight: 700,
                   opacity: removing ? 0.7 : 1, cursor: 'pointer' }}>
                 {removing ? 'Removing...' : 'Remove'}
               </button>
               <button onClick={() => setRemoveConfirm(null)} disabled={removing}
-                style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                  border: `1px solid ${BORDER}`, borderRadius: 6, padding: '10px', cursor: 'pointer' }}>
+                style={{ flex: 1, background: 'transparent', color: 'var(--text-muted)',
+                  border: '1px solid var(--border)', borderRadius: 6, padding: '10px', cursor: 'pointer' }}>
                 Cancel
               </button>
             </div>
