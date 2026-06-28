@@ -362,7 +362,7 @@ export default function GameAdvancement() {
                     : isTieRow ? 'rgba(255,170,68,0.15)'
                     : isClearWinner ? 'rgba(61,255,160,0.15)'
                     : 'transparent',
-                  opacity: (entry.isForfeited || entry.isInProgress) ? 0.5 : 1,
+                  opacity: 1,
                   alignItems: 'center',
                 }}>
                   <div style={{ color: isRoyalFlush ? '#ffd700' : isTop ? 'var(--accent)' : 'var(--text-dim)', fontWeight: 700 }}>
