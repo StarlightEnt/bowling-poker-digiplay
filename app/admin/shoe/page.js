@@ -31,7 +31,7 @@ export default function CardShoePage() {
 
   function shoeColor(remaining, total) {
     const pct = remaining / total;
-    if (pct > 0.4) return '#e8ff47';
+    if (pct > 0.4) return '#3dffa0';
     if (pct > 0.15) return '#ffaa44';
     return '#ff6666';
   }
