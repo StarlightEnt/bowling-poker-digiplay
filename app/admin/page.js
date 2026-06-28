@@ -329,7 +329,7 @@ export default function AdminDashboard() {
           </button>
           {activeGame && (
             <button onClick={() => router.push('/admin/advancement')} style={{ padding: '5px 11px', fontSize: 12, borderRadius: 6,
-              border: 'none', background: '#e8ff47',
+              border: 'none', background: 'var(--accent)',
               color: '#1a1a2e', fontWeight: 500, cursor: 'pointer' }}>
               End Game {activeGame.game_number} →
             </button>
