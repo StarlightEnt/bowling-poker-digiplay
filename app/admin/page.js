@@ -4,28 +4,22 @@ import { useRouter } from 'next/navigation';
 import StatusPill from '../../components/StatusPill.js';
 import { CardRow } from '../../components/CardDisplay.js';
 
-const BG = '#1a1a2e';
-const SURFACE = '#2a2a45';
-const BORDER = '#333355';
-const BORDER_MAIN = '#7777cc';
-const ACCENT = '#e8ff47';
-
 function StatCard({ label, value, sub, warning, onClick, active }) {
   return (
     <div
       onClick={onClick}
       style={{
-        background: SURFACE,
-        border: `1px solid ${active ? ACCENT : warning ? '#ffaa44' : BORDER}`,
+        background: 'var(--surface)',
+        border: `1px solid ${active ? 'var(--accent)' : warning ? 'var(--warning)' : 'var(--border-dim)'}`,
         borderRadius: 8,
         padding: '14px 16px',
         cursor: onClick ? 'pointer' : 'default',
       }}
     >
-      <div style={{ color: '#666688', fontSize: 10, textTransform: 'uppercase',
+      <div style={{ color: 'var(--text-dim)', fontSize: 10, textTransform: 'uppercase',
         letterSpacing: 1, marginBottom: 6 }}>{label}</div>
-      <div style={{ color: warning ? '#ffaa44' : '#ffffff', fontSize: 26, fontWeight: 700 }}>{value ?? '—'}</div>
-      {sub && <div style={{ color: '#666688', fontSize: 11, marginTop: 2 }}>{sub}</div>}
+      <div style={{ color: warning ? 'var(--warning)' : 'var(--text)', fontSize: 26, fontWeight: 700 }}>{value ?? '—'}</div>
+      {sub && <div style={{ color: 'var(--text-dim)', fontSize: 11, marginTop: 2 }}>{sub}</div>}
     </div>
   );
 }
@@ -68,33 +62,33 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
       }} />
       <div style={{
         position: 'fixed', top: 0, right: 0, bottom: 0,
-        width: '33vw', minWidth: 340, background: BG,
-        borderLeft: `1px solid ${BORDER}`,
+        width: '33vw', minWidth: 340, background: 'var(--bg)',
+        borderLeft: '1px solid var(--border-dim)',
         zIndex: 100, display: 'flex', flexDirection: 'column',
         overflowY: 'auto',
         animation: 'slideIn 0.2s ease',
       }}>
         {loading ? (
-          <div style={{ padding: 24, color: '#8888aa' }}>Loading...</div>
+          <div style={{ padding: 24, color: 'var(--text-muted)' }}>Loading...</div>
         ) : !data?.player ? (
-          <div style={{ padding: 24, color: '#ff6666' }}>Player not found</div>
+          <div style={{ padding: 24, color: 'var(--danger)' }}>Player not found</div>
         ) : (
           <>
             {/* Header */}
             <div style={{
-              padding: '16px 20px', borderBottom: `1px solid ${BORDER}`,
+              padding: '16px 20px', borderBottom: '1px solid var(--border-dim)',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
               <div>
-                <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 500 }}>
+                <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 500 }}>
                   {data.player.normalized_name}
                 </div>
-                <div style={{ color: '#8888aa', fontSize: 11 }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>
                   Lane {data.player.lane} · Pair {data.player.lane_pair}
                 </div>
               </div>
               <button onClick={onClose} style={{
-                background: 'transparent', border: 'none', color: '#8888aa',
+                background: 'transparent', border: 'none', color: 'var(--text-muted)',
                 fontSize: 20, cursor: 'pointer',
               }}>✕</button>
             </div>
@@ -102,7 +96,7 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
             {/* Stats row — 3 cols */}
             <div style={{
               display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 8, padding: '12px 20px', borderBottom: `1px solid ${BORDER}`,
+              gap: 8, padding: '12px 20px', borderBottom: '1px solid var(--border-dim)',
             }}>
               {[
                 { label: 'Drawn', value: data.state?.cards_drawn ?? 0 },
@@ -110,19 +104,19 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
                 { label: 'Dead', value: data.state?.cards_dead ?? 0 },
               ].map(({ label, value }) => (
                 <div key={label} style={{ textAlign: 'center' }}>
-                  <div style={{ color: '#666688', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</div>
-                  <div style={{ color: '#ffffff', fontSize: 20, fontWeight: 700 }}>{value}</div>
+                  <div style={{ color: 'var(--text-dim)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</div>
+                  <div style={{ color: 'var(--text)', fontSize: 20, fontWeight: 700 }}>{value}</div>
                 </div>
               ))}
             </div>
 
             {/* Status + hand name */}
-            <div style={{ padding: '12px 20px', borderBottom: `1px solid ${BORDER}` }}>
+            <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--border-dim)' }}>
               <div style={{ marginBottom: 8 }}>
                 <StatusPill status={data.state?.status || 'waiting'} />
               </div>
               {data.hand?.name && (
-                <div style={{ color: '#ffffff', fontSize: 16, fontWeight: 500 }}>
+                <div style={{ color: 'var(--text)', fontSize: 16, fontWeight: 500 }}>
                   {data.hand.name}
                 </div>
               )}
@@ -146,7 +140,7 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
               )}
               {data.hand?.deadCards?.length > 0 && (
                 <div>
-                  <div style={{ color: '#ff6666', fontSize: 10, textTransform: 'uppercase',
+                  <div style={{ color: 'var(--danger)', fontSize: 10, textTransform: 'uppercase',
                     letterSpacing: 1, marginBottom: 6 }}>Dead Cards</div>
                   <CardRow cards={data.hand.deadCards} status="dead" size="sm" />
                 </div>
@@ -154,49 +148,49 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
             </div>
 
             {/* Footer actions */}
-            <div style={{ padding: '12px 20px', borderTop: `1px solid ${BORDER}` }}>
+            <div style={{ padding: '12px 20px', borderTop: '1px solid var(--border-dim)' }}>
               {footerAction === 'force_submit_confirm' ? (
                 <div>
-                  <p style={{ color: '#8888aa', fontSize: 12, marginBottom: 8 }}>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 12, marginBottom: 8 }}>
                     Force submit {data.player.normalized_name}? Their current hand will be locked as-is.
                   </p>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button onClick={() => doAction('force_submit')} disabled={acting}
-                      style={{ flex: 1, background: ACCENT, color: '#1a1a2e', border: 'none',
+                      style={{ flex: 1, background: 'var(--accent)', color: '#1a1a2e', border: 'none',
                         borderRadius: 6, padding: '8px', fontSize: 13, fontWeight: 700,
                         opacity: acting ? 0.7 : 1 }}>
                       {acting ? 'Submitting...' : 'Confirm'}
                     </button>
                     <button onClick={() => setFooterAction(null)}
-                      style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                        border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 13 }}>
+                      style={{ flex: 1, background: 'transparent', color: 'var(--text-muted)',
+                        border: '1px solid var(--border-dim)', borderRadius: 6, padding: '8px', fontSize: 13 }}>
                       Cancel
                     </button>
                   </div>
                 </div>
               ) : footerAction === 'adjust_draw' ? (
                 <div>
-                  <p style={{ color: '#8888aa', fontSize: 12, marginBottom: 8 }}>Set draw count:</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 12, marginBottom: 8 }}>Set draw count:</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                     <button onClick={() => setAdjustCount(v => Math.max(0, v - 1))}
-                      style={{ width: 32, height: 32, background: SURFACE, border: `1px solid ${BORDER_MAIN}`,
-                        borderRadius: 6, color: '#ffffff', fontSize: 18, cursor: 'pointer' }}>−</button>
-                    <span style={{ color: '#ffffff', fontSize: 20, fontWeight: 700,
+                      style={{ width: 32, height: 32, background: 'var(--surface)', border: '1px solid var(--border-light)',
+                        borderRadius: 6, color: 'var(--text)', fontSize: 18, cursor: 'pointer' }}>−</button>
+                    <span style={{ color: 'var(--text)', fontSize: 20, fontWeight: 700,
                       minWidth: 32, textAlign: 'center' }}>{adjustCount}</span>
                     <button onClick={() => setAdjustCount(v => v + 1)}
-                      style={{ width: 32, height: 32, background: SURFACE, border: `1px solid ${BORDER_MAIN}`,
-                        borderRadius: 6, color: '#ffffff', fontSize: 18, cursor: 'pointer' }}>+</button>
+                      style={{ width: 32, height: 32, background: 'var(--surface)', border: '1px solid var(--border-light)',
+                        borderRadius: 6, color: 'var(--text)', fontSize: 18, cursor: 'pointer' }}>+</button>
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button onClick={() => doAction('adjust_draw_count', adjustCount)} disabled={acting}
-                      style={{ flex: 1, background: ACCENT, color: '#1a1a2e', border: 'none',
+                      style={{ flex: 1, background: 'var(--accent)', color: '#1a1a2e', border: 'none',
                         borderRadius: 6, padding: '8px', fontSize: 13, fontWeight: 700,
                         opacity: acting ? 0.7 : 1 }}>
                       {acting ? 'Saving...' : 'Apply'}
                     </button>
                     <button onClick={() => setFooterAction(null)}
-                      style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                        border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 13 }}>
+                      style={{ flex: 1, background: 'transparent', color: 'var(--text-muted)',
+                        border: '1px solid var(--border-dim)', borderRadius: 6, padding: '8px', fontSize: 13 }}>
                       Cancel
                     </button>
                   </div>
@@ -204,23 +198,23 @@ function PlayerSlideOut({ playerId, gameId, sessionId, onRefresh, onClose }) {
               ) : (
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button onClick={onClose}
-                    style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                      border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 13, cursor: 'pointer' }}>
+                    style={{ flex: 1, background: 'transparent', color: 'var(--text-muted)',
+                      border: '1px solid var(--border-dim)', borderRadius: 6, padding: '8px', fontSize: 13, cursor: 'pointer' }}>
                     Close
                   </button>
                   <button
                     onClick={() => setFooterAction('force_submit_confirm')}
                     disabled={!data?.state || data.state.status === 'submitted' || data.state.status === 'forfeited'}
-                    style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                      border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 12,
+                    style={{ flex: 1, background: 'transparent', color: 'var(--text-muted)',
+                      border: '1px solid var(--border-dim)', borderRadius: 6, padding: '8px', fontSize: 12,
                       cursor: 'pointer',
                       opacity: (!data?.state || data.state.status === 'submitted' || data.state.status === 'forfeited') ? 0.4 : 1 }}>
                     Force Submit
                   </button>
                   <button
                     onClick={() => { setAdjustCount(data?.state?.cards_drawn || 0); setFooterAction('adjust_draw'); }}
-                    style={{ flex: 1, background: 'transparent', color: '#8888aa',
-                      border: `1px solid ${BORDER}`, borderRadius: 6, padding: '8px', fontSize: 12,
+                    style={{ flex: 1, background: 'transparent', color: 'var(--text-muted)',
+                      border: '1px solid var(--border-dim)', borderRadius: 6, padding: '8px', fontSize: 12,
                       cursor: 'pointer' }}>
                     Adjust Draws
                   </button>
@@ -256,17 +250,17 @@ export default function AdminDashboard() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  if (loading) return <div style={{ padding: 32, color: '#8888aa' }}>Loading...</div>;
+  if (loading) return <div style={{ padding: 32, color: 'var(--text-muted)' }}>Loading...</div>;
 
   if (!data?.session) {
     return (
       <div style={{ padding: 24 }}>
-        <h1 style={{ color: ACCENT, fontSize: 26, marginBottom: 4 }}>
+        <h1 style={{ color: 'var(--accent)', fontSize: 26, marginBottom: 4 }}>
           Game Night Dashboard
         </h1>
-        <p style={{ color: '#8888aa', marginBottom: 32 }}>No active session.</p>
-        <div style={{ background: SURFACE, border: `0.5px solid ${BORDER}`, borderRadius: 8,
-          padding: 40, textAlign: 'center', color: '#666688' }}>
+        <p style={{ color: 'var(--text-muted)', marginBottom: 32 }}>No active session.</p>
+        <div style={{ background: 'var(--surface)', border: '0.5px solid var(--border-dim)', borderRadius: 8,
+          padding: 40, textAlign: 'center', color: 'var(--text-dim)' }}>
           No active session. Go to Session Setup to start game night.
         </div>
       </div>
@@ -314,24 +308,23 @@ export default function AdminDashboard() {
 
   return (
     <div style={{ padding: 24, position: 'relative' }}>
-      {/* Header — "Game Night Dashboard" text-primary 15px/500, matching mockup main-header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
         <div>
-          <h1 style={{ color: ACCENT, fontSize: 26, marginBottom: 4 }}>
+          <h1 style={{ color: 'var(--accent)', fontSize: 26, marginBottom: 4 }}>
             Game Night Dashboard
           </h1>
-          <div style={{ color: '#666688', fontSize: 11 }}>
+          <div style={{ color: 'var(--text-dim)', fontSize: 11 }}>
             {session.season_name} · Week {session.week_number}
             {activeGame && ` · Game ${activeGame.game_number} in progress`}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          <div style={{ color: '#555577', fontSize: 11, marginRight: 8 }}>
+          <div style={{ color: 'var(--text-dim)', fontSize: 11, marginRight: 8 }}>
             Auto-refreshes every 10s
           </div>
           <button onClick={exportCSV} style={{ padding: '5px 11px', fontSize: 12, borderRadius: 6,
-            border: '0.5px solid #5555aa', background: '#2a2a45',
-            color: '#ffffff', cursor: 'pointer' }}>
+            border: '0.5px solid var(--border)', background: 'var(--surface)',
+            color: 'var(--text)', cursor: 'pointer' }}>
             Export
           </button>
           {activeGame && (
@@ -344,7 +337,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Stat cards — 4-column grid per mockup */}
+      {/* Stat cards — 4-column grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 14 }}>
         <StatCard
           label="Players Checked In"
@@ -375,39 +368,39 @@ export default function AdminDashboard() {
         />
       </div>
 
-      {/* Single card: card-header (title + filter pills) → column headers → rows */}
-      <div style={{ background: SURFACE, border: `0.5px solid #666688`, borderRadius: 8, overflow: 'hidden' }}>
-        {/* Card header — title left, filter pills right */}
+      {/* Player table card */}
+      <div style={{ background: 'var(--surface)', border: '0.5px solid var(--text-dim)', borderRadius: 8, overflow: 'hidden' }}>
+        {/* Card header */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           gap: 8, padding: '10px 14px',
-          borderBottom: `0.5px solid ${BORDER}`,
+          borderBottom: '0.5px solid var(--border-dim)',
           flexWrap: 'wrap',
         }}>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#ffffff', whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', whiteSpace: 'nowrap' }}>
             {activeGame ? `All players — Game ${activeGame.game_number}` : 'All players'}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 11, color: '#ffffff', whiteSpace: 'nowrap', fontWeight: 600 }}>Status:</span>
+            <span style={{ fontSize: 11, color: 'var(--text)', whiteSpace: 'nowrap', fontWeight: 600 }}>Status:</span>
             {['all', 'drawing', 'submitted', 'forfeited', 'waiting'].map(s => (
               <button key={s} onClick={() => setStatusFilter(s)}
                 style={{
-                  background: statusFilter === s ? ACCENT : 'transparent',
-                  color: statusFilter === s ? '#1a1a2e' : '#8888aa',
-                  border: `1px solid ${statusFilter === s ? ACCENT : BORDER}`,
+                  background: statusFilter === s ? 'var(--accent)' : 'transparent',
+                  color: statusFilter === s ? '#1a1a2e' : 'var(--text-muted)',
+                  border: `1px solid ${statusFilter === s ? 'var(--accent)' : 'var(--border-dim)'}`,
                   borderRadius: 20, padding: '3px 10px', fontSize: 11,
                   textTransform: 'capitalize', cursor: 'pointer',
                 }}>
                 {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
               </button>
             ))}
-            <span style={{ fontSize: 11, color: '#ffffff', whiteSpace: 'nowrap', marginLeft: 16, fontWeight: 600 }}>Lane:</span>
+            <span style={{ fontSize: 11, color: 'var(--text)', whiteSpace: 'nowrap', marginLeft: 16, fontWeight: 600 }}>Lane:</span>
             <select
               value={lanePairFilter}
               onChange={e => setLanePairFilter(e.target.value)}
               style={{
-                background: BG, border: `1px solid ${BORDER}`,
-                borderRadius: 6, color: '#8888aa', padding: '3px 8px',
+                background: 'var(--bg)', border: '1px solid var(--border-dim)',
+                borderRadius: 6, color: 'var(--text-muted)', padding: '3px 8px',
                 fontSize: 11,
               }}
             >
@@ -416,12 +409,12 @@ export default function AdminDashboard() {
                 <option key={lp} value={lp}>Pair {lp}</option>
               ))}
             </select>
-            <div style={{ color: '#555577', fontSize: 11 }}>
+            <div style={{ color: 'var(--text-dim)', fontSize: 11 }}>
               {filtered.length} of {players.length}
             </div>
             {isFiltered && (
               <button onClick={() => { setStatusFilter('all'); setLanePairFilter('all'); }}
-                style={{ background: 'transparent', color: BORDER_MAIN, border: 'none',
+                style={{ background: 'transparent', color: 'var(--border-light)', border: 'none',
                   fontSize: 11, cursor: 'pointer', textDecoration: 'underline' }}>
                 Clear
               </button>
@@ -433,19 +426,19 @@ export default function AdminDashboard() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: '12% 10% 9% 14% 18% 18% 19%',
-          background: BG,
+          background: 'var(--bg)',
           padding: '8px 16px',
           gap: 8,
         }}>
           {['Player', 'Lane', 'Frame', 'Drawn/Earned', 'Progress', 'Status', 'Best Hand'].map(h => (
-            <div key={h} style={{ color: '#666688', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1,
+            <div key={h} style={{ color: 'var(--text-dim)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1,
               textAlign: ['Lane', 'Frame', 'Drawn/Earned'].includes(h) ? 'center' : 'left' }}>{h}</div>
           ))}
         </div>
 
         {/* Rows */}
         {filtered.length === 0 ? (
-          <div style={{ padding: '24px 16px', color: '#666688', textAlign: 'center', fontSize: 13 }}>
+          <div style={{ padding: '24px 16px', color: 'var(--text-dim)', textAlign: 'center', fontSize: 13 }}>
             No players match the current filters.
           </div>
         ) : filtered.map(player => (
@@ -457,33 +450,33 @@ export default function AdminDashboard() {
               gridTemplateColumns: '12% 10% 9% 14% 18% 18% 19%',
               padding: '10px 16px',
               gap: 8,
-              borderTop: `0.5px solid ${BORDER}`,
+              borderTop: '0.5px solid var(--border-dim)',
               cursor: 'pointer',
               background: selectedPlayer === player.id ? '#222240' : 'transparent',
               alignItems: 'center',
             }}
           >
-            <div style={{ color: '#ffffff', fontSize: 13, fontWeight: 600,
+            <div style={{ color: 'var(--text)', fontSize: 13, fontWeight: 600,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {player.normalized_name}
             </div>
-            <div style={{ color: '#8888aa', fontSize: 13, textAlign: 'center' }}>{player.lane}</div>
-            <div style={{ color: '#8888aa', fontSize: 13, textAlign: 'center' }}>{player.current_frame || 0}</div>
-            <div style={{ color: '#8888aa', fontSize: 13, textAlign: 'center' }}>
+            <div style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center' }}>{player.lane}</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center' }}>{player.current_frame || 0}</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center' }}>
               {player.cards_drawn || 0}/{player.cards_earned || 0}
             </div>
-            <div style={{ background: BG, borderRadius: 4, height: 6, overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg)', borderRadius: 4, height: 6, overflow: 'hidden' }}>
               <div style={{
                 width: `${drawProgress(player)}%`,
                 height: '100%',
                 background: player.game_status === 'submitted' ? '#3dffa0'
-                  : player.game_status === 'forfeited' ? '#ff6666' : ACCENT,
+                  : player.game_status === 'forfeited' ? '#ff6666' : 'var(--accent)',
                 borderRadius: 4,
                 transition: 'width 0.3s ease',
               }} />
             </div>
             <StatusPill status={player.game_status || 'waiting'} />
-            <div style={{ color: '#8888aa', fontSize: 12,
+            <div style={{ color: 'var(--text-muted)', fontSize: 12,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {player.best_hand_name || '—'}
             </div>

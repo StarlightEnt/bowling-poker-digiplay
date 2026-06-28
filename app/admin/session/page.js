@@ -3,15 +3,15 @@ import { useState, useEffect, useRef } from 'react';
 import { calculatePayouts, generatePin } from '../../../lib/finance.js';
 
 const card = {
-  background: '#2a2a45',
-  border: '1px solid #5555aa',
+  background: 'var(--surface)',
+  border: '1px solid var(--border)',
   borderRadius: '8px',
   padding: '24px',
 };
 
 const label = {
   display: 'block',
-  color: '#8888aa',
+  color: 'var(--text-muted)',
   fontSize: '11px',
   textTransform: 'uppercase',
   letterSpacing: '1px',
@@ -19,10 +19,10 @@ const label = {
 };
 
 const input = {
-  background: '#2a2a45',
-  border: '1px solid #5555aa',
+  background: 'var(--surface)',
+  border: '1px solid var(--border)',
   borderRadius: '6px',
-  color: '#ffffff',
+  color: 'var(--text)',
   padding: '9px 12px',
   fontSize: '14px',
   outline: 'none',
@@ -30,7 +30,7 @@ const input = {
 };
 
 const btnPrimary = {
-  background: '#e8ff47',
+  background: 'var(--accent)',
   color: '#1a1a2e',
   border: 'none',
   borderRadius: '6px',
@@ -42,8 +42,8 @@ const btnPrimary = {
 
 const btnSecondary = {
   background: 'transparent',
-  color: '#8888aa',
-  border: '1px solid #5555aa',
+  color: 'var(--text-muted)',
+  border: '1px solid var(--border)',
   borderRadius: '6px',
   padding: '9px 16px',
   fontSize: '13px',
@@ -221,13 +221,13 @@ export default function SessionSetupPage() {
 
   const isLocked = currentSession?.locked;
 
-  if (loading) return <div style={{ padding: '32px', color: '#8888aa' }}>Loading...</div>;
+  if (loading) return <div style={{ padding: '32px', color: 'var(--text-muted)' }}>Loading...</div>;
 
   return (
     <div style={{ padding: '32px', maxWidth: '1100px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
         <div>
-          <h1 style={{ color: '#e8ff47', fontSize: 26 }}>Session Setup</h1>
+          <h1 style={{ color: 'var(--accent)', fontSize: 26 }}>Session Setup</h1>
           {isLocked && (
             <span style={{ background: '#e8ff47', color: '#1a1a2e', fontSize: '11px',
               fontWeight: 700, padding: '2px 8px', borderRadius: '4px', marginTop: '4px', display: 'inline-block' }}>
@@ -254,7 +254,7 @@ export default function SessionSetupPage() {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           <div style={card}>
-            <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '16px' }}>Session Details</h2>
+            <h2 style={{ color: 'var(--text)', fontSize: '16px', marginBottom: '16px' }}>Session Details</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
               <div>
                 <label style={label}>Season</label>
@@ -281,7 +281,7 @@ export default function SessionSetupPage() {
                     <button onClick={() => setPin(generatePin())} style={btnSecondary}>Generate</button>
                   )}
                 </div>
-                <p style={{ color: '#555577', fontSize: '11px', fontStyle: 'italic', marginTop: '4px' }}>
+                <p style={{ color: 'var(--text-dim)', fontSize: '11px', fontStyle: 'italic', marginTop: '4px' }}>
                   One PIN only, please. Get it? <span style={{ fontStyle: 'normal' }}>😉</span>
                 </p>
               </div>
@@ -301,8 +301,8 @@ export default function SessionSetupPage() {
             const recommended = players.length >= 29 ? 10 : players.length >= 21 ? 8 : 6;
             return (
               <div style={card}>
-                <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '8px' }}>Card Shoe Sizing</h2>
-                <p style={{ color: '#8888aa', fontSize: '12px', marginBottom: '16px' }}>
+                <h2 style={{ color: 'var(--text)', fontSize: '16px', marginBottom: '8px' }}>Card Shoe Sizing</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '12px', marginBottom: '16px' }}>
                   Recommended based on {players.length} players imported.
                 </p>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -316,18 +316,18 @@ export default function SessionSetupPage() {
                       style={{
                         flex: 1, padding: '12px', borderRadius: '8px',
                         cursor: isLocked ? 'default' : 'pointer',
-                        background: deckCount === decks ? '#e8ff47' : '#1a1a2e',
-                        color: deckCount === decks ? '#1a1a2e' : '#ffffff',
-                        border: `1px solid ${decks === recommended ? '#e8ff47' : '#5555aa'}`,
+                        background: deckCount === decks ? 'var(--accent)' : 'var(--bg)',
+                        color: deckCount === decks ? '#1a1a2e' : 'var(--text)',
+                        border: `1px solid ${decks === recommended ? 'var(--accent)' : 'var(--border)'}`,
                         textAlign: 'center',
                         opacity: isLocked && deckCount !== decks ? 0.4 : 1,
                       }}>
                       <div style={{ fontSize: '18px', fontWeight: 700 }}>{decks} Deck</div>
                       <div style={{ fontSize: '11px', marginTop: '4px' }}>{cards} cards</div>
-                      <div style={{ fontSize: '10px', marginTop: '2px', color: deckCount === decks ? '#555' : '#8888aa' }}>{range}</div>
+                      <div style={{ fontSize: '10px', marginTop: '2px', color: deckCount === decks ? '#555' : 'var(--text-muted)' }}>{range}</div>
                       {decks === recommended && (
                         <div style={{ fontSize: '9px', marginTop: '4px', fontWeight: 700,
-                          color: deckCount === decks ? '#555' : '#e8ff47', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                          color: deckCount === decks ? '#555' : 'var(--accent)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                           Recommended
                         </div>
                       )}
@@ -340,8 +340,8 @@ export default function SessionSetupPage() {
 
           {currentSession && (
             <div style={card}>
-              <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '4px' }}>Player Import</h2>
-              <p style={{ color: '#8888aa', fontSize: '12px', marginBottom: '16px' }}>
+              <h2 style={{ color: 'var(--text)', fontSize: '16px', marginBottom: '4px' }}>Player Import</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '12px', marginBottom: '16px' }}>
                 Upload a CSV with player name and lane assignment.
               </p>
               <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
@@ -355,29 +355,29 @@ export default function SessionSetupPage() {
                   onChange={handleCsvUpload} />
               </div>
               {importStatus && (
-                <p style={{ color: '#e8ff47', fontSize: '13px', marginBottom: '12px' }}>{importStatus}</p>
+                <p style={{ color: 'var(--accent)', fontSize: '13px', marginBottom: '12px' }}>{importStatus}</p>
               )}
               {players.length > 0 && (
                 <div style={{ maxHeight: '240px', overflowY: 'auto',
-                  border: '1px solid #5555aa', borderRadius: '6px' }}>
+                  border: '1px solid var(--border)', borderRadius: '6px' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                     <thead>
-                      <tr style={{ background: '#2a2a45' }}>
-                        <th style={{ padding: '8px 12px', textAlign: 'left', color: '#8888aa',
+                      <tr style={{ background: 'var(--surface)' }}>
+                        <th style={{ padding: '8px 12px', textAlign: 'left', color: 'var(--text-muted)',
                           fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Player</th>
-                        <th style={{ padding: '8px 12px', textAlign: 'left', color: '#8888aa',
+                        <th style={{ padding: '8px 12px', textAlign: 'left', color: 'var(--text-muted)',
                           fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Lane</th>
-                        <th style={{ padding: '8px 12px', textAlign: 'left', color: '#8888aa',
+                        <th style={{ padding: '8px 12px', textAlign: 'left', color: 'var(--text-muted)',
                           fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Pair</th>
                       </tr>
                     </thead>
                     <tbody>
                       {players.map((p, i) => (
-                        <tr key={p.id} style={{ borderTop: '1px solid #5555aa',
+                        <tr key={p.id} style={{ borderTop: '1px solid var(--border)',
                           background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)' }}>
-                          <td style={{ padding: '8px 12px', color: '#ffffff' }}>{p.normalized_name}</td>
-                          <td style={{ padding: '8px 12px', color: '#8888aa' }}>{p.lane}</td>
-                          <td style={{ padding: '8px 12px', color: '#8888aa' }}>{p.lane_pair}</td>
+                          <td style={{ padding: '8px 12px', color: 'var(--text)' }}>{p.normalized_name}</td>
+                          <td style={{ padding: '8px 12px', color: 'var(--text-muted)' }}>{p.lane}</td>
+                          <td style={{ padding: '8px 12px', color: 'var(--text-muted)' }}>{p.lane_pair}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -385,7 +385,7 @@ export default function SessionSetupPage() {
                 </div>
               )}
               {players.length === 0 && (
-                <p style={{ color: '#555577', fontSize: '12px', fontStyle: 'italic' }}>
+                <p style={{ color: 'var(--text-dim)', fontSize: '12px', fontStyle: 'italic' }}>
                   No players imported yet.
                 </p>
               )}
@@ -399,16 +399,16 @@ export default function SessionSetupPage() {
 
           {/* Manager Sync card — always visible, state-dependent content */}
           <div style={{
-            background: '#2a2a45',
-            border: `1px solid ${managerConnected ? '#7777cc' : '#5555aa'}`,
+            background: 'var(--surface)',
+            border: `1px solid ${managerConnected ? 'var(--border-light)' : 'var(--border)'}`,
             borderRadius: 8, padding: '16px 20px',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <div>
-                <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 600 }}>
+                <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 600 }}>
                   Bowling Poker Manager
                 </div>
-                <div style={{ color: managerConnected ? '#aaaacc' : '#666688', fontSize: 12, marginTop: 2 }}>
+                <div style={{ color: managerConnected ? 'var(--border-light)' : 'var(--text-dim)', fontSize: 12, marginTop: 2 }}>
                   {managerConnected
                     ? "Connected — sync players and session details from this week's check-in"
                     : 'Not connected — configure in Settings → Manager Integration'}
@@ -417,8 +417,8 @@ export default function SessionSetupPage() {
               <div style={{
                 fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 10,
                 background: managerConnected ? 'rgba(119,119,204,0.15)' : 'rgba(102,102,136,0.15)',
-                color: managerConnected ? '#7777cc' : '#666688',
-                border: `1px solid ${managerConnected ? '#7777cc' : '#5555aa'}`,
+                color: managerConnected ? 'var(--border-light)' : 'var(--text-dim)',
+                border: `1px solid ${managerConnected ? 'var(--border-light)' : 'var(--border)'}`,
               }}>
                 {managerConnected ? '● Connected' : '○ Not connected'}
               </div>
@@ -430,9 +430,9 @@ export default function SessionSetupPage() {
                   onClick={syncFromManager}
                   disabled={syncing}
                   style={{
-                    background: syncing ? '#2a2a45' : '#e8ff47',
-                    color: syncing ? '#aaaacc' : '#1a1a2e',
-                    border: `1px solid ${syncing ? '#5555aa' : '#e8ff47'}`,
+                    background: syncing ? 'var(--surface)' : 'var(--accent)',
+                    color: syncing ? 'var(--border-light)' : '#1a1a2e',
+                    border: `1px solid ${syncing ? 'var(--border)' : 'var(--accent)'}`,
                     borderRadius: 6, padding: '8px 18px',
                     fontSize: 13, fontWeight: 700, cursor: syncing ? 'not-allowed' : 'pointer',
                     marginTop: 4,
@@ -443,8 +443,8 @@ export default function SessionSetupPage() {
                   <div style={{
                     marginTop: 10, fontSize: 12, padding: '8px 12px', borderRadius: 6,
                     background: syncStatus === 'success' ? 'rgba(232,255,71,0.08)' : 'rgba(255,68,68,0.08)',
-                    border: `1px solid ${syncStatus === 'success' ? '#e8ff47' : '#ff4444'}`,
-                    color: syncStatus === 'success' ? '#e8ff47' : '#ff6666',
+                    border: `1px solid ${syncStatus === 'success' ? 'var(--accent)' : '#ff4444'}`,
+                    color: syncStatus === 'success' ? 'var(--accent)' : 'var(--danger)',
                   }}>
                     {syncMessage}
                   </div>
@@ -454,7 +454,7 @@ export default function SessionSetupPage() {
           </div>
 
           <div style={card}>
-            <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '16px' }}>Financial</h2>
+            <h2 style={{ color: 'var(--text)', fontSize: '16px', marginBottom: '16px' }}>Financial</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
               <div>
                 <label style={label}>Buy-in Amount ($)</label>
@@ -468,18 +468,18 @@ export default function SessionSetupPage() {
               </div>
               <div>
                 <label style={label}>Current Progressive Pot</label>
-                <div style={{ ...input, background: '#1a1a2e', color: '#8888aa', cursor: 'default' }}>
+                <div style={{ ...input, background: 'var(--surface-deep)', color: 'var(--text-muted)', cursor: 'default' }}>
                   ${parseFloat(progressivePot || 0).toFixed(2)}
                 </div>
               </div>
               <div>
                 <label style={label}>Players Checked In</label>
-                <div style={{ ...input, background: '#1a1a2e', color: '#8888aa', cursor: 'default' }}>
+                <div style={{ ...input, background: 'var(--surface-deep)', color: 'var(--text-muted)', cursor: 'default' }}>
                   {checkedInCount}
                 </div>
               </div>
             </div>
-            <div style={{ background: '#2a2a45', borderRadius: '6px', padding: '16px',
+            <div style={{ background: 'var(--surface)', borderRadius: '6px', padding: '16px',
               display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
               {[
                 { label: 'Total Pool', value: `$${payouts.pool.toFixed(2)}` },
@@ -488,26 +488,26 @@ export default function SessionSetupPage() {
                 { label: 'Prog. Add', value: `$${payouts.progressiveAdd.toFixed(2)}` },
               ].map(({ label: l, value, highlight }) => (
                 <div key={l}>
-                  <div style={{ color: '#8888aa', fontSize: '10px', textTransform: 'uppercase',
+                  <div style={{ color: 'var(--text-muted)', fontSize: '10px', textTransform: 'uppercase',
                     letterSpacing: '1px', marginBottom: '4px' }}>{l}</div>
-                  <div style={{ color: highlight ? '#e8ff47' : '#ffffff',
+                  <div style={{ color: highlight ? 'var(--accent)' : 'var(--text)',
                     fontSize: highlight ? '20px' : '16px', fontWeight: 700 }}>{value}</div>
                 </div>
               ))}
             </div>
-            <p style={{ color: '#555577', fontSize: '11px', marginTop: '8px' }}>
+            <p style={{ color: 'var(--text-dim)', fontSize: '11px', marginTop: '8px' }}>
               Based on {checkedInCount || players.length} players
             </p>
           </div>
 
           {currentSession && !isLocked && (
-            <div style={{ ...card, border: '1px solid #7777cc' }}>
-              <h2 style={{ color: '#ffffff', fontSize: '16px', marginBottom: '8px' }}>Ready to Lock?</h2>
-              <p style={{ color: '#8888aa', fontSize: '13px', marginBottom: '16px' }}>
+            <div style={{ ...card, border: '1px solid var(--border-light)' }}>
+              <h2 style={{ color: 'var(--text)', fontSize: '16px', marginBottom: '8px' }}>Ready to Lock?</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginBottom: '16px' }}>
                 Locking the session activates the PIN, initializes card shoes, and opens the player list on the kiosk.
                 No changes can be made after locking.
               </p>
-              <p style={{ color: players.length === 0 ? '#ffaa44' : '#e8ff47', fontSize: '13px' }}>
+              <p style={{ color: players.length === 0 ? 'var(--warning)' : 'var(--accent)', fontSize: '13px' }}>
                 {players.length === 0
                   ? '⚠️ Import players before locking.'
                   : `✅ ${players.length} players ready to lock.`}
@@ -522,9 +522,9 @@ export default function SessionSetupPage() {
           )}
 
           {isLocked && (
-            <div style={{ ...card, border: '1px solid #e8ff47' }}>
-              <h2 style={{ color: '#e8ff47', fontSize: '16px', marginBottom: '8px' }}>✅ Session Locked</h2>
-              <p style={{ color: '#8888aa', fontSize: '13px' }}>
+            <div style={{ ...card, border: '1px solid var(--accent)' }}>
+              <h2 style={{ color: 'var(--accent)', fontSize: '16px', marginBottom: '8px' }}>✅ Session Locked</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
                 PIN is active. Card shoes initialized. Players can now enter on their phones or the kiosk.
               </p>
             </div>

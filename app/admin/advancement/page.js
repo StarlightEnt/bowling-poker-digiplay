@@ -3,10 +3,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { CardRow } from '../../../components/CardDisplay.js';
 import StatusPill from '../../../components/StatusPill.js';
 
-const ACCENT = '#e8ff47';
-const SURFACE = '#2a2a45';
-const BORDER = '#5555aa';
-
 export default function GameAdvancement() {
   const [dashData, setDashData] = useState(null);
   const [leaderboard, setLeaderboard] = useState(null);
@@ -89,13 +85,13 @@ export default function GameAdvancement() {
     }
   }
 
-  if (loading) return <div style={{ padding: 32, color: '#8888aa' }}>Loading...</div>;
+  if (loading) return <div style={{ padding: 32, color: 'var(--text-muted)' }}>Loading...</div>;
 
   if (!dashData?.session) {
     return (
       <div style={{ padding: 32 }}>
-        <h1 style={{ color: ACCENT, fontSize: 28, marginBottom: 8 }}>Game Advancement</h1>
-        <p style={{ color: '#8888aa' }}>No active session.</p>
+        <h1 style={{ color: 'var(--accent)', fontSize: 28, marginBottom: 8 }}>Game Advancement</h1>
+        <p style={{ color: 'var(--text-muted)' }}>No active session.</p>
       </div>
     );
   }
@@ -110,8 +106,8 @@ export default function GameAdvancement() {
 
   return (
     <div style={{ padding: 24 }}>
-      <h1 style={{ color: ACCENT, fontSize: 26, marginBottom: 4 }}>Game Advancement</h1>
-      <p style={{ color: '#8888aa', fontSize: 13, marginBottom: 20 }}>
+      <h1 style={{ color: 'var(--accent)', fontSize: 26, marginBottom: 4 }}>Game Advancement</h1>
+      <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 20 }}>
         {dashData.session.season_name} · Week {dashData.session.week_number}
       </p>
 
@@ -121,9 +117,9 @@ export default function GameAdvancement() {
           <button key={g.id}
             onClick={() => { setSelectedGameId(g.id); setConfirmed(false); setConfirmResult(null); setConfirmError(null); }}
             style={{
-              background: selectedGameId === g.id ? ACCENT : SURFACE,
-              color: selectedGameId === g.id ? '#1a1a2e' : g.status === 'open' ? '#ffffff' : '#555577',
-              border: `1px solid ${selectedGameId === g.id ? ACCENT : BORDER}`,
+              background: selectedGameId === g.id ? 'var(--accent)' : 'var(--surface)',
+              color: selectedGameId === g.id ? '#1a1a2e' : g.status === 'open' ? 'var(--text)' : 'var(--text-dim)',
+              border: `1px solid ${selectedGameId === g.id ? 'var(--accent)' : 'var(--border)'}`,
               borderRadius: 6, padding: '8px 20px', fontSize: 13, fontWeight: 700,
               opacity: g.status === 'pending' ? 0.4 : 1,
               cursor: g.status === 'pending' ? 'default' : 'pointer',
@@ -136,8 +132,7 @@ export default function GameAdvancement() {
         ))}
       </div>
 
-      {/* New instructional subtitle */}
-      <p style={{ color: '#ffffff', fontSize: 13, fontWeight: 700, marginBottom: 20 }}>
+      <p style={{ color: 'var(--text)', fontSize: 13, fontWeight: 700, marginBottom: 20 }}>
         Review all hands · confirm winner · announce to all screens
       </p>
 
@@ -150,7 +145,7 @@ export default function GameAdvancement() {
           <div style={{ color: '#3dffa0', fontSize: 16, fontWeight: 700, marginBottom: 4 }}>
             ✅ Winner confirmed — announcement sent to all screens
           </div>
-          <div style={{ color: '#8888aa', fontSize: 13 }}>
+          <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>
             {confirmResult.winners.join(' & ')} · {confirmResult.handName} · ${confirmResult.payout.toFixed(2)}/player
             {confirmResult.isRoyalFlush && ` + $${confirmResult.progressivePot?.toFixed(2)} progressive pot`}
           </div>
@@ -158,22 +153,21 @@ export default function GameAdvancement() {
       )}
 
       {!leaderboard ? (
-        <div style={{ color: '#8888aa' }}>Loading leaderboard...</div>
+        <div style={{ color: 'var(--text-muted)' }}>Loading leaderboard...</div>
       ) : (
         <>
           {/* Confirm winner card */}
           {!confirmed && leaderboard.tiedPlayers.length > 0 && (
             <div style={{
-              background: SURFACE,
-              border: `1px solid ${manualWinner ? ACCENT : leaderboard.isTie ? '#ffaa44' : '#3dffa0'}`,
+              background: 'var(--surface)',
+              border: `1px solid ${manualWinner ? 'var(--accent)' : leaderboard.isTie ? '#ffaa44' : '#3dffa0'}`,
               borderRadius: 8, overflow: 'hidden', marginBottom: 20,
             }}>
-              {/* Header bar: dynamic eyebrow + Change winner / Cancel */}
               <div style={{
-                padding: '10px 16px', borderBottom: `1px solid ${BORDER}`,
+                padding: '10px 16px', borderBottom: '1px solid var(--border)',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               }}>
-                <div style={{ color: '#ffffff', fontSize: 13, fontWeight: 500 }}>
+                <div style={{ color: 'var(--text)', fontSize: 13, fontWeight: 500 }}>
                   {manualWinner ? '✏️ Manual Override' : leaderboard.isTie ? '⚠️ Tie Detected — Split Payout' : '🏆 Suggested Winner'}
                 </div>
                 {!changingWinner && (
@@ -181,8 +175,8 @@ export default function GameAdvancement() {
                     <button
                       onClick={() => { setManualWinner(null); setChangeSearch(''); }}
                       style={{
-                        background: 'transparent', color: '#8888aa',
-                        border: `1px solid ${BORDER}`, borderRadius: 6,
+                        background: 'transparent', color: 'var(--text-muted)',
+                        border: '1px solid var(--border)', borderRadius: 6,
                         padding: '7px 14px', fontSize: 13, cursor: 'pointer',
                       }}>
                       Cancel
@@ -191,8 +185,8 @@ export default function GameAdvancement() {
                     <button
                       onClick={() => { setChangingWinner(true); setChangeSearch(''); }}
                       style={{
-                        background: 'transparent', color: '#8888aa',
-                        border: `1px solid ${BORDER}`, borderRadius: 6,
+                        background: 'transparent', color: 'var(--text-muted)',
+                        border: '1px solid var(--border)', borderRadius: 6,
                         padding: '7px 14px', fontSize: 13, cursor: 'pointer',
                       }}>
                       Change winner
@@ -202,32 +196,30 @@ export default function GameAdvancement() {
               </div>
 
               <div style={{ padding: 20 }}>
-              {/* Tie explanation note */}
               {!manualWinner && leaderboard.isTie && (
                 <div style={{
-                  fontSize: 11, color: '#ffaa44', background: 'rgba(255,170,68,0.12)',
+                  fontSize: 11, color: 'var(--warning)', background: 'rgba(255,170,68,0.12)',
                   padding: '8px 12px', borderRadius: 6, marginBottom: 12,
                 }}>
                   Tie detected — pot will be split equally. No further action needed.
                 </div>
               )}
 
-              {/* Main row: left = winner block(s), right = big Confirm & Announce button */}
               {!changingWinner && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
                   <div style={{ flex: 1, minWidth: 240 }}>
                     {(manualWinner ? [manualWinner] : leaderboard.tiedPlayers).map(p => (
                       <div key={p.id} style={{ marginBottom: 12 }}>
-                        <div style={{ color: '#ffffff', fontSize: 18, fontWeight: 700 }}>
+                        <div style={{ color: 'var(--text)', fontSize: 18, fontWeight: 700 }}>
                           {p.normalized_name}
                         </div>
-                        <div style={{ color: ACCENT, fontSize: 14 }}>{p.hand?.name}</div>
+                        <div style={{ color: 'var(--accent)', fontSize: 14 }}>{p.hand?.name}</div>
                         {p.hand?.best5?.length > 0 && (
                           <div style={{ marginTop: 6 }}>
                             <CardRow cards={p.hand.best5} status="best5" size="sm" />
                           </div>
                         )}
-                        <div style={{ marginTop: 6, color: '#8888aa', fontSize: 13, fontWeight: 500 }}>
+                        <div style={{ marginTop: 6, color: 'var(--text-muted)', fontSize: 13, fontWeight: 500 }}>
                           Lane {p.lane} · {!manualWinner && leaderboard.isTie ? 'Split payout' : 'Payout'} ${leaderboard.splitAmount.toFixed(2)}
                           {p.score >= 9_000_000 && (
                             <span style={{ color: '#ffd700' }}> · + ${leaderboard.progressivePot.toFixed(2)} progressive pot</span>
@@ -241,9 +233,9 @@ export default function GameAdvancement() {
                     onClick={() => { if (!isClosed) handleConfirmWinner(); }}
                     disabled={confirming || isClosed}
                     style={{
-                      background: isClosed ? SURFACE : ACCENT,
-                      color: isClosed ? '#555577' : '#1a1a2e',
-                      border: isClosed ? `1px solid ${BORDER}` : 'none',
+                      background: isClosed ? 'var(--surface)' : 'var(--accent)',
+                      color: isClosed ? 'var(--text-dim)' : '#1a1a2e',
+                      border: isClosed ? '1px solid var(--border)' : 'none',
                       borderRadius: 8,
                       padding: '0 28px', fontSize: 16, fontWeight: 700,
                       height: 68, minWidth: 190,
@@ -255,7 +247,6 @@ export default function GameAdvancement() {
                 </div>
               )}
 
-              {/* Autocomplete search — unchanged from previous version */}
               {changingWinner && (
                 <div style={{ position: 'relative' }}>
                   <div style={{ display: 'flex', gap: 8 }}>
@@ -265,16 +256,16 @@ export default function GameAdvancement() {
                       onChange={e => setChangeSearch(e.target.value)}
                       placeholder="Type player name..."
                       style={{
-                        flex: 1, background: '#1a1a2e', border: `1px solid ${BORDER}`,
-                        borderRadius: 6, padding: '8px 12px', color: '#ffffff',
+                        flex: 1, background: 'var(--bg)', border: '1px solid var(--border)',
+                        borderRadius: 6, padding: '8px 12px', color: 'var(--text)',
                         fontSize: 14, outline: 'none',
                       }}
                     />
                     <button
                       onClick={() => setChangingWinner(false)}
                       style={{
-                        background: 'transparent', color: '#8888aa',
-                        border: `1px solid ${BORDER}`, borderRadius: 6,
+                        background: 'transparent', color: 'var(--text-muted)',
+                        border: '1px solid var(--border)', borderRadius: 6,
                         padding: '8px 12px', fontSize: 13, cursor: 'pointer',
                       }}>
                       ✕
@@ -288,22 +279,22 @@ export default function GameAdvancement() {
                     return (
                       <div style={{
                         position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 52, zIndex: 10,
-                        background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 6,
+                        background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6,
                         maxHeight: 200, overflowY: 'auto', boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
                       }}>
                         {filtered.length === 0 ? (
-                          <div style={{ padding: '10px 12px', color: '#8888aa', fontSize: 13 }}>No matches</div>
+                          <div style={{ padding: '10px 12px', color: 'var(--text-muted)', fontSize: 13 }}>No matches</div>
                         ) : filtered.map(e => (
                           <div key={e.id}
                             onClick={() => { setManualWinner(e); setChangingWinner(false); setChangeSearch(''); }}
                             style={{
                               padding: '10px 12px', cursor: 'pointer',
-                              borderBottom: `1px solid ${BORDER}`,
+                              borderBottom: '1px solid var(--border)',
                             }}>
-                            <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 600 }}>
+                            <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 600 }}>
                               {e.normalized_name}
                             </div>
-                            <div style={{ color: ACCENT, fontSize: 12 }}>{e.hand?.name || '—'}</div>
+                            <div style={{ color: 'var(--accent)', fontSize: 12 }}>{e.hand?.name || '—'}</div>
                           </div>
                         ))}
                       </div>
@@ -312,20 +303,18 @@ export default function GameAdvancement() {
                 </div>
               )}
 
-              {/* Confirm error — shown when API call fails */}
               {confirmError && (
                 <div style={{
                   marginTop: 10, padding: '10px 14px',
-                  background: 'rgba(255,68,68,0.12)',
+                  background: 'var(--danger-bg)',
                   border: '1px solid #ff4444',
-                  borderRadius: 6, color: '#ff6666',
+                  borderRadius: 6, color: 'var(--danger)',
                   fontSize: 13, lineHeight: 1.5,
                 }}>
                   ⚠️ {confirmError}
                 </div>
               )}
-              {/* Confirm helper text — always visible until confirmed */}
-              <div style={{ marginTop: 12, fontSize: 13, color: '#8888aa', fontWeight: 500 }}>
+              <div style={{ marginTop: 12, fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>
                 Confirming will push the winner announcement to all active player screens simultaneously.
               </div>
               </div>
@@ -333,16 +322,15 @@ export default function GameAdvancement() {
           )}
 
           {/* Leaderboard card */}
-          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 8, overflow: 'hidden' }}>
-            {/* Card header */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{
-              padding: '10px 16px', borderBottom: `1px solid ${BORDER}`,
+              padding: '10px 16px', borderBottom: '1px solid var(--border)',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
-              <div style={{ color: '#ffffff', fontSize: 13, fontWeight: 500 }}>
+              <div style={{ color: 'var(--text)', fontSize: 13, fontWeight: 500 }}>
                 Game {selectedGame?.game_number} leaderboard
               </div>
-              <div style={{ color: '#666688', fontSize: 11 }}>
+              <div style={{ color: 'var(--text-dim)', fontSize: 11 }}>
                 {submittedCount} of {totalCount} submitted · {drawingCount} still drawing
               </div>
             </div>
@@ -350,10 +338,10 @@ export default function GameAdvancement() {
             <div style={{
               display: 'grid',
               gridTemplateColumns: '6fr 17fr 16fr 37fr 10fr minmax(100px, 14fr)',
-              background: '#1a1a2e', padding: '8px 16px', gap: 8,
+              background: 'var(--bg)', padding: '8px 16px', gap: 8,
             }}>
               {['Rank', 'Player', 'Hand', 'Cards', 'Lane', 'Status'].map(h => (
-                <div key={h} style={{ color: '#555577', fontSize: 10,
+                <div key={h} style={{ color: 'var(--text-dim)', fontSize: 10,
                   textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
               ))}
             </div>
@@ -369,7 +357,7 @@ export default function GameAdvancement() {
                   display: 'grid',
                   gridTemplateColumns: '6fr 17fr 16fr 37fr 10fr minmax(100px, 14fr)',
                   padding: '10px 16px', gap: 8,
-                  borderTop: `1px solid ${BORDER}`,
+                  borderTop: '1px solid var(--border)',
                   background: isRoyalFlush ? '#2a1f00'
                     : isTieRow ? 'rgba(255,170,68,0.15)'
                     : isClearWinner ? 'rgba(61,255,160,0.15)'
@@ -377,12 +365,12 @@ export default function GameAdvancement() {
                   opacity: (entry.isForfeited || entry.isInProgress) ? 0.5 : 1,
                   alignItems: 'center',
                 }}>
-                  <div style={{ color: isRoyalFlush ? '#ffd700' : isTop ? ACCENT : '#555577', fontWeight: 700 }}>
+                  <div style={{ color: isRoyalFlush ? '#ffd700' : isTop ? 'var(--accent)' : 'var(--text-dim)', fontWeight: 700 }}>
                     {entry.isSubmitted ? idx + 1 : '—'}
-                    {isTieRow && <span style={{ color: '#ffaa44', fontSize: 10, marginLeft: 2 }}>TIE</span>}
+                    {isTieRow && <span style={{ color: 'var(--warning)', fontSize: 10, marginLeft: 2 }}>TIE</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, overflow: 'hidden' }}>
-                    <span style={{ color: isRoyalFlush ? '#ffd700' : '#ffffff', fontWeight: 600,
+                    <span style={{ color: isRoyalFlush ? '#ffd700' : 'var(--text)', fontWeight: 600,
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {entry.normalized_name}
                     </span>
@@ -395,7 +383,7 @@ export default function GameAdvancement() {
                       </span>
                     )}
                   </div>
-                  <div style={{ color: isRoyalFlush ? '#ffd700' : ACCENT, fontSize: 13,
+                  <div style={{ color: isRoyalFlush ? '#ffd700' : 'var(--accent)', fontSize: 13,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {entry.isForfeited ? 'Forfeited' : entry.hand?.name || '—'}
                   </div>
@@ -406,12 +394,12 @@ export default function GameAdvancement() {
                         size="xs" />
                     )}
                     {entry.isInProgress && (
-                      <span style={{ color: '#8888aa', fontSize: 10, display: 'block', marginTop: 2 }}>
+                      <span style={{ color: 'var(--text-muted)', fontSize: 10, display: 'block', marginTop: 2 }}>
                         in progress
                       </span>
                     )}
                   </div>
-                  <div style={{ color: isRoyalFlush ? '#ffd700' : '#8888aa', fontSize: 13 }}>{entry.lane}</div>
+                  <div style={{ color: isRoyalFlush ? '#ffd700' : 'var(--text-muted)', fontSize: 13 }}>{entry.lane}</div>
                   <StatusPill status={entry.status || 'waiting'} />
                 </div>
               );

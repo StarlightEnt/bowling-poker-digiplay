@@ -38,19 +38,19 @@ export default function AdminSidebar({ session }) {
   return (
     <aside style={{
       width: '240px',
-      background: '#1a1a2e',
-      borderRight: '0.5px solid #333355',
+      background: 'var(--bg)',
+      borderRight: '0.5px solid var(--border-dim)',
       position: 'fixed',
       top: 0, left: 0, bottom: 0,
       display: 'flex',
       flexDirection: 'column',
       zIndex: 100,
     }}>
-      <div style={{ padding: '16px 20px', borderBottom: '0.5px solid #333355' }}>
-        <div style={{ fontSize: 22, fontWeight: 700, color: '#e8ff47', letterSpacing: 0.5 }}>
+      <div style={{ padding: '16px 20px', borderBottom: '0.5px solid var(--border-dim)' }}>
+        <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--accent)', letterSpacing: 0.5 }}>
           Bowling Poker
         </div>
-        <div style={{ fontSize: 14, color: '#666688', marginTop: 2 }}>
+        <div style={{ fontSize: 14, color: 'var(--text-dim)', marginTop: 2 }}>
           Digiplay Admin
         </div>
       </div>
@@ -60,7 +60,7 @@ export default function AdminSidebar({ session }) {
         {NAV.map(({ section, items }) => (
           <div key={section}>
             <div style={{
-              color: '#ffffff',
+              color: 'var(--text)',
               fontSize: 12,
               fontWeight: 700,
               textTransform: 'uppercase',
@@ -79,9 +79,9 @@ export default function AdminSidebar({ session }) {
                   gap: 11,
                   padding: '9px 20px',
                   fontSize: 16,
-                  color: isActive(href) ? '#ffffff' : '#8888aa',
-                  background: isActive(href) ? '#2a2a45' : 'transparent',
-                  borderLeft: isActive(href) ? '2px solid #e8ff47' : '2px solid transparent',
+                  color: isActive(href) ? 'var(--text)' : 'var(--text-muted)',
+                  background: isActive(href) ? 'var(--surface)' : 'transparent',
+                  borderLeft: isActive(href) ? '2px solid var(--accent)' : '2px solid transparent',
                   fontWeight: isActive(href) ? 500 : 400,
                   transition: 'all 0.15s',
                   textDecoration: 'none',
@@ -95,8 +95,8 @@ export default function AdminSidebar({ session }) {
         ))}
       </nav>
 
-      <div style={{ padding: '12px 20px', paddingBottom: 72, borderTop: '0.5px solid #333355', fontSize: 14, color: '#666688' }}>
-        <div style={{ display: 'block', color: '#8888aa', fontWeight: 500, fontSize: 15, marginBottom: 2 }}>
+      <div style={{ padding: '12px 20px', paddingBottom: 72, borderTop: '0.5px solid var(--border-dim)', fontSize: 14, color: 'var(--text-dim)' }}>
+        <div style={{ display: 'block', color: 'var(--text-muted)', fontWeight: 500, fontSize: 15, marginBottom: 2 }}>
           {session?.user?.leagueName || 'League'}
         </div>
         Week {session?.user?.weekNumber || '—'}
@@ -104,8 +104,8 @@ export default function AdminSidebar({ session }) {
           onClick={() => signOut({ callbackUrl: '/login' })}
           style={{
             display: 'block', marginTop: 8,
-            background: 'transparent', border: '0.5px solid #333355',
-            borderRadius: 4, color: '#666688', fontSize: 12,
+            background: 'transparent', border: '0.5px solid var(--border-dim)',
+            borderRadius: 4, color: 'var(--text-dim)', fontSize: 12,
             padding: '4px 8px', cursor: 'pointer', width: '100%',
           }}
         >

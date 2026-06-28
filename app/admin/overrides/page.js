@@ -3,29 +3,25 @@
 import { useState, useEffect, useCallback } from 'react';
 import StatusPill from '../../../components/StatusPill.js';
 
-const ACCENT = '#e8ff47';
-const SURFACE = '#2a2a45';
-const BORDER = '#5555aa';
-
 function ConfirmModal({ title, message, confirmLabel, dangerous, onConfirm, onCancel, disabled, children }) {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}>
-      <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: 12, padding: 28, maxWidth: 380, width: '90%' }}>
-        <h3 style={{ color: '#ffffff', marginBottom: 8 }}>{title}</h3>
-        <p style={{ color: '#8888aa', fontSize: 13, marginBottom: 16 }}>{message}</p>
+        <h3 style={{ color: 'var(--text)', marginBottom: 8 }}>{title}</h3>
+        <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 16 }}>{message}</p>
         {children}
         <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
           <button onClick={onConfirm} disabled={disabled} style={{
-            flex: 1, background: dangerous ? '#ff4444' : ACCENT,
-            color: dangerous ? '#ffffff' : '#1a1a2e',
+            flex: 1, background: dangerous ? '#ff4444' : 'var(--accent)',
+            color: dangerous ? 'var(--text)' : '#1a1a2e',
             border: 'none', borderRadius: 6, padding: '10px', fontWeight: 700, fontSize: 14,
             opacity: disabled ? 0.5 : 1, cursor: disabled ? 'default' : 'pointer',
           }}>{confirmLabel}</button>
           <button onClick={onCancel} style={{
-            flex: 1, background: 'transparent', color: '#8888aa',
-            border: `1px solid ${BORDER}`, borderRadius: 6, padding: '10px',
+            flex: 1, background: 'transparent', color: 'var(--text-muted)',
+            border: '1px solid var(--border)', borderRadius: 6, padding: '10px',
           }}>Cancel</button>
         </div>
       </div>
@@ -41,7 +37,7 @@ function validateScore(frame, strikes, spares) {
 }
 
 const actionBtn = {
-  background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
+  background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)',
   borderRadius: 4, padding: '4px 10px', fontSize: 11, cursor: 'pointer',
 };
 const dangerBtn = {
@@ -121,11 +117,11 @@ export default function OverridesPage() {
     a.click();
   }
 
-  if (loading) return <div style={{ padding: 32, color: '#8888aa' }}>Loading...</div>;
+  if (loading) return <div style={{ padding: 32, color: 'var(--text-muted)' }}>Loading...</div>;
   if (!dashData?.session) return (
     <div style={{ padding: 32 }}>
-      <h1 style={{ color: ACCENT, fontSize: 26, marginBottom: 8 }}>Overrides</h1>
-      <p style={{ color: '#8888aa' }}>No active session.</p>
+      <h1 style={{ color: 'var(--accent)', fontSize: 26, marginBottom: 8 }}>Overrides</h1>
+      <p style={{ color: 'var(--text-muted)' }}>No active session.</p>
     </div>
   );
 
@@ -161,8 +157,8 @@ export default function OverridesPage() {
 
   return (
     <div style={{ padding: 24 }}>
-      <h1 style={{ color: ACCENT, fontSize: 26, marginBottom: 4 }}>Overrides</h1>
-      <p style={{ color: '#8888aa', fontSize: 13, marginBottom: 20 }}>
+      <h1 style={{ color: 'var(--accent)', fontSize: 26, marginBottom: 4 }}>Overrides</h1>
+      <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 20 }}>
         {session.season_name} · Week {session.week_number} · Every action requires confirmation.
       </p>
 
@@ -170,22 +166,22 @@ export default function OverridesPage() {
       {games?.slice().sort((a, b) => a.game_number - b.game_number).map(game => {
         const board = gameBoards[game.id];
         const statusLabel = game.status === 'open' ? '● OPEN' : game.status === 'closed' ? '✓ CLOSED' : 'PENDING';
-        const statusColor = game.status === 'open' ? ACCENT : game.status === 'closed' ? '#8888aa' : '#555577';
+        const statusColor = game.status === 'open' ? 'var(--accent)' : game.status === 'closed' ? 'var(--text-muted)' : 'var(--text-dim)';
 
         return (
-          <div key={game.id} style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+          <div key={game.id} style={{ background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 8, overflow: 'hidden', marginBottom: 16 }}>
-            <div style={{ padding: '12px 16px', borderBottom: `1px solid ${BORDER}`,
+            <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700 }}>
+              <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 700 }}>
                 Player overrides — Game {game.game_number}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 {game.status === 'closed' && (
                   <button
                     onClick={() => setModal({ action: 'undo_confirm_winner', game })}
-                    style={{ background: 'transparent', color: '#ffaa44',
-                      border: '1px solid #ffaa44', borderRadius: 4,
+                    style={{ background: 'transparent', color: 'var(--warning)',
+                      border: '1px solid var(--warning)', borderRadius: 4,
                       padding: '3px 10px', fontSize: 11, cursor: 'pointer' }}>
                     Undo Confirmation
                   </button>
@@ -213,9 +209,9 @@ export default function OverridesPage() {
             {game.status === 'open' && board && (
               <>
                 <div style={{ display: 'grid', gridTemplateColumns: colsOpen,
-                  background: '#1a1a2e', padding: '8px 16px', gap: 8 }}>
+                  background: 'var(--bg)', padding: '8px 16px', gap: 8 }}>
                   {['Player', 'Lane', 'Status', 'Actions'].map(h => (
-                    <div key={h} style={{ color: '#555577', fontSize: 10,
+                    <div key={h} style={{ color: 'var(--text-dim)', fontSize: 10,
                       textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
                   ))}
                 </div>
@@ -223,12 +219,12 @@ export default function OverridesPage() {
                   <div key={entry.id} style={{
                     display: 'grid', gridTemplateColumns: colsOpen,
                     padding: '10px 16px', gap: 8,
-                    borderTop: `1px solid ${BORDER}`, alignItems: 'center',
+                    borderTop: '1px solid var(--border)', alignItems: 'center',
                   }}>
-                    <div style={{ color: '#ffffff', fontSize: 13, fontWeight: 600 }}>
+                    <div style={{ color: 'var(--text)', fontSize: 13, fontWeight: 600 }}>
                       {entry.normalized_name}
                     </div>
-                    <div style={{ color: '#8888aa', fontSize: 13 }}>{entry.lane}</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{entry.lane}</div>
                     <StatusPill status={entry.status || 'waiting'} />
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {(entry.status === 'drawing' || entry.status === 'waiting') && (
@@ -265,9 +261,9 @@ export default function OverridesPage() {
             {game.status === 'closed' && board && (
               <>
                 <div style={{ display: 'grid', gridTemplateColumns: colsClosed,
-                  background: '#1a1a2e', padding: '8px 16px', gap: 8 }}>
+                  background: 'var(--bg)', padding: '8px 16px', gap: 8 }}>
                   {['Player', 'Lane', 'Hand', 'Status'].map(h => (
-                    <div key={h} style={{ color: '#555577', fontSize: 10,
+                    <div key={h} style={{ color: 'var(--text-dim)', fontSize: 10,
                       textTransform: 'uppercase', letterSpacing: 1 }}>{h}</div>
                   ))}
                 </div>
@@ -275,13 +271,13 @@ export default function OverridesPage() {
                   <div key={entry.id} style={{
                     display: 'grid', gridTemplateColumns: colsClosed,
                     padding: '10px 16px', gap: 8,
-                    borderTop: `1px solid ${BORDER}`, alignItems: 'center', opacity: 0.85,
+                    borderTop: '1px solid var(--border)', alignItems: 'center', opacity: 0.85,
                   }}>
-                    <div style={{ color: '#ffffff', fontSize: 13, fontWeight: 600 }}>
+                    <div style={{ color: 'var(--text)', fontSize: 13, fontWeight: 600 }}>
                       {entry.normalized_name}
                     </div>
-                    <div style={{ color: '#8888aa', fontSize: 13 }}>{entry.lane}</div>
-                    <div style={{ color: ACCENT, fontSize: 13 }}>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{entry.lane}</div>
+                    <div style={{ color: 'var(--accent)', fontSize: 13 }}>
                       {entry.isForfeited ? 'Forfeited' : entry.hand?.name || '—'}
                     </div>
                     <StatusPill status={entry.status || 'waiting'} />
@@ -294,27 +290,27 @@ export default function OverridesPage() {
       })}
 
       {/* Audit trail */}
-      <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 8, padding: 16 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-          <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 700 }}>Audit Trail</div>
+          <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 700 }}>Audit Trail</div>
           {overrides.length > 0 && (
             <button onClick={exportAuditLog}
-              style={{ background: 'transparent', color: '#8888aa', border: `1px solid ${BORDER}`,
+              style={{ background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)',
                 borderRadius: 6, padding: '4px 12px', fontSize: 11, cursor: 'pointer' }}>
               Export CSV
             </button>
           )}
         </div>
         {overrides.length === 0 ? (
-          <div style={{ color: '#555577', fontSize: 13, fontStyle: 'italic' }}>
+          <div style={{ color: 'var(--text-dim)', fontSize: 13, fontStyle: 'italic' }}>
             No overrides performed yet tonight.
           </div>
         ) : overrides.map(ov => (
           <div key={ov.id} style={{ display: 'flex', gap: 12, padding: '6px 0',
-            borderTop: `1px solid ${BORDER}`, fontSize: 12 }}>
-            <div style={{ color: '#555577', whiteSpace: 'nowrap' }}>{formatTime(ov.performed_at)}</div>
-            <div style={{ color: '#8888aa' }}>{formatAction(ov)}</div>
-            <div style={{ color: '#555577', marginLeft: 'auto', whiteSpace: 'nowrap' }}>{ov.admin_name}</div>
+            borderTop: '1px solid var(--border)', fontSize: 12 }}>
+            <div style={{ color: 'var(--text-dim)', whiteSpace: 'nowrap' }}>{formatTime(ov.performed_at)}</div>
+            <div style={{ color: 'var(--text-muted)' }}>{formatAction(ov)}</div>
+            <div style={{ color: 'var(--text-dim)', marginLeft: 'auto', whiteSpace: 'nowrap' }}>{ov.admin_name}</div>
           </div>
         ))}
       </div>
@@ -371,35 +367,35 @@ export default function OverridesPage() {
           >
             <div style={{ display: 'flex', gap: 20, margin: '12px 0', justifyContent: 'center' }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ color: '#666688', fontSize: 11, marginBottom: 4 }}>Strikes</div>
+                <div style={{ color: 'var(--text-dim)', fontSize: 11, marginBottom: 4 }}>Strikes</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <button onClick={() => setScoreStrikes(v => Math.max(0, v - 1))}
-                    style={{ width: 28, height: 28, background: '#1a1a2e', border: `1px solid ${BORDER}`,
-                      borderRadius: 6, color: '#ffffff', fontSize: 16 }}>−</button>
-                  <span style={{ color: '#ffffff', fontSize: 18, fontWeight: 700, minWidth: 24, textAlign: 'center' }}>{scoreStrikes}</span>
+                    style={{ width: 28, height: 28, background: 'var(--bg)', border: '1px solid var(--border)',
+                      borderRadius: 6, color: 'var(--text)', fontSize: 16 }}>−</button>
+                  <span style={{ color: 'var(--text)', fontSize: 18, fontWeight: 700, minWidth: 24, textAlign: 'center' }}>{scoreStrikes}</span>
                   <button onClick={() => setScoreStrikes(v => v + 1)}
-                    style={{ width: 28, height: 28, background: '#1a1a2e', border: `1px solid ${BORDER}`,
-                      borderRadius: 6, color: '#ffffff', fontSize: 16 }}>+</button>
+                    style={{ width: 28, height: 28, background: 'var(--bg)', border: '1px solid var(--border)',
+                      borderRadius: 6, color: 'var(--text)', fontSize: 16 }}>+</button>
                 </div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ color: '#666688', fontSize: 11, marginBottom: 4 }}>Spares</div>
+                <div style={{ color: 'var(--text-dim)', fontSize: 11, marginBottom: 4 }}>Spares</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <button onClick={() => setScoreSpares(v => Math.max(0, v - 1))}
-                    style={{ width: 28, height: 28, background: '#1a1a2e', border: `1px solid ${BORDER}`,
-                      borderRadius: 6, color: '#ffffff', fontSize: 16 }}>−</button>
-                  <span style={{ color: '#ffffff', fontSize: 18, fontWeight: 700, minWidth: 24, textAlign: 'center' }}>{scoreSpares}</span>
+                    style={{ width: 28, height: 28, background: 'var(--bg)', border: '1px solid var(--border)',
+                      borderRadius: 6, color: 'var(--text)', fontSize: 16 }}>−</button>
+                  <span style={{ color: 'var(--text)', fontSize: 18, fontWeight: 700, minWidth: 24, textAlign: 'center' }}>{scoreSpares}</span>
                   <button onClick={() => setScoreSpares(v => v + 1)}
-                    style={{ width: 28, height: 28, background: '#1a1a2e', border: `1px solid ${BORDER}`,
-                      borderRadius: 6, color: '#ffffff', fontSize: 16 }}>+</button>
+                    style={{ width: 28, height: 28, background: 'var(--bg)', border: '1px solid var(--border)',
+                      borderRadius: 6, color: 'var(--text)', fontSize: 16 }}>+</button>
                 </div>
               </div>
             </div>
-            <div style={{ textAlign: 'center', color: ACCENT, fontSize: 13, fontWeight: 600, marginBottom: error ? 8 : 0 }}>
+            <div style={{ textAlign: 'center', color: 'var(--accent)', fontSize: 13, fontWeight: 600, marginBottom: error ? 8 : 0 }}>
               Cards earned: {cardsEarned}
             </div>
             {error && (
-              <div style={{ color: '#ff6666', fontSize: 12, textAlign: 'center' }}>{error}</div>
+              <div style={{ color: 'var(--danger)', fontSize: 12, textAlign: 'center' }}>{error}</div>
             )}
           </ConfirmModal>
         );
