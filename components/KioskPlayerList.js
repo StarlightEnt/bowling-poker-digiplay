@@ -12,6 +12,10 @@ export default function KioskPlayerList({ session, onNewWeek }) {
   const [selected, setSelected] = useState(null);
   const [confirmMsg, setConfirmMsg] = useState('');
   const [confirmed, setConfirmed] = useState(null);
+  const [exitModalOpen, setExitModalOpen] = useState(false);
+  const [exitPin, setExitPin] = useState('');
+  const [exitError, setExitError] = useState(false);
+  const [exitChecking, setExitChecking] = useState(false);
 
   useEffect(() => {
     fetchPlayers();
@@ -22,6 +26,28 @@ export default function KioskPlayerList({ session, onNewWeek }) {
     const data = await res.json();
     setPlayers(data.players || []);
     setLoading(false);
+  }
+
+  async function handleExitConfirm() {
+    if (exitPin.length !== 4 || exitChecking) return;
+    setExitChecking(true);
+    setExitError(false);
+    const res = await fetch('/api/play/verify-pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin: exitPin }),
+    });
+    const data = await res.json();
+    setExitChecking(false);
+    if (data.valid) {
+      setExitModalOpen(false);
+      setExitPin('');
+      onNewWeek();
+    } else {
+      setExitError(true);
+      setExitPin('');
+      setTimeout(() => setExitError(false), 2000);
+    }
   }
 
   async function handleConfirm() {
@@ -61,14 +87,39 @@ export default function KioskPlayerList({ session, onNewWeek }) {
       alignItems: 'center',
       padding: '24px',
     }}>
-      {/* Header — title left, no session info here */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-        <div style={{ fontSize: 22, fontWeight: 500, color: '#ffffff', letterSpacing: 1 }}>
-          Bowling Poker
+      {/* Header — title left, exit button right */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+        maxWidth: 680,
+        marginBottom: 4,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+          <div style={{ fontSize: 22, fontWeight: 500, color: '#ffffff', letterSpacing: 1 }}>
+            Bowling Poker
+          </div>
+          <div style={{ fontSize: 10, color: ACCENT, letterSpacing: 3, textTransform: 'uppercase' }}>
+            Digiplay
+          </div>
         </div>
-        <div style={{ fontSize: 10, color: ACCENT, letterSpacing: 3, textTransform: 'uppercase' }}>
-          Digiplay
-        </div>
+        <button
+          onClick={() => { setExitModalOpen(true); setExitPin(''); setExitError(false); }}
+          style={{
+            background: 'transparent',
+            color: '#555577',
+            border: '1px solid #333355',
+            borderRadius: 6,
+            padding: '5px 12px',
+            fontSize: 11,
+            fontWeight: 500,
+            cursor: 'pointer',
+            letterSpacing: '0.3px',
+          }}
+        >
+          End Session
+        </button>
       </div>
 
       {/* Prompt */}
@@ -177,6 +228,88 @@ export default function KioskPlayerList({ session, onNewWeek }) {
           New Week
         </button>
       </div>
+
+      {exitModalOpen && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 200,
+          background: 'rgba(0,0,0,0.7)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            background: '#2a2a45',
+            border: '1px solid #5555aa',
+            borderRadius: 12,
+            padding: '28px 32px',
+            width: 300,
+            textAlign: 'center',
+            fontFamily: 'system-ui, sans-serif',
+          }}>
+            <div style={{ fontSize: 16, fontWeight: 600, color: '#ffffff', marginBottom: 8 }}>
+              End Session?
+            </div>
+            <div style={{ fontSize: 13, color: '#8888aa', marginBottom: 20 }}>
+              Enter the session PIN to confirm.
+            </div>
+            <input
+              type="tel"
+              inputMode="numeric"
+              maxLength={4}
+              value={exitPin}
+              onChange={e => setExitPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              onKeyDown={e => { if (e.key === 'Enter') handleExitConfirm(); }}
+              placeholder="_ _ _ _"
+              autoFocus
+              style={{
+                width: '100%',
+                background: '#1a1a2e',
+                border: `1px solid ${exitError ? '#ff6666' : '#5555aa'}`,
+                borderRadius: 8,
+                color: '#ffffff',
+                fontSize: 24,
+                fontWeight: 700,
+                textAlign: 'center',
+                letterSpacing: 8,
+                padding: '10px 0',
+                outline: 'none',
+                marginBottom: 8,
+                boxSizing: 'border-box',
+              }}
+            />
+            {exitError && (
+              <div style={{ color: '#ff6666', fontSize: 12, marginBottom: 8 }}>
+                Wrong PIN — try again.
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+              <button
+                onClick={() => { setExitModalOpen(false); setExitPin(''); setExitError(false); }}
+                style={{
+                  flex: 1, padding: '10px 0',
+                  background: 'transparent', color: '#8888aa',
+                  border: '1px solid #5555aa', borderRadius: 8,
+                  fontSize: 13, cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleExitConfirm}
+                disabled={exitPin.length !== 4 || exitChecking}
+                style={{
+                  flex: 1, padding: '10px 0',
+                  background: exitPin.length === 4 ? '#ff6666' : '#2a2a45',
+                  color: exitPin.length === 4 ? '#ffffff' : '#555577',
+                  border: `1px solid ${exitPin.length === 4 ? '#ff6666' : '#5555aa'}`,
+                  borderRadius: 8,
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                {exitChecking ? 'Checking...' : 'End Session'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -192,9 +192,47 @@ export default function PhonePinEntry() {
         </p>
       )}
 
-      <p style={{ color: '#333355', fontSize: '11px', position: 'absolute', bottom: '16px' }}>
-        Summer 2026
-      </p>
+      {/* Admin / Kiosk nav — bottom of screen, muted, unobtrusive */}
+      <div style={{
+        position: 'absolute',
+        bottom: '16px',
+        display: 'flex',
+        gap: 12,
+        alignItems: 'center',
+      }}>
+        <button
+          onClick={() => window.location.href = '/admin'}
+          style={{
+            background: 'transparent',
+            color: '#555577',
+            border: '1px solid #333355',
+            borderRadius: 6,
+            padding: '5px 14px',
+            fontSize: 11,
+            fontWeight: 500,
+            letterSpacing: '0.5px',
+            cursor: 'pointer',
+          }}
+        >
+          Admin
+        </button>
+        <button
+          onClick={() => window.location.href = '/kiosk'}
+          style={{
+            background: 'transparent',
+            color: '#555577',
+            border: '1px solid #333355',
+            borderRadius: 6,
+            padding: '5px 14px',
+            fontSize: 11,
+            fontWeight: 500,
+            letterSpacing: '0.5px',
+            cursor: 'pointer',
+          }}
+        >
+          Kiosk
+        </button>
+      </div>
 
       <style>{`
         @keyframes shake {
