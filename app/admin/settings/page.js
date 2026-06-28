@@ -1,7 +1,7 @@
 // PATH: app/admin/settings/page.js
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { THEMES, getThemeTokens } from '../../../lib/themes.js';
+import { THEMES, getThemeTokens, getLuminance } from '../../../lib/themes.js';
 
 const BG_SWATCHES = ['#1a1a2e', '#0a0a0f', '#0a1a0f', '#1a0a0f', '#0a0f1a', '#1a1000'];
 const ACCENT_SWATCHES = ['#e8ff47', '#4fa3ff', '#3dffa0', '#ff6b35', '#cc88ff', '#ff5577'];
@@ -255,6 +255,7 @@ export default function SettingsPage() {
   const lowContrast = contrastRatio < 4.5;
   const bgIsCustom     = !BG_SWATCHES.includes(themeBackground);
   const accentIsCustom = !ACCENT_SWATCHES.includes(themeAccent);
+  const isDarkBg       = getLuminance(themeBackground) < 0.18;
 
   if (loading) return <div style={{ padding: 32, color: 'var(--text-muted)' }}>Loading...</div>;
 
@@ -676,21 +677,21 @@ export default function SettingsPage() {
                       fontSize: 11,
                       fontWeight: 600,
                       background: admin.role === 'owner'
-                        ? 'rgba(232,255,71,0.12)'
+                        ? (isDarkBg ? 'rgba(232,255,71,0.12)'    : 'rgba(180,160,0,0.15)')
                         : admin.role === 'manager_admin'
                         ? 'rgba(119,119,204,0.15)'
-                        : 'rgba(136,136,170,0.12)',
+                        : (isDarkBg ? 'rgba(136,136,170,0.12)'   : 'rgba(100,100,140,0.15)'),
                       color: admin.role === 'owner'
-                        ? '#e8ff47'
+                        ? (isDarkBg ? '#e8ff47'  : '#886600')
                         : admin.role === 'manager_admin'
-                        ? '#7777cc'
-                        : '#8888aa',
+                        ? (isDarkBg ? '#7777cc'  : '#4444aa')
+                        : (isDarkBg ? '#8888aa'  : '#555577'),
                       border: `1px solid ${
                         admin.role === 'owner'
-                          ? 'rgba(232,255,71,0.3)'
+                          ? (isDarkBg ? 'rgba(232,255,71,0.3)'   : 'rgba(136,120,0,0.4)')
                           : admin.role === 'manager_admin'
-                          ? 'rgba(119,119,204,0.3)'
-                          : 'rgba(136,136,170,0.2)'
+                          ? (isDarkBg ? 'rgba(119,119,204,0.3)'  : 'rgba(68,68,170,0.4)')
+                          : (isDarkBg ? 'rgba(136,136,170,0.2)'  : 'rgba(85,85,119,0.3)')
                       }`,
                     }}>
                       {admin.role === 'manager_admin' ? 'manager' : admin.role}
