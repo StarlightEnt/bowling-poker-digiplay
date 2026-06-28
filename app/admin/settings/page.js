@@ -507,7 +507,7 @@ export default function SettingsPage() {
               borderRadius: 6, padding: '10px 14px', marginBottom: 14,
               display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ color: themeAccent, fontSize: 13, fontWeight: 700 }}>Preview</div>
-              <div style={{ color: '#ffffff', fontSize: 12 }}>Bowling Poker · {themeMode}</div>
+              <div style={{ color: getThemeTokens(themeBackground, themeAccent)['--text'], fontSize: 12 }}>Bowling Poker · {themeMode}</div>
             </div>
 
             {savedAppearance && (
