@@ -91,6 +91,14 @@ export async function POST(request) {
   }
 
   await sql`
+    UPDATE games
+    SET status = 'open', opened_at = NOW()
+    WHERE game_session_id = ${game.game_session_id}
+    AND status = 'pending'
+    AND game_number = ${game.game_number + 1}
+  `;
+
+  await sql`
     INSERT INTO overrides (game_session_id, league_id, admin_user_id, admin_name, action, target_type, target_id, details)
     VALUES (
       ${game.game_session_id}, ${leagueId}, ${adminId}, ${adminName},
