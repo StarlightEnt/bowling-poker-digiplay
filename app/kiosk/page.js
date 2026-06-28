@@ -14,11 +14,6 @@ function applyThemeTokens(themeBackground, themeAccent) {
   });
 }
 
-const BG = '#1a1a2e';
-const SURFACE = '#2a2a45';
-const BORDER = '#7777cc';
-const ACCENT = '#e8ff47';
-
 export default function KioskPage() {
   const [bootState, setBootState] = useState('loading'); // loading | continue | pin | playerlist
   const [savedSession, setSavedSession] = useState(null);
@@ -60,8 +55,8 @@ export default function KioskPage() {
 
   if (bootState === 'loading') {
     return (
-      <div style={{ minHeight: '100vh', background: BG, display: 'flex',
-        alignItems: 'center', justifyContent: 'center', color: '#8888aa' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex',
+        alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
         Loading...
       </div>
     );
@@ -79,7 +74,7 @@ export default function KioskPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: BG,
+      background: 'var(--bg)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -90,11 +85,11 @@ export default function KioskPage() {
       {/* Branding — matching kiosk continue mockup (lighter weights, smaller subtitle) */}
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
         <div style={{ fontSize: 11, fontWeight: 500, letterSpacing: 3,
-          color: '#888888', textTransform: 'uppercase', marginBottom: 6 }}>Welcome back to</div>
-        <div style={{ color: '#ffffff', fontSize: 32, fontWeight: 500, letterSpacing: 1, marginBottom: 4 }}>
+          color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Welcome back to</div>
+        <div style={{ color: 'var(--text)', fontSize: 32, fontWeight: 500, letterSpacing: 1, marginBottom: 4 }}>
           Bowling Poker
         </div>
-        <div style={{ color: ACCENT, fontSize: 11, letterSpacing: 3, textTransform: 'uppercase' }}>
+        <div style={{ color: 'var(--accent)', fontSize: 11, letterSpacing: 3, textTransform: 'uppercase' }}>
           Digiplay
         </div>
       </div>
@@ -114,9 +109,9 @@ export default function KioskPage() {
             style={{
               flex: 1,
               padding: '32px 16px',
-              background: SURFACE,
-              color: '#ffffff',
-              border: `2px solid ${BORDER}`,
+              background: 'var(--surface)',
+              color: 'var(--text)',
+              border: '2px solid var(--border-light)',
               borderRadius: 12,
               fontSize: 20,
               fontWeight: 700,
@@ -134,9 +129,9 @@ export default function KioskPage() {
 
       {savedSession && (
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 12, color: '#666688', letterSpacing: 2,
+          <div style={{ fontSize: 12, color: 'var(--text-dim)', letterSpacing: 2,
             textTransform: 'uppercase', marginBottom: 8 }}>Current Session</div>
-          <div style={{ fontSize: 18, fontWeight: 500, color: '#aaaacc' }}>
+          <div style={{ fontSize: 18, fontWeight: 500, color: 'var(--text-muted)' }}>
             {savedSession.seasonName} · Week {savedSession.weekNumber}
           </div>
         </div>

@@ -2,11 +2,6 @@
 import { useState, useEffect } from 'react';
 import PhoneDrawScreen from './PhoneDrawScreen.js';
 
-const BG = '#1a1a2e';
-const SURFACE = '#2a2a45';
-const BORDER = '#7777cc';
-const ACCENT = '#e8ff47';
-
 export default function PlayerNameSelect({ session }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,8 +39,8 @@ export default function PlayerNameSelect({ session }) {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: BG, display: 'flex',
-        alignItems: 'center', justifyContent: 'center', color: '#8888aa' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex',
+        alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
         Loading players...
       </div>
     );
@@ -53,23 +48,23 @@ export default function PlayerNameSelect({ session }) {
 
   return (
     <div style={{
-      minHeight: '100vh', background: BG, padding: '56px 16px 24px',
+      minHeight: '100vh', background: 'var(--bg)', padding: '56px 16px 24px',
       fontFamily: 'system-ui, sans-serif',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       overflowY: 'auto',
     }}>
       {/* Branding header matching mockup */}
-      <div style={{ fontSize: 10, fontWeight: 500, letterSpacing: 3, color: '#888888',
+      <div style={{ fontSize: 10, fontWeight: 500, letterSpacing: 3, color: 'var(--text-muted)',
         textTransform: 'uppercase', marginBottom: 3, alignSelf: 'center' }}>
         Welcome to
       </div>
-      <div style={{ fontSize: 20, fontWeight: 500, color: '#ffffff', letterSpacing: 1, marginBottom: 2 }}>
+      <div style={{ fontSize: 20, fontWeight: 500, color: 'var(--text)', letterSpacing: 1, marginBottom: 2 }}>
         Bowling Poker
       </div>
-      <div style={{ fontSize: 9, color: ACCENT, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 18 }}>
+      <div style={{ fontSize: 9, color: 'var(--accent)', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 18 }}>
         Digiplay
       </div>
-      <div style={{ fontSize: 12, color: '#aaaaaa', marginBottom: 14, letterSpacing: '0.3px' }}>
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14, letterSpacing: '0.3px' }}>
         Who are you?
       </div>
 
@@ -81,24 +76,24 @@ export default function PlayerNameSelect({ session }) {
           alignItems: 'center',
           gap: 10,
           width: '100%',
-          background: SURFACE,
-          border: `1px solid ${BORDER}`,
+          background: 'var(--surface)',
+          border: '1px solid var(--border-light)',
           borderRadius: 12,
           padding: 16,
           textAlign: 'center',
           marginBottom: 12,
         }}>
-          <div style={{ fontSize: 18, fontWeight: 600, color: '#ffffff' }}>
+          <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--text)' }}>
             {selected.normalized_name}
           </div>
-          <div style={{ fontSize: 11, color: '#aaaaaa' }}>Is that you?</div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Is that you?</div>
           <div style={{ display: 'flex', gap: 8, width: '100%' }}>
             <button
               onClick={handleConfirm}
               disabled={checkingIn}
               style={{
                 flex: 1, padding: 11,
-                background: ACCENT, color: '#1a1a2e',
+                background: 'var(--accent)', color: '#1a1a2e',
                 border: 'none', borderRadius: 8,
                 fontSize: 13, fontWeight: 600, cursor: 'pointer',
               }}
@@ -109,8 +104,8 @@ export default function PlayerNameSelect({ session }) {
               onClick={() => setSelected(null)}
               style={{
                 flex: 1, padding: 11,
-                background: SURFACE, color: '#ffffff',
-                border: `1px solid ${BORDER}`, borderRadius: 8,
+                background: 'var(--surface)', color: 'var(--text)',
+                border: '1px solid var(--border-light)', borderRadius: 8,
                 fontSize: 13, fontWeight: 500, cursor: 'pointer',
               }}
             >
@@ -133,9 +128,9 @@ export default function PlayerNameSelect({ session }) {
             key={player.id}
             onClick={() => setSelected(player)}
             style={{
-              background: selected?.id === player.id ? '#ffffff' : SURFACE,
-              color: selected?.id === player.id ? '#1a1a2e' : '#ffffff',
-              border: `1px solid ${selected?.id === player.id ? '#ffffff' : BORDER}`,
+              background: selected?.id === player.id ? '#ffffff' : 'var(--surface)',
+              color: selected?.id === player.id ? '#1a1a2e' : 'var(--text)',
+              border: `1px solid ${selected?.id === player.id ? '#ffffff' : 'var(--border-light)'}`,
               borderRadius: 8,
               padding: '12px 4px',
               fontSize: 11,
@@ -153,7 +148,7 @@ export default function PlayerNameSelect({ session }) {
       </div>
 
       {/* Week info at bottom */}
-      <div style={{ fontSize: 10, color: '#444466', marginTop: 'auto', paddingTop: 12, letterSpacing: 1 }}>
+      <div style={{ fontSize: 10, color: 'var(--border-dim)', marginTop: 'auto', paddingTop: 12, letterSpacing: 1 }}>
         {session.seasonName} · Week {session.weekNumber}
       </div>
     </div>

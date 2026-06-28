@@ -13,10 +13,6 @@ function applyThemeTokens(themeBackground, themeAccent) {
   });
 }
 
-const BG = '#1a1a2e';
-const SURFACE = '#2a2a45';
-const BORDER = '#7777cc';
-const ACCENT = '#e8ff47';
 const ERROR = '#e8192c';
 
 export default function PhonePinEntry() {
@@ -86,13 +82,13 @@ export default function PhonePinEntry() {
     return <PlayerNameSelect session={sessionData} />;
   }
 
-  const borderColor = status === 'error' ? ERROR : BORDER;
+  const borderColor = status === 'error' ? ERROR : 'var(--border-light)';
 
   return (
     <div style={{
       height: '100dvh',
       overflow: 'hidden',
-      background: BG,
+      background: 'var(--bg)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -102,11 +98,11 @@ export default function PhonePinEntry() {
     }}>
       {/* Header */}
       <div style={{ textAlign: 'center' }}>
-        <div style={{ color: '#8888aa', fontSize: '14px', letterSpacing: '2px',
+        <div style={{ color: 'var(--text-muted)', fontSize: '14px', letterSpacing: '2px',
           textTransform: 'uppercase', marginBottom: '4px' }}>Welcome to</div>
-        <div style={{ color: '#ffffff', fontSize: '32px', fontWeight: 900,
+        <div style={{ color: 'var(--text)', fontSize: '32px', fontWeight: 900,
           letterSpacing: '2px', lineHeight: 1 }}>Bowling Poker</div>
-        <div style={{ color: ACCENT, fontSize: '28px', fontWeight: 900,
+        <div style={{ color: 'var(--accent)', fontSize: '28px', fontWeight: 900,
           letterSpacing: '6px' }}>DIGIPLAY</div>
       </div>
 
@@ -154,10 +150,10 @@ export default function PhonePinEntry() {
               style={{
                 width: '36px',
                 height: '44px',
-                background: SURFACE,
-                border: `2px solid ${digit ? borderColor : ACCENT}`,
+                background: 'var(--surface)',
+                border: `2px solid ${digit ? borderColor : 'var(--accent)'}`,
                 borderRadius: '6px',
-                color: '#ffffff',
+                color: 'var(--text)',
                 fontSize: '20px',
                 fontWeight: 700,
                 textAlign: 'center',
@@ -171,10 +167,10 @@ export default function PhonePinEntry() {
 
       {/* Instructions */}
       <div style={{ textAlign: 'center' }}>
-        <p style={{ color: '#8888aa', fontSize: '14px', marginBottom: '8px' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '8px' }}>
           Enter the PIN to get started.
         </p>
-        <p style={{ color: '#555577', fontSize: '12px', fontStyle: 'italic' }}>
+        <p style={{ color: 'var(--text-dim)', fontSize: '12px', fontStyle: 'italic' }}>
           One PIN only, please. Get it? <span style={{ fontStyle: 'normal' }}>😉</span>
         </p>
       </div>
@@ -184,9 +180,9 @@ export default function PhonePinEntry() {
         onClick={handleSubmit}
         disabled={!pinComplete || status === 'checking'}
         style={{
-          background: pinComplete ? ACCENT : SURFACE,
-          color: pinComplete ? '#1a1a2e' : '#555577',
-          border: `2px solid ${pinComplete ? ACCENT : BORDER}`,
+          background: pinComplete ? 'var(--accent)' : 'var(--surface)',
+          color: pinComplete ? '#1a1a2e' : 'var(--text-dim)',
+          border: `2px solid ${pinComplete ? 'var(--accent)' : 'var(--border-light)'}`,
           borderRadius: '8px',
           padding: '14px 40px',
           fontSize: '16px',
@@ -216,8 +212,8 @@ export default function PhonePinEntry() {
           onClick={() => window.location.href = '/admin'}
           style={{
             background: 'transparent',
-            color: '#555577',
-            border: '1px solid #333355',
+            color: 'var(--text-dim)',
+            border: '1px solid var(--border-dim)',
             borderRadius: 6,
             padding: '5px 14px',
             fontSize: 11,
@@ -232,8 +228,8 @@ export default function PhonePinEntry() {
           onClick={() => window.location.href = '/kiosk'}
           style={{
             background: 'transparent',
-            color: '#555577',
-            border: '1px solid #333355',
+            color: 'var(--text-dim)',
+            border: '1px solid var(--border-dim)',
             borderRadius: 6,
             padding: '5px 14px',
             fontSize: 11,

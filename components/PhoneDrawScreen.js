@@ -4,9 +4,6 @@ import HandDisplay from './HandDisplay.js';
 import BowlingMarks from './BowlingMarks.js';
 import { CardRow } from './CardDisplay.js';
 
-const ACCENT = '#e8ff47';
-const SURFACE = '#2a2a45';
-
 const SUIT_NAMES = { '♠': 'Spades', '♥': 'Hearts', '♦': 'Diamonds', '♣': 'Clubs' };
 const RANK_DISPLAY = {'2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','T':'10','J':'J','Q':'Q','K':'K','A':'A'};
 const SUIT_SYMBOL = {'s':'♠','h':'♥','c':'♣','d':'♦'};
@@ -192,12 +189,12 @@ export default function PhoneDrawScreen({ player, session }) {
 
   const showSubmitButton = marks.frame === 10 && cardsAvailable === 0 && !isSubmitted && !isForfeited;
   const drawBtnDisabled = drawing || isInvalid || cardsAvailable === 0 || isSubmitted || isForfeited;
-  const drawBtnBg = queueCount > 0 ? '#ffcc00' : ACCENT;
+  const drawBtnBg = queueCount > 0 ? '#ffcc00' : 'var(--accent)';
 
   return (
     <div style={{
       height: '100dvh',
-      background: '#1a1a2e',
+      background: 'var(--bg)',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: 'system-ui, sans-serif',
@@ -208,7 +205,7 @@ export default function PhoneDrawScreen({ player, session }) {
         padding: '12px 14px',
         flexShrink: 0,
       }}>
-        <div style={{ color: '#ffffff', fontSize: 15, fontWeight: 600 }}>
+        <div style={{ color: 'var(--text)', fontSize: 15, fontWeight: 600 }}>
           {player.normalized_name}
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
@@ -220,9 +217,9 @@ export default function PhoneDrawScreen({ player, session }) {
                 key={g.id}
                 onClick={() => { if (isOpen) selectGame(g.id, i); }}
                 style={{
-                  background: isActive ? ACCENT : SURFACE,
-                  color: isActive ? '#1a1a2e' : '#aaaacc',
-                  border: `1px solid ${isActive ? ACCENT : '#5555aa'}`,
+                  background: isActive ? 'var(--accent)' : 'var(--surface)',
+                  color: isActive ? '#1a1a2e' : 'var(--text-muted)',
+                  border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
                   borderRadius: 6,
                   padding: '5px 10px',
                   fontSize: 11,
@@ -243,8 +240,8 @@ export default function PhoneDrawScreen({ player, session }) {
 
         {/* Inputs section — ONE card: steppers + divider + nudge + draw row */}
         <div style={{
-          background: '#2a2a45',
-          border: '1px solid #5555aa',
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
           borderRadius: 10,
           padding: 12,
           flexShrink: 0,
@@ -261,11 +258,11 @@ export default function PhoneDrawScreen({ player, session }) {
           {/* Draw row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 26, fontWeight: 700, color: '#e8ff47', lineHeight: 1 }}>
+              <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--accent)', lineHeight: 1 }}>
                 {isInvalid ? '—' : cardsAvailable}
               </div>
-              <div style={{ fontSize: 11, color: '#aaaacc' }}>Cards to draw now</div>
-              <div style={{ fontSize: 11, color: '#666688', marginTop: 1 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Cards to draw now</div>
+              <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 1 }}>
                 Already drawn: {playerState?.cards_drawn || 0}
               </div>
             </div>
@@ -275,7 +272,7 @@ export default function PhoneDrawScreen({ player, session }) {
                 disabled={drawBtnDisabled}
                 style={{
                   padding: '13px 18px',
-                  background: ACCENT,
+                  background: 'var(--accent)',
                   border: 'none',
                   borderRadius: 10,
                   fontSize: 15,
@@ -285,7 +282,7 @@ export default function PhoneDrawScreen({ player, session }) {
                   whiteSpace: 'nowrap',
                   cursor: drawBtnDisabled ? 'default' : 'pointer',
                   opacity: drawBtnDisabled ? 0.25 : 1,
-                  backgroundColor: drawBtnDisabled ? ACCENT : drawBtnBg,
+                  backgroundColor: drawBtnDisabled ? 'var(--accent)' : drawBtnBg,
                 }}
               >
                 Draw 🃏
@@ -296,7 +293,7 @@ export default function PhoneDrawScreen({ player, session }) {
             </div>
           </div>
           {dupMessage && (
-            <div style={{ fontSize: 11, color: '#ff6666', fontWeight: 600, textAlign: 'center', minHeight: 14, marginTop: 4 }}>
+            <div style={{ fontSize: 11, color: 'var(--danger)', fontWeight: 600, textAlign: 'center', minHeight: 14, marginTop: 4 }}>
               {dupMessage}
             </div>
           )}
@@ -336,8 +333,8 @@ export default function PhoneDrawScreen({ player, session }) {
                 Yes, submit my hand
               </button>
               <button onClick={() => setShowSubmitConfirm(false)}
-                style={{ flex: 1, background: '#2a2a45', color: '#ffffff',
-                  border: '1px solid #7777cc', borderRadius: 10, padding: '14px', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>
+                style={{ flex: 1, background: 'var(--surface)', color: 'var(--text)',
+                  border: '1px solid var(--border-light)', borderRadius: 10, padding: '14px', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>
                 Not yet
               </button>
             </div>
@@ -368,8 +365,8 @@ export default function PhoneDrawScreen({ player, session }) {
                 Yes, forfeit
               </button>
               <button onClick={() => setShowForfeitOverlay(false)}
-                style={{ flex: 1, background: '#2a2a45', color: '#ffffff',
-                  border: '1px solid #7777cc', borderRadius: 10, padding: '14px', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>
+                style={{ flex: 1, background: 'var(--surface)', color: 'var(--text)',
+                  border: '1px solid var(--border-light)', borderRadius: 10, padding: '14px', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>
                 Never mind
               </button>
             </div>
@@ -430,7 +427,7 @@ export default function PhoneDrawScreen({ player, session }) {
           onClick={() => setAnnouncementDismissed(true)}
           style={{
             position: 'fixed', inset: 0,
-            background: announcement.isRoyalFlush ? '#1a1000' : '#1a1a2e',
+            background: announcement.isRoyalFlush ? '#1a1000' : 'var(--bg)',
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
             zIndex: 1000, padding: 24, textAlign: 'center',
@@ -445,13 +442,13 @@ export default function PhoneDrawScreen({ player, session }) {
             Congratulations
           </div>
           <div style={{
-            color: announcement.isRoyalFlush ? '#ffd700' : '#ffffff',
+            color: announcement.isRoyalFlush ? '#ffd700' : 'var(--text)',
             fontSize: 42, fontWeight: 900, marginBottom: 6, lineHeight: 1.1,
           }}>
             {announcement.winners.join(' & ')}
           </div>
           <div style={{
-            color: announcement.isRoyalFlush ? '#ffd700' : '#e8ff47',
+            color: announcement.isRoyalFlush ? '#ffd700' : 'var(--accent)',
             fontSize: 18,
             fontWeight: announcement.isRoyalFlush ? 700 : 600,
             letterSpacing: announcement.isRoyalFlush ? 2 : 1,
@@ -496,13 +493,13 @@ export default function PhoneDrawScreen({ player, session }) {
           )}
           {!announcement.isRoyalFlush && (
             <>
-              <div style={{ fontSize: 12, color: '#666688', letterSpacing: 1,
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', letterSpacing: 1,
                 textTransform: 'uppercase', marginBottom: 6 }}>Game payout</div>
-              <div style={{ color: '#e8ff47', fontSize: 32, fontWeight: 700 }}>
+              <div style={{ color: 'var(--accent)', fontSize: 32, fontWeight: 700 }}>
                 ${announcement.payoutAmount?.toFixed(2)}
               </div>
               {announcement.isTie && (
-                <div style={{ color: '#ffaa44', fontSize: 13, marginBottom: 4 }}>Split payout</div>
+                <div style={{ color: 'var(--warning)', fontSize: 13, marginBottom: 4 }}>Split payout</div>
               )}
             </>
           )}
@@ -521,7 +518,7 @@ export default function PhoneDrawScreen({ player, session }) {
               </div>
             </>
           )}
-          <div style={{ fontSize: 11, color: announcement.isRoyalFlush ? '#7a4f00' : '#444466', marginTop: announcement.isRoyalFlush ? 20 : 24, letterSpacing: '0.5px' }}>Tap anywhere to dismiss</div>
+          <div style={{ fontSize: 11, color: announcement.isRoyalFlush ? '#7a4f00' : 'var(--border-dim)', marginTop: announcement.isRoyalFlush ? 20 : 24, letterSpacing: '0.5px' }}>Tap anywhere to dismiss</div>
         </div>
       )}
 

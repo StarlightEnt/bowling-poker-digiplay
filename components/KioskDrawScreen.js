@@ -4,9 +4,6 @@ import HandDisplay from './HandDisplay.js';
 import BowlingMarks from './BowlingMarks.js';
 import { CardRow } from './CardDisplay.js';
 
-const ACCENT = '#e8ff47';
-const SURFACE = '#2a2a45';
-const BORDER = '#7777cc';
 const INACTIVITY_SECONDS = 8;
 
 const SUIT_NAMES = { '♠': 'Spades', '♥': 'Hearts', '♦': 'Diamonds', '♣': 'Clubs' };
@@ -146,7 +143,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
   const isForfeited = playerState?.status === 'forfeited';
   const showSubmitButton = marks.frame === 10 && cardsAvailable === 0 && !isSubmitted && !isForfeited;
   const drawBtnDisabled = drawing || isInvalid || cardsAvailable === 0 || isSubmitted || isForfeited;
-  const drawBtnBg = queueCount > 0 ? '#ffcc00' : ACCENT;
+  const drawBtnBg = queueCount > 0 ? '#ffcc00' : 'var(--accent)';
 
   function handleDrawTap() {
     resetInactivity();
@@ -215,7 +212,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
       onClick={resetInactivity}
       style={{
         minHeight: '100vh',
-        background: '#1a1a2e',
+        background: 'var(--bg)',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: 'system-ui, sans-serif',
@@ -230,17 +227,17 @@ export default function KioskDrawScreen({ player, session, onBack }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div>
-            <div style={{ color: '#ffffff', fontSize: 18, fontWeight: 600 }}>
+            <div style={{ color: 'var(--text)', fontSize: 18, fontWeight: 600 }}>
               {player.normalized_name}
             </div>
-            <div style={{ color: '#444466', fontSize: 11, letterSpacing: 1 }}>
+            <div style={{ color: 'var(--border-dim)', fontSize: 11, letterSpacing: 1 }}>
               {session.seasonName} · Week {session.weekNumber} · Lane {player.lane}
             </div>
           </div>
           <button
             onClick={onBack}
             style={{
-              background: '#e8ff47',
+              background: 'var(--accent)',
               color: '#1a1a2e',
               border: 'none',
               borderRadius: 6,
@@ -261,9 +258,9 @@ export default function KioskDrawScreen({ player, session, onBack }) {
               <button key={g.id}
                 onClick={() => { if (isOpen) selectGame(g.id, i); }}
                 style={{
-                  background: isActive ? ACCENT : SURFACE,
-                  color: isActive ? '#1a1a2e' : '#aaaacc',
-                  border: `1px solid ${isActive ? ACCENT : '#5555aa'}`,
+                  background: isActive ? 'var(--accent)' : 'var(--surface)',
+                  color: isActive ? '#1a1a2e' : 'var(--text-muted)',
+                  border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
                   borderRadius: 6, padding: '6px 14px', fontSize: 12,
                   fontWeight: isActive ? 600 : 400,
                   opacity: isOpen ? 1 : 0.35,
@@ -292,12 +289,12 @@ export default function KioskDrawScreen({ player, session, onBack }) {
 
             {/* Section card — ONE card: bowling marks title + steppers + divider + nudge + draw row */}
             <div style={{
-              background: SURFACE,
-              border: '1px solid #5555aa',
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
               borderRadius: 10,
               padding: 14,
             }}>
-              <div style={{ fontSize: 10, color: '#666688', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
+              <div style={{ fontSize: 10, color: 'var(--text-dim)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
                 Bowling marks
               </div>
               <BowlingMarks
@@ -310,11 +307,11 @@ export default function KioskDrawScreen({ player, session, onBack }) {
               {/* Draw row */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 32, fontWeight: 700, color: '#e8ff47', lineHeight: 1 }}>
+                  <div style={{ fontSize: 32, fontWeight: 700, color: 'var(--accent)', lineHeight: 1 }}>
                     {isInvalid ? '—' : cardsAvailable}
                   </div>
-                  <div style={{ fontSize: 12, color: '#aaaacc', marginTop: 2 }}>Cards to draw</div>
-                  <div style={{ fontSize: 11, color: '#666688', marginTop: 1 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Cards to draw</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 1 }}>
                     Already drawn: {playerState?.cards_drawn || 0}
                   </div>
                 </div>
@@ -324,7 +321,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
                     disabled={drawBtnDisabled}
                     style={{
                       padding: '16px 24px',
-                      background: drawBtnDisabled ? ACCENT : drawBtnBg,
+                      background: drawBtnDisabled ? 'var(--accent)' : drawBtnBg,
                       border: 'none', borderRadius: 10,
                       fontSize: 18, fontWeight: 700,
                       color: '#1a1a2e',
@@ -343,7 +340,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
                 </div>
               </div>
               {dupMessage && (
-                <div style={{ fontSize: 12, color: '#ff6666', fontWeight: 600, textAlign: 'center', minHeight: 16, marginTop: 4 }}>
+                <div style={{ fontSize: 12, color: 'var(--danger)', fontWeight: 600, textAlign: 'center', minHeight: 16, marginTop: 4 }}>
                   {dupMessage}
                 </div>
               )}
@@ -355,15 +352,15 @@ export default function KioskDrawScreen({ player, session, onBack }) {
                 <button onClick={() => setShowSubmitConfirm(true)}
                   style={{
                     width: '100%', padding: 14,
-                    background: SURFACE, border: `2px solid ${BORDER}`,
-                    borderRadius: 10, color: '#ffffff',
+                    background: 'var(--surface)', border: '2px solid var(--border-light)',
+                    borderRadius: 10, color: 'var(--text)',
                     fontSize: 15, fontWeight: 600,
                     letterSpacing: '0.5px',
                     cursor: 'pointer',
                   }}>
                   Submit Hand for Game {activeGame?.game_number}
                 </button>
-                <div style={{ fontSize: 11, color: '#555577', textAlign: 'center', marginTop: 6 }}>
+                <div style={{ fontSize: 11, color: 'var(--text-dim)', textAlign: 'center', marginTop: 6 }}>
                   Frame 10 complete · all cards drawn
                 </div>
               </div>
@@ -405,17 +402,17 @@ export default function KioskDrawScreen({ player, session, onBack }) {
           style={{
             position: 'absolute', bottom: 0, left: 0, right: 0,
             background: 'rgba(0,0,0,0.75)',
-            borderTop: '1px solid #333355',
+            borderTop: '1px solid var(--border-dim)',
             padding: '10px 20px',
             textAlign: 'center',
-            fontSize: 13, color: '#aaaaaa',
+            fontSize: 13, color: 'var(--text-muted)',
             letterSpacing: '0.5px',
             cursor: 'pointer',
             zIndex: 50,
           }}
         >
           Returning to player list in{' '}
-          <span style={{ color: ACCENT, fontWeight: 700 }}>{inactivityCountdown}</span>
+          <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{inactivityCountdown}</span>
           ... — tap anywhere to stay
         </div>
       )}
@@ -442,8 +439,8 @@ export default function KioskDrawScreen({ player, session, onBack }) {
                 Yes, submit my hand
               </button>
               <button onClick={() => setShowSubmitConfirm(false)}
-                style={{ flex: 1, padding: 14, background: SURFACE, border: `1px solid ${BORDER}`,
-                  borderRadius: 10, color: '#ffffff', fontSize: 15, fontWeight: 500, cursor: 'pointer' }}>
+                style={{ flex: 1, padding: 14, background: 'var(--surface)', border: '1px solid var(--border-light)',
+                  borderRadius: 10, color: 'var(--text)', fontSize: 15, fontWeight: 500, cursor: 'pointer' }}>
                 Not yet
               </button>
             </div>
@@ -475,8 +472,8 @@ export default function KioskDrawScreen({ player, session, onBack }) {
                 Yes, forfeit
               </button>
               <button onClick={() => setShowForfeitOverlay(false)}
-                style={{ flex: 1, padding: 14, background: SURFACE, border: `1px solid ${BORDER}`,
-                  borderRadius: 10, color: '#ffffff', fontSize: 15, fontWeight: 500, cursor: 'pointer' }}>
+                style={{ flex: 1, padding: 14, background: 'var(--surface)', border: '1px solid var(--border-light)',
+                  borderRadius: 10, color: 'var(--text)', fontSize: 15, fontWeight: 500, cursor: 'pointer' }}>
                 Never mind
               </button>
             </div>
@@ -509,7 +506,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
       {announcement && !announcementDismissed && (
         <div style={{
           position: 'absolute', inset: 0, zIndex: 500,
-          background: announcement.isRoyalFlush ? '#1a1000' : '#1a1a2e',
+          background: announcement.isRoyalFlush ? '#1a1000' : 'var(--bg)',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
           padding: '40px 80px', cursor: 'pointer',
@@ -523,12 +520,12 @@ export default function KioskDrawScreen({ player, session, onBack }) {
             textTransform: 'uppercase', color: announcement.isRoyalFlush ? '#c9860a' : '#888899',
             marginBottom: 8 }}>Congratulations</div>
           <div style={{ fontSize: 56, fontWeight: 700,
-            color: announcement.isRoyalFlush ? '#ffd700' : '#ffffff',
+            color: announcement.isRoyalFlush ? '#ffd700' : 'var(--text)',
             marginBottom: 4, lineHeight: 1.1 }}>
             {announcement.winners.join(' & ')}
           </div>
           <div style={{
-            color: announcement.isRoyalFlush ? '#ffd700' : '#e8ff47',
+            color: announcement.isRoyalFlush ? '#ffd700' : 'var(--accent)',
             fontSize: announcement.isRoyalFlush ? 26 : 24,
             fontWeight: announcement.isRoyalFlush ? 700 : 600,
             letterSpacing: announcement.isRoyalFlush ? 2 : 1,
@@ -550,7 +547,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
                     width: 64, height: 90,
                     background: announcement.isRoyalFlush ? '#fff9e6' : '#ffffff',
                     borderRadius: 8,
-                    border: `2px solid ${announcement.isRoyalFlush ? '#ffd700' : '#e8ff47'}`,
+                    border: `2px solid ${announcement.isRoyalFlush ? '#ffd700' : 'var(--accent)'}`,
                     display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
                   }}>
@@ -571,9 +568,9 @@ export default function KioskDrawScreen({ player, session, onBack }) {
           )}
           {!announcement.isRoyalFlush && (
             <>
-              <div style={{ fontSize: 12, color: '#666688', letterSpacing: 1,
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', letterSpacing: 1,
                 textTransform: 'uppercase', marginBottom: 6 }}>Game payout</div>
-              <div style={{ fontSize: 44, fontWeight: 700, color: '#e8ff47' }}>
+              <div style={{ fontSize: 44, fontWeight: 700, color: 'var(--accent)' }}>
                 ${announcement.payoutAmount?.toFixed(2)}
               </div>
             </>
@@ -593,7 +590,7 @@ export default function KioskDrawScreen({ player, session, onBack }) {
               </div>
             </>
           )}
-          <div style={{ fontSize: 11, color: announcement.isRoyalFlush ? '#7a4f00' : '#444466', marginTop: announcement.isRoyalFlush ? 20 : 24, letterSpacing: '0.5px' }}>
+          <div style={{ fontSize: 11, color: announcement.isRoyalFlush ? '#7a4f00' : 'var(--border-dim)', marginTop: announcement.isRoyalFlush ? 20 : 24, letterSpacing: '0.5px' }}>
             Tap anywhere to dismiss
           </div>
         </div>

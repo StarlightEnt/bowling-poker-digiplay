@@ -1,10 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 
-const BG = '#1a1a2e';
-const SURFACE = '#2a2a45';
-const BORDER = '#7777cc';
-const ACCENT = '#e8ff47';
 const ERROR = '#e8192c';
 
 export default function KioskPinEntry({ onSuccess }) {
@@ -69,7 +65,7 @@ export default function KioskPinEntry({ onSuccess }) {
   return (
     <div style={{
       minHeight: '100vh',
-      background: BG,
+      background: 'var(--bg)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -77,12 +73,12 @@ export default function KioskPinEntry({ onSuccess }) {
       fontFamily: 'system-ui, sans-serif',
     }}>
       <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-        <div style={{ color: '#8888aa', fontSize: '18px', letterSpacing: '2px',
+        <div style={{ color: 'var(--text-muted)', fontSize: '18px', letterSpacing: '2px',
           textTransform: 'uppercase', marginBottom: '4px' }}>Welcome to</div>
-        <div style={{ color: '#ffffff', fontSize: '52px', fontWeight: 900, letterSpacing: '2px' }}>
+        <div style={{ color: 'var(--text)', fontSize: '52px', fontWeight: 900, letterSpacing: '2px' }}>
           Bowling Poker
         </div>
-        <div style={{ color: ACCENT, fontSize: '46px', fontWeight: 900, letterSpacing: '8px' }}>
+        <div style={{ color: 'var(--accent)', fontSize: '46px', fontWeight: 900, letterSpacing: '8px' }}>
           DIGIPLAY
         </div>
       </div>
@@ -115,10 +111,10 @@ export default function KioskPinEntry({ onSuccess }) {
               style={{
                 width: '48px',
                 height: '56px',
-                background: SURFACE,
-                border: `2px solid ${status === 'error' ? ERROR : BORDER}`,
+                background: 'var(--surface)',
+                border: `2px solid ${status === 'error' ? ERROR : 'var(--border-light)'}`,
                 borderRadius: '8px',
-                color: '#ffffff',
+                color: 'var(--text)',
                 fontSize: '24px',
                 fontWeight: 700,
                 textAlign: 'center',
@@ -129,10 +125,10 @@ export default function KioskPinEntry({ onSuccess }) {
         </div>
       </div>
 
-      <p style={{ color: '#8888aa', fontSize: '16px', marginBottom: '8px' }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: '16px', marginBottom: '8px' }}>
         Enter the PIN to get started.
       </p>
-      <p style={{ color: '#555577', fontSize: '13px', fontStyle: 'italic', marginBottom: '40px' }}>
+      <p style={{ color: 'var(--text-dim)', fontSize: '13px', fontStyle: 'italic', marginBottom: '40px' }}>
         One PIN only, please. Get it? <span style={{ fontStyle: 'normal' }}>😉</span>
       </p>
 
@@ -140,9 +136,9 @@ export default function KioskPinEntry({ onSuccess }) {
         onClick={handleSubmit}
         disabled={!pinComplete || status === 'checking'}
         style={{
-          background: pinComplete ? ACCENT : SURFACE,
-          color: pinComplete ? '#1a1a2e' : '#555577',
-          border: `2px solid ${pinComplete ? ACCENT : BORDER}`,
+          background: pinComplete ? 'var(--accent)' : 'var(--surface)',
+          color: pinComplete ? '#1a1a2e' : 'var(--text-dim)',
+          border: `2px solid ${pinComplete ? 'var(--accent)' : 'var(--border-light)'}`,
           borderRadius: '10px',
           padding: '18px 56px',
           fontSize: '20px',
