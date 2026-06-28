@@ -35,20 +35,31 @@ export async function GET(request) {
     ORDER BY dealt_at ASC
   `;
 
-  const legalPool = allCards.filter(c => c.status === 'legal').map(c => c.card_code);
+  const legalCards = allCards.filter(c => c.status === 'legal').map(c => c.card_code);
+  const best5Cards = allCards.filter(c => c.status === 'best5').map(c => c.card_code);
+  const alsoHeldCards = allCards.filter(c => c.status === 'also_held').map(c => c.card_code);
   const deadCards = allCards.filter(c => c.status === 'dead').map(c => c.card_code);
 
-  let handResult = { best5: [], alsoHeld: [], score: 0, name: 'No cards yet' };
-  if (legalPool.length >= 5) {
-    handResult = evaluateBestHand(legalPool);
-  } else if (legalPool.length > 0) {
-    handResult = { best5: legalPool, alsoHeld: [], score: 0, name: 'Not enough cards' };
+  let handResult;
+  if (best5Cards.length > 0) {
+    handResult = {
+      best5: best5Cards,
+      alsoHeld: alsoHeldCards,
+      score: state.best_hand_score || 0,
+      name: state.best_hand_name || 'Unknown',
+    };
+  } else if (legalCards.length >= 5) {
+    handResult = evaluateBestHand(legalCards);
+  } else if (legalCards.length > 0) {
+    handResult = { best5: legalCards, alsoHeld: [], score: 0, name: 'Not enough cards' };
+  } else {
+    handResult = { best5: [], alsoHeld: [], score: 0, name: 'No cards yet' };
   }
 
   return Response.json({
     state,
     hand: {
-      legalPool,
+      legalPool: legalCards,
       best5: sortForDisplay(handResult.best5),
       alsoHeld: sortByRankDesc(handResult.alsoHeld),
       deadCards: sortByRankDesc(deadCards),

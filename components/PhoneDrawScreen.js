@@ -169,7 +169,13 @@ export default function PhoneDrawScreen({ player, session }) {
     if (data.submitted) {
       setShowSubmitConfirm(false);
       await fetchState(activeGame.id);
-      await fetchGames();
+      const currentIndex = activeGameIndex;
+      const res2 = await fetch(`/api/play/games?sessionId=${session.id}&playerId=${player.id}`);
+      const data2 = await res2.json();
+      if (data2.games) {
+        setGames(data2.games);
+        setActiveGameIndex(currentIndex);
+      }
     }
   }
 
@@ -215,7 +221,7 @@ export default function PhoneDrawScreen({ player, session }) {
             return (
               <button
                 key={g.id}
-                onClick={() => { if (isOpen) selectGame(g.id, i); }}
+                onClick={() => selectGame(g.id, i)}
                 style={{
                   background: isActive ? 'var(--accent)' : 'var(--surface)',
                   color: isActive ? '#1a1a2e' : 'var(--text-muted)',
@@ -224,8 +230,8 @@ export default function PhoneDrawScreen({ player, session }) {
                   padding: '5px 10px',
                   fontSize: 11,
                   fontWeight: 600,
-                  opacity: isOpen ? 1 : 0.35,
-                  cursor: isOpen ? 'pointer' : 'default',
+                  opacity: isOpen ? 1 : 0.6,
+                  cursor: 'pointer',
                 }}
               >
                 Game {g.game_number}
