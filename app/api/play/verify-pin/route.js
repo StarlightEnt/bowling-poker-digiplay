@@ -17,9 +17,13 @@ export async function POST(request) {
       gs.week_number,
       gs.session_date,
       gs.progressive_pot,
-      l.display_name as league_name
+      l.display_name as league_name,
+      l.id as league_id,
+      ls.theme_background,
+      ls.theme_accent
     FROM game_sessions gs
     JOIN leagues l ON l.id = gs.league_id
+    LEFT JOIN league_settings ls ON ls.league_id = l.id
     WHERE TRIM(gs.pin) = ${pin}
       AND gs.locked = true
       AND gs.status = 'active'
@@ -39,6 +43,9 @@ export async function POST(request) {
       weekNumber: sessions[0].week_number,
       sessionDate: sessions[0].session_date,
       leagueName: sessions[0].league_name,
+      leagueId: sessions[0].league_id,
+      themeBackground: sessions[0].theme_background || '#1a1a2e',
+      themeAccent: sessions[0].theme_accent || '#e8ff47',
     },
   });
 }

@@ -2,6 +2,17 @@
 import { useState, useEffect } from 'react';
 import KioskPinEntry from '../../components/KioskPinEntry.js';
 import KioskPlayerList from '../../components/KioskPlayerList.js';
+import { getThemeTokens } from '../../lib/themes.js';
+
+function applyThemeTokens(themeBackground, themeAccent) {
+  const tokens = getThemeTokens(
+    themeBackground || '#1a1a2e',
+    themeAccent || '#e8ff47'
+  );
+  Object.entries(tokens).forEach(([key, val]) => {
+    document.documentElement.style.setProperty(key, val);
+  });
+}
 
 const BG = '#1a1a2e';
 const SURFACE = '#2a2a45';
@@ -29,6 +40,7 @@ export default function KioskPage() {
   }, []);
 
   function handleContinue() {
+    applyThemeTokens(savedSession.themeBackground, savedSession.themeAccent);
     setActiveSession(savedSession);
     setBootState('playerlist');
   }
@@ -40,6 +52,7 @@ export default function KioskPage() {
   }
 
   function handlePinSuccess(session) {
+    applyThemeTokens(session.themeBackground, session.themeAccent);
     localStorage.setItem('digiplay_kiosk_session', JSON.stringify(session));
     setActiveSession(session);
     setBootState('playerlist');

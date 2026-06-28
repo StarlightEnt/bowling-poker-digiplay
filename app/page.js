@@ -1,6 +1,17 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import PlayerNameSelect from '../components/PlayerNameSelect.js';
+import { getThemeTokens } from '../lib/themes.js';
+
+function applyThemeTokens(themeBackground, themeAccent) {
+  const tokens = getThemeTokens(
+    themeBackground || '#1a1a2e',
+    themeAccent || '#e8ff47'
+  );
+  Object.entries(tokens).forEach(([key, val]) => {
+    document.documentElement.style.setProperty(key, val);
+  });
+}
 
 const BG = '#1a1a2e';
 const SURFACE = '#2a2a45';
@@ -57,6 +68,7 @@ export default function PhonePinEntry() {
     const data = await res.json();
     if (data.valid) {
       setStatus('success');
+      applyThemeTokens(data.session.themeBackground, data.session.themeAccent);
       setSessionData(data.session);
     } else {
       setStatus('error');
