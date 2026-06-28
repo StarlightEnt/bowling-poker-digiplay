@@ -315,7 +315,7 @@ export default function AdminDashboard() {
           </h1>
           <div style={{ color: 'var(--text-dim)', fontSize: 11 }}>
             {session.season_name} · Week {session.week_number}
-            {activeGame && ` · Game ${activeGame.game_number} in progress`}
+            {activeGame && activeGame.status === 'open' && ` · Game ${activeGame.game_number} in progress`}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -327,7 +327,7 @@ export default function AdminDashboard() {
             color: 'var(--text)', cursor: 'pointer' }}>
             Export
           </button>
-          {activeGame && (
+          {activeGame && activeGame.status === 'open' && (
             <button onClick={() => router.push('/admin/advancement')} style={{ padding: '5px 11px', fontSize: 12, borderRadius: 6,
               border: 'none', background: 'var(--accent)',
               color: '#1a1a2e', fontWeight: 500, cursor: 'pointer' }}>
