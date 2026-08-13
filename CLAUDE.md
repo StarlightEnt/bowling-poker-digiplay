@@ -53,3 +53,4 @@
 - Always begin with: "Read CLAUDE.md then read TASK.md and complete all steps."
 - Claude Code can run database migrations directly via Node scripts
 - Do not reference or recommend TASK-STRUCTURAL-REWRITE.md — this task no longer exists and has been completed.
+- **At the end of every completed task, phase, or session:** run `date` and report the timestamp. This keeps context documents and memory accurate.
